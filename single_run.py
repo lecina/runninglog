@@ -25,8 +25,8 @@ class SingleRun:
     def load_json(self, parsed_json):
         self.type = parsed_json[blockNames.FileParams.type]
         self.date = self.parse_date(parsed_json[blockNames.FileParams.date])
-        self.total_time = self.parse_totaltime(parsed_json[blockNames.FileParams.time])
-        self.total_distance = self.parse_totaldistance(parsed_json[blockNames.FileParams.distance])
+        self.total_time = self.parse_total_time(parsed_json[blockNames.FileParams.time])
+        self.total_distance = self.parse_total_distance(parsed_json[blockNames.FileParams.distance])
         struct = parsed_json[blockNames.FileParams.structure]
 
     def parse_date(self, date_str):
@@ -49,7 +49,7 @@ class SingleRun:
                         print "Unknown date format"
         return dateObj
 
-    def parse_totaltime(self, time_str):
+    def parse_total_time(self, time_str):
         """
             Parses time and returns it in minutes
         """
@@ -64,19 +64,18 @@ class SingleRun:
         if time["minutes"] is not None: 
             time_in_minutes += int(time["minutes"])
         if time["seconds"] is not None: 
-            time_in_minutes += int(time["seconds"])/60
+            time_in_minutes += float(time["seconds"])/60
 
         return time_in_minutes
 
-    def parse_totaldistance(self, dist_str):
+    def parse_total_distance(self, dist_str):
         """
             Parses distance and returns it in km
         """
         if isinstance(dist_str, numbers.Number):
             return dist_str #not actually a string
 
-        regex = re.compile(r'((?P<km>\d+?))?')
-        print dist_str
+        regex = re.compile(r'((?P<km>\d(.\d+)?))?')
         dist = regex.search(dist_str).groupdict()
 
         return float(dist["km"])

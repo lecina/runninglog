@@ -58,6 +58,23 @@ class TestSingleRun(unittest.TestCase):
         parsed_time = singleRun.parse_total_time("1h30m30seg")
         self.assertEqual(parsed_time, 90.5)
 
+    def test_parse_pace(self):
+        singleRun = single_run.SingleRun()
+        parsed_time = singleRun.parse_pace("3:56")
+        self.assertEqual(parsed_time, 236)
+
+    def test_parse_pace2(self):
+        singleRun = single_run.SingleRun()
+        parsed_time = singleRun.parse_pace(240)
+        self.assertEqual(parsed_time, 240)
+
+    def test_compute_avg_pace(self):
+        singleRun = single_run.SingleRun()
+        singleRun.total_distance = 10
+        singleRun.total_time = 40
+        avg_pace = singleRun.compute_avg_pace()
+        self.assertEqual(avg_pace, 240)
+
 def main():
     return unittest.main(exit=False)
 

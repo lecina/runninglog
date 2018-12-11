@@ -4,9 +4,10 @@
     "time": "1h15min",
     "distance": 13.8,
     "climb": 110, 
+    "where":"Sant Cugat - Cerdanyola - Sant Cugat",
     "structure":{
-        "WU" : {"l" : 2.36},
-        "T" : {"l": 5.84, "p":"3:56", "where":"Sant Cugat - Cerdanyola - Sant Cugat"},
-        "CD" : {"l" : 2.2}
+        "WU" : {"distance" : 2.36},
+        "T" : {"distance": 5.84, "pace":"3:56"},
+        "CD" : {"distance" : 2.2}
     }
 }

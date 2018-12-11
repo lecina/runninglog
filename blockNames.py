@@ -5,8 +5,24 @@ class FileParams:
     distance = "distance"
     climb = "climb"
     structure = "structure"
+    pace = "pace"
+    where = "where"
 
-class Runtypes:
+class RunTypes:
+    type = "type"
+    E = "E"
+    LE = "LE"
+    M = "M"
+    T = "T" 
+    I = "I"
+    H = "H"
+    R = "R"
+    C = "C"
+    X = "X" 
+    WU = "WU"
+    CD = "CD"
+
+class RunTypesLongName:
     type = "type"
     E = "easy"
     LE = "long easy"

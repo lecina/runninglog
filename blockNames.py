@@ -7,6 +7,7 @@ class FileParams:
     structure = "structure"
     pace = "pace"
     where = "where"
+    notes = "notes"
 
 class RunTypes:
     type = "type"

@@ -1,4 +1,4 @@
-import blockNames
+from constants import blockNames
 
 class BASIC_RUN_TYPES:
     E, M, T, I, R, WU, CD = range(7)

@@ -1,6 +1,7 @@
+from single_run import single_run
+from single_run import runTypes
+
 import unittest
-import single_run
-import runTypes
 import datetime
 
 class TestSingleRun(unittest.TestCase):

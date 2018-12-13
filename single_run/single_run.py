@@ -1,8 +1,9 @@
-import blockNames
+from constants import blockNames
+import runTypes
+
 import datetime
 import re
 import numbers
-import runTypes
 import sys
 
 class SingleRun:

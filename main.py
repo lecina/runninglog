@@ -1,5 +1,5 @@
-import reader
-import single_run
+from reader import reader
+from single_run import single_run
 
 def load_single_run(filename):
     parsed_json = reader.read_file(filename)
@@ -9,8 +9,3 @@ def load_single_run(filename):
 
 if __name__ == "__main__":
     singleRun = load_single_run("data/test.json")
-
-    print singleRun.type
-    print singleRun.date
-    print singleRun.time
-    print singleRun.length

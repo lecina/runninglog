@@ -63,6 +63,29 @@ class SingleRun:
 
         return str_to_return
 
+    def as_dict(self):
+        rdict = {
+            blockNames.Colnames.type : self.type,
+            blockNames.Colnames.time : self.total_time,
+            blockNames.Colnames.distance : self.total_distance,
+            blockNames.Colnames.climb : self.climb,
+            blockNames.Colnames.avg_pace : self.avg_pace,
+            blockNames.Colnames.date : self.date,
+            blockNames.Colnames.where : self.where,
+            blockNames.Colnames.notes : self.notes,
+            blockNames.Colnames.distE : self.basic_dist[runTypes.BASIC_RUN_TYPES.E],
+            blockNames.Colnames.distM : self.basic_dist[runTypes.BASIC_RUN_TYPES.M],
+            blockNames.Colnames.distT : self.basic_dist[runTypes.BASIC_RUN_TYPES.T],
+            blockNames.Colnames.distI : self.basic_dist[runTypes.BASIC_RUN_TYPES.I],
+            blockNames.Colnames.distR : self.basic_dist[runTypes.BASIC_RUN_TYPES.R],
+            blockNames.Colnames.paceE : self.basic_pace[runTypes.BASIC_RUN_TYPES.E],
+            blockNames.Colnames.paceM : self.basic_pace[runTypes.BASIC_RUN_TYPES.M],
+            blockNames.Colnames.paceT : self.basic_pace[runTypes.BASIC_RUN_TYPES.T],
+            blockNames.Colnames.paceI : self.basic_pace[runTypes.BASIC_RUN_TYPES.I],
+            blockNames.Colnames.paceR : self.basic_pace[runTypes.BASIC_RUN_TYPES.R]
+        }
+        return rdict
+
     def load_json(self, parsed_json):
         parsed_json = dict((k.lower(), v) for k, v in parsed_json.iteritems())
 

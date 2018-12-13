@@ -1,5 +1,6 @@
 from single_run import single_run
 from single_run import runTypes
+from constants import blockNames
 
 import unittest
 import datetime
@@ -300,6 +301,41 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.WU], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.CD], None)
 
+    def test_as_dict(self):
+        singleRun = single_run.SingleRun()
+        singleRun.type="E"
+        singleRun.total_time=75
+        singleRun.total_distance=12
+        singleRun.climb=110
+        singleRun.avg_pace=375
+        singleRun.date = datetime.datetime.strptime("01/01/19", "%d/%m/%y")
+        singleRun.where = "Park"
+        singleRun.notes = "Good!"
+        singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E]=12
+        singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E]=375
+
+        golden_dict = {
+            blockNames.Colnames.type : "E",
+            blockNames.Colnames.time : 75, 
+            blockNames.Colnames.distance : 12, 
+            blockNames.Colnames.climb : 110,
+            blockNames.Colnames.avg_pace : 375,
+            blockNames.Colnames.date : datetime.datetime.strptime("01/01/19", "%d/%m/%y"),
+            blockNames.Colnames.where : "Park",
+            blockNames.Colnames.notes : "Good!",
+            blockNames.Colnames.distE : 12,
+            blockNames.Colnames.distM : 0, 
+            blockNames.Colnames.distT : 0,
+            blockNames.Colnames.distI : 0,
+            blockNames.Colnames.distR : 0,
+            blockNames.Colnames.paceE : 375,
+            blockNames.Colnames.paceM : None,
+            blockNames.Colnames.paceT : None,
+            blockNames.Colnames.paceI : None,
+            blockNames.Colnames.paceR : None
+        }
+
+        self.assertEqual(singleRun.as_dict(), golden_dict)
 
 
 def main():

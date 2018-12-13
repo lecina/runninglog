@@ -9,6 +9,26 @@ class FileParams:
     where = "where"
     notes = "notes"
 
+class Colnames:
+    type = "type"
+    date = "date"
+    time = "time"
+    distance = "distance"
+    avg_pace = "avg_pace"
+    climb = "climb"
+    where = "where"
+    notes = "notes"
+    distE = "distE"
+    distM = "distM"
+    distT = "distT"
+    distI = "distI"
+    distR = "distR"
+    paceE = "paceE"
+    paceM = "paceM"
+    paceT = "paceT"
+    paceI = "paceI"
+    paceR = "paceR"
+
 class RunTypes:
     type = "type"
     E = "E"

@@ -64,7 +64,6 @@ class RunningLog():
                 newdict = {}
                 newdict[constants.blockNames.FileParams.list] = [jsonFile]
                 with open(oname, "w") as json_file:
-                    print json.dumps(newdict)
                     json_file.write(json.dumps(newdict, indent=4, separators=(',', ' : ')))
                 print "Wrote new file:", oname
 

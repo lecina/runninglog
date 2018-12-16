@@ -38,8 +38,16 @@ class AllRuns():
                 #TODO: add json validator
                 sr = self.read_single_run(f) 
                 sr_ds = pd.Series(sr.as_dict())
-                self.df = self.df.append(sr_ds, ignore_index=True)
+            
+                if self.df.size == 0:
+                    already_added = False
+                else:
+                    already_added = sum((self.df.values==sr_ds.values).all(axis=1))
 
-                parsed_json_files.append((f,sr.date))
+                if already_added:
+                    print "Not adding already added move:", f
+                else:
+                    self.df = self.df.append(sr_ds, ignore_index=True)
+                    parsed_json_files.append((f,sr.date))
 
         return parsed_json_files

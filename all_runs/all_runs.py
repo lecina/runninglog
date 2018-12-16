@@ -28,6 +28,7 @@ class AllRuns():
             print "No files to read!"
             return
 
+        parsed_json_files = []
         for f in file_list:
             jsonFile = open(f, 'r').read()
             if jsonFile == constants.EMPTY_JSON:
@@ -38,3 +39,7 @@ class AllRuns():
                 sr = self.read_single_run(f) 
                 sr_ds = pd.Series(sr.as_dict())
                 self.df = self.df.append(sr_ds, ignore_index=True)
+
+                parsed_json_files.append((f,sr.date))
+
+        return parsed_json_files

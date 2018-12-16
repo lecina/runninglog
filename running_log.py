@@ -1,14 +1,22 @@
 from all_runs import all_runs
 from utilities import utilities
 from constants import constants
+from reader import reader
+
+import os.path
+import json
 
 class RunningLog():
-    def __init__(self, *args, **kwargs):
-        
+    def __init__(self):
         self.allRuns = all_runs.AllRuns()
-        if len(args) == 1:
-            directory = args[0]
-            self.allRuns.load_files_in_dir(directory)
+
+        self.output_dir = "../running_log_data/"
+        self.raw_json_output_dir = os.path.join(self.output_dir, "raw")
+
+    def load_files_in_directory(self, directory):
+        loaded_files = self.allRuns.load_files_in_dir(directory)
+        return loaded_files
+
 
     def generate_empty_json(self):
         fname_template = os.path.join(constants.TO_LOAD_FOLDER,
@@ -28,7 +36,37 @@ class RunningLog():
 
     def load_files_to_load(self):
         directory = constants.TO_LOAD_FOLDER
-        self.allRuns.load_files_in_dir(directory)
+        loaded_files = self.load_files_in_directory(directory)
+
+        utilities.make_dir(self.raw_json_output_dir)
+        for (fname, date) in loaded_files:
+            output_dir = os.path.join(self.raw_json_output_dir, str(date.year))
+            utilities.make_dir(output_dir)
+            output_fname = str(date.month) + ".json"
+            oname = os.path.join(output_dir, output_fname)
+
+            #append if exists
+            if os.path.isfile(oname):
+                #jsonFile = open(fname, 'r').read()
+                jsonFile = reader.read_file(fname)
+                outputJsonFile = reader.read_file(oname)
+                outputJsonFileList = outputJsonFile[constants.blockNames.FileParams.list]
+                if jsonFile in outputJsonFileList:
+                    print "Json has already been inserted!"
+                else:
+                    outputJsonFileList.append(jsonFile)
+                    #Better write and if correct, replace
+                    with open(oname, "w") as json_file:
+                        json_file.write(json.dumps(outputJsonFile, indent=4, separators=(',', ' : ')))
+            #create if doesn't
+            else:
+                jsonFile = reader.read_file(fname)
+                newdict = {}
+                newdict[constants.blockNames.FileParams.list] = [jsonFile]
+                with open(oname, "w") as json_file:
+                    print json.dumps(newdict)
+                    json_file.write(json.dumps(newdict, indent=4, separators=(',', ' : ')))
+                print "Wrote new file:", oname
 
 
 def main():

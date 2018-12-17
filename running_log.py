@@ -5,6 +5,15 @@ from reader import reader
 
 import os.path
 import json
+import argparse
+import types
+
+def parseArgs():
+    parser = argparse.ArgumentParser(description="Running log program.")
+    parser.add_argument("-t", "--template", action='store_true', help="Generate template file")
+    parser.add_argument("-l", "--load", type=str, default="", nargs='*', help="Directory to load")
+    args = parser.parse_args()
+    return args
 
 class RunningLog():
     def __init__(self):
@@ -16,7 +25,6 @@ class RunningLog():
     def load_files_in_directory(self, directory):
         loaded_files = self.allRuns.load_files_in_dir(directory)
         return loaded_files
-
 
     def generate_empty_json(self):
         fname_template = os.path.join(constants.TO_LOAD_FOLDER,
@@ -69,7 +77,21 @@ class RunningLog():
 
 
 def main():
-    allRuns = all_runs.AllRuns()
+    args = parseArgs()
+
+    rl = RunningLog()
+
+    if args.template:
+        print "Generating template"
+        rl.generate_empty_json()
+
+    if args.load==[]:
+        print "Loading files to load"
+        rl.load_files_to_load()
+    elif type(args.load) == list:
+        for directory in args.load:
+            print "Loading files in ", directory
+            rl.load_files_in_directory(directory)
 
 if __name__ == "__main__":
     main()

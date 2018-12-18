@@ -11,7 +11,12 @@ import types
 def parseArgs():
     parser = argparse.ArgumentParser(description="Running log program.")
     parser.add_argument("-t", "--template", action='store_true', help="Generate template file")
-    parser.add_argument("-l", "--load", type=str, default="", nargs='*', help="Directory to load")
+    parser.add_argument("-lj", "--load_json", type=str, default="", nargs='*', help="Directory to load")
+
+    parser.add_argument("-l", "--load_df", action='store_true', help="Load data frame existing data")
+
+    parser.add_argument("-ns", "--dont_save_df", action='store_true', help="Do not save the resulting data frame")
+
     args = parser.parse_args()
     return args
 
@@ -19,8 +24,22 @@ class RunningLog():
     def __init__(self):
         self.allRuns = all_runs.AllRuns()
 
+        #move to config file
         self.output_dir = "../running_log_data/"
         self.raw_json_output_dir = os.path.join(self.output_dir, "raw")
+
+        self.all_runs_output_dir = os.path.join(self.output_dir, "processed")
+        self.pickled_df_filename = "df.pkl"
+
+        self.fname = os.path.join(self.output_dir, self.all_runs_output_dir, self.pickled_df_filename)
+
+    def load_all_runs(self):
+        if os.path.isfile(self.fname):
+            self.allRuns.load_all_runs(self.fname)
+
+    def save_all_runs(self):
+        utilities.rm_file(self.fname)
+        self.allRuns.save_all_runs(self.fname)
 
     def load_files_in_directory(self, directory):
         loaded_files = self.allRuns.load_files_in_dir(directory)
@@ -82,16 +101,25 @@ def main():
     rl = RunningLog()
 
     if args.template:
-        print "Generating template"
+        print "Generating template\n"
         rl.generate_empty_json()
 
-    if args.load==[]:
-        print "Loading files to load"
+    if args.load_df:
+        rl.load_all_runs()
+
+    if args.load_json==[]:
+        print "Loading files to load\n"
         rl.load_files_to_load()
-    elif type(args.load) == list:
+    elif type(args.load_json) == list:
         for directory in args.load:
             print "Loading files in ", directory
             rl.load_files_in_directory(directory)
+        print ""
+
+    if args.dont_save_df != True:
+        print "Saving all runs"
+        rl.save_all_runs()
+    
 
 if __name__ == "__main__":
     main()

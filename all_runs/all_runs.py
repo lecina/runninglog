@@ -6,6 +6,7 @@ from utilities import utilities
 import os
 import fnmatch
 import pandas as pd
+import pickle
 
 class AllRuns():
     def __init__(self):
@@ -16,7 +17,6 @@ class AllRuns():
         singleRun = single_run.SingleRun()
         singleRun.load_json(parsed_json)
         return singleRun
-
 
     def load_files_in_dir(self, directory):
         file_list = []
@@ -51,3 +51,9 @@ class AllRuns():
                     parsed_json_files.append((f,sr.date))
 
         return parsed_json_files
+
+    def save_all_runs(self, fname):
+        self.df.to_pickle(fname)
+
+    def load_all_runs(self, fname):
+        self.df = pd.read_pickle(fname)

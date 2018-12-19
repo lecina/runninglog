@@ -116,7 +116,7 @@ def main():
             rl.load_files_in_directory(directory)
         print ""
 
-    if args.dont_save_df != True:
+    if args.load_df == True and args.dont_save_df != True:
         print "Saving all runs"
         rl.save_all_runs()
     

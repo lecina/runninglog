@@ -1,6 +1,6 @@
 from reader import reader
 from single_run import single_run
-from constants import constants
+from constants import constants, blockNames
 from utilities import utilities
 
 import os
@@ -13,10 +13,21 @@ class AllRuns():
         self.df = pd.DataFrame()
 
     def read_single_run(self, filename):
+        print "Reading", filename
+        #TODO: raise/catch exception
         parsed_json = reader.read_file(filename)
-        singleRun = single_run.SingleRun()
-        singleRun.load_json(parsed_json)
-        return singleRun
+
+        if blockNames.FileParams.list in parsed_json.keys():
+            singleRuns = []
+            for json_dir in parsed_json[blockNames.FileParams.list]:
+                singleRun = single_run.SingleRun()
+                singleRun.load_json(json_dir)
+                singleRuns.append(singleRun)
+            return singleRuns
+        else:
+            singleRun = single_run.SingleRun()
+            singleRun.load_json(parsed_json)
+            return singleRun
 
     def load_files_in_dir(self, directory):
         file_list = []
@@ -36,19 +47,23 @@ class AllRuns():
                 utilities.rm_file(f)
             else:
                 #TODO: add json validator
-                sr = self.read_single_run(f) 
-                sr_ds = pd.Series(sr.as_dict())
-            
-                if self.df.size == 0:
-                    already_added = False
-                else:
-                    already_added = sum((self.df.values==sr_ds.values).all(axis=1))
+                srs = self.read_single_run(f) 
+                if type(srs) is not list:
+                    srs = [srs]
+                
+                for sr in srs:
+                    sr_ds = pd.Series(sr.as_dict())
+                
+                    if self.df.size == 0:
+                        already_added = False
+                    else:
+                        already_added = sum((self.df.values==sr_ds.values).all(axis=1))
 
-                if already_added:
-                    print "Not adding already added move:", f
-                else:
-                    self.df = self.df.append(sr_ds, ignore_index=True)
-                    parsed_json_files.append((f,sr.date))
+                    if already_added:
+                        print "Not adding already added move:", f
+                    else:
+                        self.df = self.df.append(sr_ds, ignore_index=True)
+                        parsed_json_files.append((f,sr.date))
 
         return parsed_json_files
 

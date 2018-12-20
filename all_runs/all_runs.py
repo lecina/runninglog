@@ -39,7 +39,7 @@ class AllRuns():
             print "No files to read!"
             return
 
-        parsed_json_files = []
+        parsed_single_runs = []
         for f in file_list:
             jsonFile = open(f, 'r').read()
             if jsonFile == constants.EMPTY_JSON:
@@ -60,12 +60,14 @@ class AllRuns():
                         already_added = sum((self.df.values==sr_ds.values).all(axis=1))
 
                     if already_added:
-                        print "Not adding already added move:", f
+                        print "Not adding already added move:", sr.as_dict()
+                        print "in %s"%f
                     else:
                         self.df = self.df.append(sr_ds, ignore_index=True)
-                        parsed_json_files.append((f,sr.date))
+                        #parsed_json_files.append((f,sr.date))
+                        parsed_single_runs.append(sr)
 
-        return parsed_json_files
+        return parsed_single_runs
 
     def save_all_runs(self, fname):
         self.df.to_pickle(fname)

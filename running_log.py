@@ -63,19 +63,21 @@ class RunningLog():
 
     def load_files_to_load(self):
         directory = constants.TO_LOAD_FOLDER
-        loaded_files = self.load_files_in_directory(directory)
+        loaded_runs = self.load_files_in_directory(directory)
 
         utilities.make_dir(self.raw_json_output_dir)
-        for (fname, date) in loaded_files:
-            output_dir = os.path.join(self.raw_json_output_dir, str(date.year))
+        #for (fname, date) in loaded_files:
+        for srun in loaded_runs:
+            output_dir = os.path.join(self.raw_json_output_dir, str(srun.date.year))
             utilities.make_dir(output_dir)
-            output_fname = str(date.month) + ".json"
+            output_fname = str(srun.date.month) + ".json"
             oname = os.path.join(output_dir, output_fname)
 
             #append if exists
             if os.path.isfile(oname):
                 #jsonFile = open(fname, 'r').read()
-                jsonFile = reader.read_file(fname)
+                #jsonFile = reader.read_file(fname)
+                jsonFile = srun.orig_json_string
                 outputJsonFile = reader.read_file(oname)
                 outputJsonFileList = outputJsonFile[constants.blockNames.FileParams.list]
                 if jsonFile in outputJsonFileList:
@@ -87,7 +89,8 @@ class RunningLog():
                         json_file.write(json.dumps(outputJsonFile, indent=4, separators=(',', ' : ')))
             #create if doesn't
             else:
-                jsonFile = reader.read_file(fname)
+                #jsonFile = reader.read_file(fname)
+                jsonFile = srun.orig_json_string
                 newdict = {}
                 newdict[constants.blockNames.FileParams.list] = [jsonFile]
                 with open(oname, "w") as json_file:

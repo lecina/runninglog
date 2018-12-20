@@ -20,6 +20,7 @@ class SingleRun:
         self.where = None
 
         self.notes = ""
+        self.orig_json_string = ""
 
         #distances split over basic running types
         self.basic_dist = {}
@@ -87,6 +88,7 @@ class SingleRun:
         return rdict
 
     def load_json(self, parsed_json):
+        self.orig_json_string = parsed_json
         parsed_json = dict((k.lower(), v) for k, v in parsed_json.iteritems())
 
         #Compulsory

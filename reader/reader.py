@@ -18,4 +18,3 @@ def read_file(jsonParams):
     jsonFile = open(jsonParams, 'r').read()
     parsedJSON = json.loads(jsonFile)
     return parsedJSON
-

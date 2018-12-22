@@ -1,4 +1,5 @@
 from constants import blockNames
+from utilities import utilities
 import runTypes
 
 import datetime
@@ -28,6 +29,24 @@ class SingleRun:
         for k in runTypes.BASIC_RUN_TYPES_DICTIONARY.iterkeys():
             self.basic_dist[k] = 0 
             self.basic_pace[k] = None
+
+    def __eq__(self, other):
+        for (a,b) in zip(self.basic_dist, other.basic_dist):
+            if not utilities.isclose(a,b,abs_tol=1e-3):
+                return False
+
+        for (a,b) in zip(self.basic_pace, other.basic_pace):
+            if not utilities.isclose(a,b,abs_tol=1e-3):
+                return False
+
+        return self.type == other.type and\
+                self.total_time == other.total_time and\
+                utilities.isclose(self.total_distance, other.total_distance, abs_tol=1e-3) and\
+                self.climb == other.climb and\
+                utilities.isclose(self.avg_pace, other.avg_pace, abs_tol=1e-3) and\
+                self.date == other.date and\
+                self.where == other.where and\
+                self.notes == other.notes
 
     def __str__(self):
         str_to_return = ""

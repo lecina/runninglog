@@ -1,0 +1,25 @@
+{
+    "list" : [
+        {
+            "type": "T",
+            "date": "26-11-2018",
+            "time": "1h15min",
+            "distance": 13.8,
+            "climb": 110, 
+            "where":"Park",
+            "structure":{
+                "WU" : {"distance" : 2.36},
+                "T" : {"distance": 5.84, "pace":"3:56"},
+                "CD" : {"distance" : 2.2}
+            }
+        },
+        {
+            "type": "E",
+            "date": "27-11-2018",
+            "time": "1h",
+            "distance": 12.2,
+            "climb": 100, 
+            "where":"Park2"
+        }
+    ]
+}

@@ -12,8 +12,8 @@ class AllRuns():
     def __init__(self):
         self.df = pd.DataFrame()
 
-    def read_single_run(self, filename):
-        print "Reading", filename
+    def read_single_run(self, filename, verbose=True):
+        if verbose: print "Reading", filename
         #TODO: raise/catch exception
         parsed_json = reader.read_file(filename)
 
@@ -29,43 +29,56 @@ class AllRuns():
             singleRun.load_json(parsed_json)
             return singleRun
 
-    def load_files_in_dir(self, directory):
+    def append_single_run_if_not_present(self, sr):
+        sr_ds = pd.Series(sr.as_dict())
+    
+        if self.df.size == 0:
+            already_added = False
+        else:
+            already_added = sum((self.df.values==sr_ds.values).all(axis=1))
+
+        if not already_added:
+            self.df = self.df.append(sr_ds, ignore_index=True)
+
+        added_sr = not already_added
+        return added_sr
+
+    def get_json_files_in_subdirs(self, directory):
         file_list = []
         for root, dirnames, filenames in os.walk(directory):
             for filename in fnmatch.filter(filenames, '*.json'):
                 file_list.append(os.path.join(root, filename))
+        return file_list
+
+    def load_files_in_dir(self, directory, verbose=True):
+        file_list = self.get_json_files_in_subdirs(directory)
 
         if len(file_list) == 0:
-            print "No files to read!"
-            return
+            if verbose: 
+                print "No files to read!"
+            return []
 
         parsed_single_runs = []
         for f in file_list:
             jsonFile = open(f, 'r').read()
-            if jsonFile == constants.EMPTY_JSON:
-                print "Empty json file: \"%s\"!\nCleaning it up!!"%f
+            if jsonFile == constants.EMPTY_JSON or jsonFile == "":
+                if verbose: 
+                    print "Empty json file: \"%s\"!\nCleaning it up!!"%f
                 utilities.rm_file(f)
             else:
                 #TODO: add json validator
-                srs = self.read_single_run(f) 
+                srs = self.read_single_run(f, verbose) 
                 if type(srs) is not list:
                     srs = [srs]
                 
                 for sr in srs:
-                    sr_ds = pd.Series(sr.as_dict())
-                
-                    if self.df.size == 0:
-                        already_added = False
-                    else:
-                        already_added = sum((self.df.values==sr_ds.values).all(axis=1))
+                    added_sr = self.append_single_run_if_not_present(sr)
 
-                    if already_added:
+                    if added_sr:
+                        parsed_single_runs.append(sr)
+                    elif verbose==True:
                         print "Not adding already added move:", sr.as_dict()
                         print "in %s"%f
-                    else:
-                        self.df = self.df.append(sr_ds, ignore_index=True)
-                        #parsed_json_files.append((f,sr.date))
-                        parsed_single_runs.append(sr)
 
         return parsed_single_runs
 

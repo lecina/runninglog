@@ -31,12 +31,16 @@ class SingleRun:
             self.basic_pace[k] = None
 
     def __eq__(self, other):
-        for (a,b) in zip(self.basic_dist, other.basic_dist):
-            if not utilities.isclose(a,b,abs_tol=1e-3):
+        for (a,b) in zip(self.basic_dist.values(), other.basic_dist.values()):
+            if (a is not None and b is not None) and not utilities.isclose(a,b,abs_tol=1e-3):
+                return False
+            if (a is None and b is not None) or (a is not None and b is None):
                 return False
 
-        for (a,b) in zip(self.basic_pace, other.basic_pace):
-            if not utilities.isclose(a,b,abs_tol=1e-3):
+        for (a,b) in zip(self.basic_pace.values(), other.basic_pace.values()):
+            if (a is not None and b is not None) and not utilities.isclose(a,b,abs_tol=1e-3):
+                return False
+            if (a is None and b is not None) or (a is not None and b is None):
                 return False
 
         return self.type == other.type and\

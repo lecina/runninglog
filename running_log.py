@@ -31,13 +31,14 @@ class RunningLog():
         self.all_runs_output_dir = os.path.join(self.output_dir, "processed")
         self.pickled_df_filename = "df.pkl"
 
-        self.fname = os.path.join(self.output_dir, self.all_runs_output_dir, self.pickled_df_filename)
+        self.fname = os.path.join(self.all_runs_output_dir, self.pickled_df_filename)
 
     def load_all_runs(self):
         if os.path.isfile(self.fname):
             self.allRuns.load_all_runs(self.fname)
 
     def save_all_runs(self):
+        utilities.make_dir(self.all_runs_output_dir)
         utilities.rm_file(self.fname)
         self.allRuns.save_all_runs(self.fname)
 
@@ -122,7 +123,7 @@ def main():
     if args.load_df == True and args.dont_save_df != True:
         print "Saving all runs"
         rl.save_all_runs()
-    
+
 
 if __name__ == "__main__":
     main()

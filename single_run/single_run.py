@@ -89,7 +89,7 @@ class SingleRun:
 
     def as_dict(self):
         rdict = {
-            blockNames.Colnames.type : self.type,
+            blockNames.Colnames.type : runTypes.RUN_TYPES_DICTIONARY[self.type],
             blockNames.Colnames.time : self.total_time,
             blockNames.Colnames.distance : self.total_distance,
             blockNames.Colnames.climb : self.climb,
@@ -203,7 +203,7 @@ class SingleRun:
                         dateObj = datetime.datetime.strptime(date_str, fmt)
                     except ValueError:
                         sys.exit("Unknown date format")
-        return dateObj
+        return dateObj.date()
 
     def parse_total_time(self, time_str):
         """

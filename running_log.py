@@ -29,18 +29,21 @@ class RunningLog():
         self.raw_json_output_dir = os.path.join(self.output_dir, "raw")
 
         self.all_runs_output_dir = os.path.join(self.output_dir, "processed")
-        self.pickled_df_filename = "df.pkl"
+        self.pickled_df_filename = "df.%s"
 
         self.fname = os.path.join(self.all_runs_output_dir, self.pickled_df_filename)
 
     def load_all_runs(self):
-        if os.path.isfile(self.fname):
+        if os.path.isfile(self.fname%"pkl"):
             self.allRuns.load_all_runs(self.fname)
 
-    def save_all_runs(self):
+    def save_all_runs(self, ext="pkl"):
         utilities.make_dir(self.all_runs_output_dir)
-        utilities.rm_file(self.fname)
-        self.allRuns.save_all_runs(self.fname)
+        utilities.rm_file(self.fname%ext)
+        if ext=="pkl":
+            self.allRuns.save_all_runs(self.fname%ext)
+        elif ext=="csv":
+            self.allRuns.save_all_runs_as_csv(self.fname%ext)
 
     def load_files_in_directory(self, directory):
         loaded_files = self.allRuns.load_files_in_dir(directory)
@@ -122,7 +125,8 @@ def main():
 
     if args.load_df == True and args.dont_save_df != True:
         print "Saving all runs"
-        rl.save_all_runs()
+        rl.save_all_runs("pkl")
+        rl.save_all_runs("csv")
 
 
 if __name__ == "__main__":

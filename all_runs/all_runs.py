@@ -87,3 +87,9 @@ class AllRuns():
 
     def load_all_runs(self, fname):
         self.df = pd.read_pickle(fname)
+
+    def save_all_runs_as_csv(self, fname):
+        self.df.to_csv(fname, encoding='utf-8')
+
+    def load_all_runs_from_csv(self, fname):
+        self.df = pd.from_csv(fname)

@@ -3,8 +3,14 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import plotly.graph_objs as go
+import numpy as np
 
 df = pd.read_pickle("../../running_log_data/processed/df.pkl")
+df.date = pd.to_datetime(df.date)
+
+years = df.date.dt.year
+year_marks={str(year): str(year) for year in np.hstack([years.unique(), [years.max()+1]])}
+year_marks[str(years.max()+1)] = 'All'
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -14,6 +20,50 @@ available_cols = list(df.columns)
 
 app.layout = html.Div([
     html.Div([
+        html.Div([
+            html.Div([dcc.Markdown('''Choose date:''')], style={'padding':'0px 0px 0px 10px'}),
+            html.Div([
+                dcc.Slider(
+                    id='year--slider',
+                    min=df.date.dt.year.min(),
+                    max=df.date.dt.year.max()+1,
+                    value=df.date.dt.year.max()+1,
+                    step=1,
+                    marks=year_marks,
+                    included=False
+                )], style={'width': '49%', 'display': 'inline-block', 'padding': '0px 0px 0px 20px'}),
+            html.Div([
+                dcc.DatePickerRange(
+                    id='date-picker-range',
+                    start_date=df.date.min(),
+                    end_date=df.date.max(),
+                    first_day_of_week=1,
+                    display_format = "D/M/YYYY")
+            ], style={  
+                        'width': '35%', 
+                        'float': 'right', 
+                        'display': 'inline-block', 
+                        'align-items': 'center',
+                        'padding': '0px 0px 0px 0px'
+                    })
+            ]),
+        html.Div([
+            dcc.Markdown('''Choose type:'''),
+            dcc.Dropdown(
+                id='type-dropdown',
+                options=[
+                    {'label': 'Easy pace', 'value': 'E'}, #todo: read it from runTypes
+                    {'label': u'Threshold', 'value': 'T'},
+                    {'label': 'Interval', 'value': 'I'},
+                    {'label': 'Repetitions', 'value': 'R'},
+                    {'label': 'Race', 'value': 'C'},
+                    {'label': 'Cross training', 'value': 'X'}
+                ],
+                value=['E', 'T', 'I', 'R', 'C'],
+                multi = True
+            )], style={'padding':'20px 10px 10px 10px'})
+    ]),
+    html.Div([
 
         html.Div([
             dcc.Dropdown(
@@ -21,14 +71,14 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in available_cols],
                 value='time'
             ),
-            dcc.RadioItems(
+            dcc.Checklist(
                 id='xaxis-type',
-                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                value='Linear',
+                options=[ {'label': 'Log', 'value': 'Log'},],
+                values=[],
                 labelStyle={'display': 'inline-block'}
             )
         ],
-        style={'width': '48%', 'display': 'inline-block'}),
+        style={'width': '49%', 'display': 'inline-block', 'padding':'0px 0px 0px 10px'}),
 
         html.Div([
             dcc.Dropdown(
@@ -36,29 +86,15 @@ app.layout = html.Div([
                 options=[{'label': i, 'value': i} for i in available_cols],
                 value='distance'
             ),
-            dcc.RadioItems(
+            dcc.Checklist(
                 id='yaxis-type',
-                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                value='Linear',
+                options=[ {'label': 'Log', 'value': 'Log'},],
+                values=[],
                 labelStyle={'display': 'inline-block'}
             )
-        ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
-    ]),
-    html.Label('Multi-Select Dropdown'),
-    dcc.Dropdown(
-        id='type-dropdown',
-        options=[
-            {'label': 'Easy pace', 'value': 'E'}, #todo: read it from runTypes
-            {'label': u'Threshold', 'value': 'T'},
-            {'label': 'Interval', 'value': 'I'},
-            {'label': 'Repetitions', 'value': 'R'},
-            {'label': 'Race', 'value': 'C'},
-            {'label': 'Cross training', 'value': 'X'}
-        ],
-        value=['E', 'T', 'I', 'R', 'C'],
-        multi = True
-    ),
+        ],style={'width': '49%', 'float': 'right', 'display': 'inline-block'}),
     dcc.Graph(id='graph-with-dropdown')
+    ], style = {'width' : '50%'})
 ])
 
 
@@ -66,17 +102,34 @@ app.layout = html.Div([
     dash.dependencies.Output('graph-with-dropdown', 'figure'),
     [dash.dependencies.Input('xaxis-column', 'value'),
      dash.dependencies.Input('yaxis-column', 'value'),
-     dash.dependencies.Input('xaxis-type', 'value'),
-     dash.dependencies.Input('yaxis-type', 'value'),
-     dash.dependencies.Input('type-dropdown', 'value')])
+     dash.dependencies.Input('xaxis-type', 'values'),
+     dash.dependencies.Input('yaxis-type', 'values'),
+     dash.dependencies.Input('type-dropdown', 'value'),
+     dash.dependencies.Input('year--slider', 'value'),
+     dash.dependencies.Input('date-picker-range', 'start_date'),
+     dash.dependencies.Input('date-picker-range', 'end_date')])
 def update_figure(xaxis_column_name, yaxis_column_name,
                  xaxis_type, yaxis_type,
-                 selected_types):
+                 selected_types, chosen_year,
+                 start_date, end_date):
+
+    if chosen_year == df.date.dt.year.max()+1:
+        filt_df = df
+    else:
+        filt_df = df[df.date.dt.year == chosen_year]
+
+    filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
+
+    xaxis_dict = {'title':xaxis_column_name}
+    if xaxis_type == ['Log']: xaxis_dict['type'] = 'log'
+    yaxis_dict = {'title':yaxis_column_name}
+    if yaxis_type == ['Log']: yaxis_dict['type'] = 'log'
+
     traces = [
                 go.Scatter(
-                    x=df[df['type'] == i][xaxis_column_name],
-                    y=df[df['type'] == i][yaxis_column_name],
-                    text=df[df['type'] == i]['date'],
+                    x=filt_df[filt_df['type'] == i][xaxis_column_name],
+                    y=filt_df[filt_df['type'] == i][yaxis_column_name],
+                    text=filt_df[filt_df['type'] == i]['date'],
                     mode='markers',
                     opacity=0.5,
                     marker={
@@ -90,8 +143,8 @@ def update_figure(xaxis_column_name, yaxis_column_name,
     return {
         'data': traces,
         'layout': go.Layout(
-            xaxis={'title': xaxis_column_name, 'type': 'linear' if xaxis_type == 'Linear' else 'log'},
-            yaxis={'title': yaxis_column_name, 'type': 'linear' if yaxis_type == 'Linear' else 'log'},
+            xaxis=xaxis_dict,
+            yaxis=yaxis_dict,
             margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
             legend={'x': 0, 'y': 1},
             hovermode='closest'

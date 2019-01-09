@@ -168,7 +168,7 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.notes, "Feeling good!")
 
-        dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y")
+        dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
         self.assertAlmostEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E], 7.96, 2)
@@ -205,7 +205,7 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.where, "")
 
-        dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y")
+        dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E], 15.0)
@@ -242,7 +242,7 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.where, "")
 
-        dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y")
+        dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E], 15.0)
@@ -282,7 +282,7 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.where, "")
 
-        dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y")
+        dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E], 0)
@@ -303,24 +303,24 @@ class TestSingleRun(unittest.TestCase):
 
     def test_as_dict(self):
         singleRun = single_run.SingleRun()
-        singleRun.type="E"
+        singleRun.type=runTypes.RUN_TYPES.E
         singleRun.total_time=75
         singleRun.total_distance=12
         singleRun.climb=110
         singleRun.avg_pace=375
-        singleRun.date = datetime.datetime.strptime("01/01/19", "%d/%m/%y")
+        singleRun.date = datetime.datetime.strptime("01/01/19", "%d/%m/%y").date()
         singleRun.where = "Park"
         singleRun.notes = "Good!"
         singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E]=12
         singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E]=375
 
         golden_dict = {
-            blockNames.Colnames.type : "E",
+            blockNames.Colnames.type : runTypes.RUN_TYPES_DICTIONARY[runTypes.RUN_TYPES.E],
             blockNames.Colnames.time : 75, 
             blockNames.Colnames.distance : 12, 
             blockNames.Colnames.climb : 110,
             blockNames.Colnames.avg_pace : 375,
-            blockNames.Colnames.date : datetime.datetime.strptime("01/01/19", "%d/%m/%y"),
+            blockNames.Colnames.date : datetime.datetime.strptime("01/01/19", "%d/%m/%y").date(),
             blockNames.Colnames.where : "Park",
             blockNames.Colnames.notes : "Good!",
             blockNames.Colnames.distE : 12,

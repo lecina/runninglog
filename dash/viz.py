@@ -5,6 +5,8 @@ import pandas as pd
 import plotly.graph_objs as go
 import numpy as np
 
+from constants import blockNames
+
 df = pd.read_pickle("../../running_log_data/processed/df.pkl")
 df.date = pd.to_datetime(df.date)
 
@@ -16,8 +18,26 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+runType_order = [blockNames.RunTypes.E, 
+                 blockNames.RunTypes.M,
+                 blockNames.RunTypes.T,
+                 blockNames.RunTypes.I,
+                 blockNames.RunTypes.R,
+                 blockNames.RunTypes.C,
+                 blockNames.RunTypes.X]
+available_run_types = [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
+
+basicRunning_types = [blockNames.RunTypes.E, 
+                     blockNames.RunTypes.M,
+                     blockNames.RunTypes.T,
+                     blockNames.RunTypes.I,
+                     blockNames.RunTypes.R,
+                     blockNames.RunTypes.X]
+
 available_cols = list(df.columns)
 available_cols.append('week')
+
+time_agg_options = ['day', 'week', 'month', 'year']
 
 app.layout = html.Div([
     html.Div([
@@ -52,15 +72,8 @@ app.layout = html.Div([
             #dcc.Markdown('''Choose type:'''),
             dcc.Dropdown(
                 id='type-dropdown',
-                options=[
-                    {'label': 'Easy pace', 'value': 'E'}, #todo: read it from runTypes
-                    {'label': u'Threshold', 'value': 'T'},
-                    {'label': 'Interval', 'value': 'I'},
-                    {'label': 'Repetitions', 'value': 'R'},
-                    {'label': 'Race', 'value': 'C'},
-                    {'label': 'Cross training', 'value': 'X'}
-                ],
-                value=['E', 'T', 'I', 'R', 'C'],
+                options=available_run_types,
+                value=[blockNames.RunTypes.E, blockNames.RunTypes.T, blockNames.RunTypes.I, blockNames.RunTypes.R, blockNames.RunTypes.C, blockNames.RunTypes.X],
                 multi = True
             )], style={'padding':'20px 10px 10px 10px'})
     ]),
@@ -115,8 +128,8 @@ app.layout = html.Div([
         html.Div([
             dcc.Dropdown(
                 id='xaxis-column2',
-                options=[{'label': i, 'value': i} for i in available_cols],
-                value='date'
+                options=[{'label': i, 'value': i} for i in time_agg_options],
+                value='day'
             ),
             dcc.Checklist(
                 id='xaxis-type2',
@@ -190,19 +203,21 @@ def update_figure(xaxis_column_name, yaxis_column_name,
      dash.dependencies.Input('yaxis-column2', 'value'),
      dash.dependencies.Input('xaxis-type2', 'values'),
      dash.dependencies.Input('yaxis-type2', 'values'),
-     #dash.dependencies.Input('type-dropdown', 'value'),
+     dash.dependencies.Input('type-dropdown', 'value'),
      dash.dependencies.Input('year--slider', 'value'),
      dash.dependencies.Input('date-picker-range', 'start_date'),
      dash.dependencies.Input('date-picker-range', 'end_date')])
 def update_figure(xaxis_column_name, yaxis_column_name,
                  xaxis_type, yaxis_type,
-                 chosen_year,
+                 dropdown_types, chosen_year,
                  start_date, end_date):
 
     if chosen_year == df.date.dt.year.max()+1:
         filt_df = df
     else:
         filt_df = df[df.date.dt.year == chosen_year]
+
+    filt_df = filt_df[filt_df.type.isin(dropdown_types)]
 
     filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
 
@@ -211,16 +226,28 @@ def update_figure(xaxis_column_name, yaxis_column_name,
     yaxis_dict = {'title':yaxis_column_name}
     if yaxis_type == ['Log']: yaxis_dict['type'] = 'log'
 
-    #TODO:move code
+    #TODO:move code outside callback
+    #TODO:generalize beyond distance
+    if xaxis_column_name == 'day':
+        xaxis_column_name = 'date'
+
+    distance_template = 'dist%s'
+    basicDistances = [distance_template%bt for bt in basicRunning_types]
+    basicDistances.extend(['distance', 'date'])
     if xaxis_column_name == 'week' or yaxis_column_name == 'week':
-        filt_df['week'] = filt_df.date.apply(lambda x: x.isocalendar()[1])
-        filt_df = filt_df[:][['distance', 'distE', 'distM', 'distT', 'distI', 'distR']].groupby(filt_df['week']).sum()
+        filt_df = filt_df[:][basicDistances].resample('W', on='date').sum()
         filt_df['week'] = filt_df.index
-        print filt_df
+    elif xaxis_column_name == 'month' or yaxis_column_name == 'month':
+        filt_df = filt_df[:][basicDistances].resample('MS', on='date').sum()
+        filt_df['month'] = filt_df.index
+    elif xaxis_column_name == 'year' or yaxis_column_name == 'year':
+        filt_df = filt_df[:][basicDistances].resample('YS', on='date').sum()
+        filt_df['year'] = filt_df.index
+
+    selected_basicRunning_types = [t for t in basicRunning_types if t in dropdown_types]
 
 
     if yaxis_column_name == 'distance':
-        types = ['E', 'M', 'T', 'I', 'R']
         distance_template = 'dist%s'
         traces = [
                     go.Bar(
@@ -231,7 +258,7 @@ def update_figure(xaxis_column_name, yaxis_column_name,
                         opacity=0.5,
                         #marker={ 'size': 15, 'line': {'width': 0.5, 'color': 'white'} },
                         name=i
-                    ) for i in types 
+                    ) for i in selected_basicRunning_types
         ]
     else:
         traces = [

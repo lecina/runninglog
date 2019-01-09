@@ -24,16 +24,17 @@ class Colnames:
     distT = "distT"
     distI = "distI"
     distR = "distR"
+    distX = "distX"
     paceE = "paceE"
     paceM = "paceM"
     paceT = "paceT"
     paceI = "paceI"
     paceR = "paceR"
+    paceX = "paceX"
 
 class RunTypes:
     type = "type"
     E = "E"
-    LE = "LE"
     M = "M"
     T = "T" 
     I = "I"
@@ -44,14 +45,12 @@ class RunTypes:
     WU = "WU"
     CD = "CD"
 
-class RunTypesLongName:
-    type = "type"
-    E = "easy"
-    LE = "long easy"
-    M = "marathon pace"
-    T = "threshold pace" 
-    I = "intervals"
-    H = "hard"
-    R = "repetitions"
-    C = "carrera"
-    X = "cross training" 
+RUN_TYPES_LONG_NAME_DICTIONARY = {
+    RunTypes.E : "Easy pace",
+    RunTypes.M : "Marathon pace",
+    RunTypes.T : "Threshold",
+    RunTypes.I : "Intervals",
+    RunTypes.R : "Repetitions",
+    RunTypes.C : "Race",
+    RunTypes.X : "Cross-training(Mountaineering)"
+}

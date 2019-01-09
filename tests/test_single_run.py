@@ -245,21 +245,23 @@ class TestSingleRun(unittest.TestCase):
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
-        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E], 15.0)
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E], 0)
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M], 0)
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T], 0)
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I], 0)
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R], 0)
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.WU], 0)
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.CD], 0)
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.X], 15.0)
 
-        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E], 300.0)
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.I], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.R], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.WU], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.CD], None)
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.X], 300.0)
 
     def test_load_json4(self):
         singleRun = single_run.SingleRun()
@@ -328,11 +330,13 @@ class TestSingleRun(unittest.TestCase):
             blockNames.Colnames.distT : 0,
             blockNames.Colnames.distI : 0,
             blockNames.Colnames.distR : 0,
+            blockNames.Colnames.distX : 0,
             blockNames.Colnames.paceE : 375,
             blockNames.Colnames.paceM : None,
             blockNames.Colnames.paceT : None,
             blockNames.Colnames.paceI : None,
-            blockNames.Colnames.paceR : None
+            blockNames.Colnames.paceR : None,
+            blockNames.Colnames.paceX : None
         }
 
         self.assertEqual(singleRun.as_dict(), golden_dict)

@@ -18,7 +18,10 @@ class SingleRun:
         self.avg_pace = None #sec
 
         self.date = None
+
         self.where = None
+        #TODO: add route
+        #self.route = None
 
         self.notes = ""
         self.orig_json_string = ""
@@ -102,11 +105,13 @@ class SingleRun:
             blockNames.Colnames.distT : self.basic_dist[runTypes.BASIC_RUN_TYPES.T],
             blockNames.Colnames.distI : self.basic_dist[runTypes.BASIC_RUN_TYPES.I],
             blockNames.Colnames.distR : self.basic_dist[runTypes.BASIC_RUN_TYPES.R],
+            blockNames.Colnames.distX : self.basic_dist[runTypes.BASIC_RUN_TYPES.X],
             blockNames.Colnames.paceE : self.basic_pace[runTypes.BASIC_RUN_TYPES.E],
             blockNames.Colnames.paceM : self.basic_pace[runTypes.BASIC_RUN_TYPES.M],
             blockNames.Colnames.paceT : self.basic_pace[runTypes.BASIC_RUN_TYPES.T],
             blockNames.Colnames.paceI : self.basic_pace[runTypes.BASIC_RUN_TYPES.I],
-            blockNames.Colnames.paceR : self.basic_pace[runTypes.BASIC_RUN_TYPES.R]
+            blockNames.Colnames.paceR : self.basic_pace[runTypes.BASIC_RUN_TYPES.R],
+            blockNames.Colnames.paceX : self.basic_pace[runTypes.BASIC_RUN_TYPES.X]
         }
         return rdict
 
@@ -279,11 +284,12 @@ class SingleRun:
             to be set beforehand
         """
         dictkey = 0
-        if self.type in runTypes.BASIC_RUN_TYPES_DICTIONARY.values():
+
+        type_val = runTypes.RUN_TYPES_DICTIONARY[self.type]
+        if type_val in runTypes.BASIC_RUN_TYPES_DICTIONARY.values():
             for (k1,v1) in runTypes.BASIC_RUN_TYPES_DICTIONARY.iteritems():
-                if key==v1: 
+                if type_val==v1: 
                     dictkey = k1
-            self.basic_dist[dictkey] = self.total_distance
         else:
             dictkey = runTypes.BASIC_RUN_TYPES.E
 
@@ -300,8 +306,6 @@ class SingleRun:
         #grouping into basic run types 
         self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.basic_dist[runTypes.BASIC_RUN_TYPES.WU]
         self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.basic_dist[runTypes.BASIC_RUN_TYPES.CD]
-        #TODO: add as different running type?
-        #self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.basic_dist[runTypes.RUN_TYPES.X] 
 
         self.basic_dist[runTypes.BASIC_RUN_TYPES.WU] = 0
         self.basic_dist[runTypes.BASIC_RUN_TYPES.CD] = 0

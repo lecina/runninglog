@@ -18,7 +18,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.climb = 110
         goldenSingleRun.avg_pace = 326.087
         goldenSingleRun.where = "Park"
-        goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y")
+        goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 7.96
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
@@ -43,7 +43,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.climb = 100
         goldenSingleRun.avg_pace = 295.081967213 
         goldenSingleRun.where = "Park2"
-        goldenSingleRun.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y")
+        goldenSingleRun.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y").date()
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 12.2
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 0
@@ -68,7 +68,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.climb = 110
         goldenSingleRun.avg_pace = 326.087
         goldenSingleRun.where = "Park"
-        goldenSingleRun.date = datetime.datetime.strptime("26/12/2018", "%d/%m/%Y")
+        goldenSingleRun.date = datetime.datetime.strptime("26/12/2018", "%d/%m/%Y").date()
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 7.96
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
@@ -87,7 +87,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.climb = 100
         goldenSingleRun2.avg_pace = 295.082
         goldenSingleRun2.where = "Park2"
-        goldenSingleRun2.date = datetime.datetime.strptime("27/12/2018", "%d/%m/%Y")
+        goldenSingleRun2.date = datetime.datetime.strptime("27/12/2018", "%d/%m/%Y").date()
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 12.2
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 0
@@ -166,7 +166,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.climb = 110
         goldenSingleRun.avg_pace = 326.086957
         goldenSingleRun.where = "Park"
-        goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y")
+        goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 7.96
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
@@ -185,7 +185,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.climb = 100
         goldenSingleRun2.avg_pace = 295.081967213
         goldenSingleRun2.where = "Park2"
-        goldenSingleRun2.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y")
+        goldenSingleRun2.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y").date()
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 12.2
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 0

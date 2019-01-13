@@ -25,6 +25,18 @@ runType_order = [blockNames.RunTypes.E,
                  blockNames.RunTypes.R,
                  blockNames.RunTypes.C,
                  blockNames.RunTypes.X]
+colors = [  '#1f77b4', # muted blue
+            '#ff7f0e', # safety orange
+            '#2ca02c', # cooked asparagus green
+            '#d62728', # brick red
+            '#9467bd', # muted purple
+            '#8c564b', # chestnut brown
+            #'#e377c2', # raspberry yogurt pink
+            #'#7f7f7f', # middle gray
+            #'#bcbd22', # curry yellow-green
+            '#17becf'] # blue-teal
+runTypesToColors = {runType_order[i]:colors[i] for i in range(len(runType_order))}
+
 available_run_types = [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
 
 basicRunning_types = [blockNames.RunTypes.E, 
@@ -42,7 +54,6 @@ time_agg_options = ['day', 'week', 'month', 'year']
 app.layout = html.Div([
     html.Div([
         html.Div([
-            #html.Div([dcc.Markdown('''Choose date:''')], style={'padding':'0px 0px 0px 10px'}),
             html.Div([
                 dcc.Slider(
                     id='year--slider',
@@ -69,11 +80,10 @@ app.layout = html.Div([
                     })
             ]),
         html.Div([
-            #dcc.Markdown('''Choose type:'''),
             dcc.Dropdown(
                 id='type-dropdown',
                 options=available_run_types,
-                value=[blockNames.RunTypes.E, blockNames.RunTypes.T, blockNames.RunTypes.I, blockNames.RunTypes.R, blockNames.RunTypes.C, blockNames.RunTypes.X],
+                value=[blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.E],
                 multi = True
             )], style={'padding':'20px 10px 10px 10px'})
     ]),
@@ -129,13 +139,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='xaxis-column2',
                 options=[{'label': i, 'value': i} for i in time_agg_options],
-                value='day'
-            ),
-            dcc.Checklist(
-                id='xaxis-type2',
-                options=[ {'label': 'Log', 'value': 'Log'},],
-                values=[],
-                labelStyle={'display': 'inline-block'}
+                value='week'
             )
         ],style={'width': '49%', 'float': 'right', 'display': 'inline-block'}),
     dcc.Graph(id='graph2')
@@ -180,7 +184,8 @@ def update_figure(xaxis_column_name, yaxis_column_name,
                     opacity=0.5,
                     marker={
                         'size': 15,
-                        'line': {'width': 0.5, 'color': 'white'}
+                        'line': {'width': 0.5, 'color': 'white'},
+                        'color': runTypesToColors[i]
                     },
                     name=i
                 ) for i in selected_types 
@@ -201,15 +206,13 @@ def update_figure(xaxis_column_name, yaxis_column_name,
     dash.dependencies.Output('graph2', 'figure'),
     [dash.dependencies.Input('xaxis-column2', 'value'),
      dash.dependencies.Input('yaxis-column2', 'value'),
-     dash.dependencies.Input('xaxis-type2', 'values'),
      dash.dependencies.Input('yaxis-type2', 'values'),
      dash.dependencies.Input('type-dropdown', 'value'),
      dash.dependencies.Input('year--slider', 'value'),
      dash.dependencies.Input('date-picker-range', 'start_date'),
      dash.dependencies.Input('date-picker-range', 'end_date')])
 def update_figure(xaxis_column_name, yaxis_column_name,
-                 xaxis_type, yaxis_type,
-                 dropdown_types, chosen_year,
+                 yaxis_type, dropdown_types, chosen_year,
                  start_date, end_date):
 
     if chosen_year == df.date.dt.year.max()+1:
@@ -222,7 +225,6 @@ def update_figure(xaxis_column_name, yaxis_column_name,
     filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
 
     xaxis_dict = {'title':xaxis_column_name}
-    if xaxis_type == ['Log']: xaxis_dict['type'] = 'log'
     yaxis_dict = {'title':yaxis_column_name}
     if yaxis_type == ['Log']: yaxis_dict['type'] = 'log'
 
@@ -257,6 +259,7 @@ def update_figure(xaxis_column_name, yaxis_column_name,
                         #mode='markers',
                         opacity=0.5,
                         #marker={ 'size': 15, 'line': {'width': 0.5, 'color': 'white'} },
+                        marker={ 'color': runTypesToColors[i] },
                         name=i
                     ) for i in selected_basicRunning_types
         ]
@@ -268,6 +271,7 @@ def update_figure(xaxis_column_name, yaxis_column_name,
                         #text=filt_df[:]['date'],
                         #mode='markers',
                         opacity=0.5,
+                        marker={ 'color': runTypesToColors[i] },
                         #marker={ 'size': 15, 'line': {'width': 0.5, 'color': 'white'} },
                         name='All'
                     ) 

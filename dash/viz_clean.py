@@ -125,80 +125,136 @@ def main():
                 value=[blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.E],
                 multi = True
             )], style={'padding':'10px 10px 10px 10px'}),
+        html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data
+        html.Div(id='weekly_agg', style={'display': 'none'}), #hidden, in order to share data
+        html.Div(id='monthly_agg', style={'display': 'none'}), #hidden, in order to share data
+        html.Div(id='yearly_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div([
-            html.Div(id='agg_df', style={'display': 'none'}),
             html.Div([
-                html.Div([
-                    dcc.Dropdown(
-                        id='yaxis-column2',
-                        options=[{'label': i, 'value': i} for i in available_cols],
-                        value='distance'
-                    )
-                ], style={'width': '49%', 'display': 'inline-block'}),
-                html.Div([
-                    dcc.Dropdown(
-                        id='xaxis-column2',
-                        options=[{'label': i, 'value': i} for i in time_agg_options],
-                        value='week'
-                    )
-                ],style={'width': '49%', 'float': 'right', 'display': 'inline-block'}),
-                dcc.Graph(id='agg_graph')
-            ], style={'width': '49%', 'display': 'inline-block'}),
-            #html.Div(id='output_table1')
+                dcc.Dropdown(
+                    id='yaxis-column2',
+                    options=[{'label': i, 'value': i} for i in available_cols],
+                    value='distance'
+                ),
+            ], style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
             html.Div([
-                dash_table.DataTable(
-                            id='agg_table',
-                            data=df.to_dict('rows'),
-                            #columns=[{'id': c, 'name': c} for c in df.columns],
-                            columns=[
-                                    {"name": ["", "Date"], "id": "date"},
-                                    {"name": ["", "Type"], "id": "type"},
-                                    {"name": ["", "Dist."], "id": "distance"},
-                                    {"name": ["", "Climb"], "id": "climb"},
-                                    {"name": ["", "Time"], "id": "time"},
-                                    {"name": ["", "Where"], "id": "where"},
-                                    {"name": ["", "Notes"], "id": "notes"},
-                                    {"name": ["", "Avg. Pace"], "id": "avg_pace"},
-                                    #{"name": ["Distances", "Dist. E"], "id": "distE"},
-                                    #{"name": ["Distances", "Dist. M"], "id": "distM"},
-                                    #{"name": ["Distances", "Dist. T"], "id": "distT"},
-                                    #{"name": ["Distances", "Dist. I"], "id": "distI"},
-                                    #{"name": ["Distances", "Dist. R"], "id": "distR"},
-                                    #{"name": ["Distances", "Dist. X"], "id": "distX"},
-                                    #{"name": ["Paces", "Pace E"], "id": "paceE"},
-                                    #{"name": ["Paces", "Pace M"], "id": "paceM"},
-                                    #{"name": ["Paces", "Pace T"], "id": "paceT"},
-                                    #{"name": ["Paces", "Pace I"], "id": "paceI"},
-                                    #{"name": ["Paces", "Pace R"], "id": "paceR"},
-                                    #{"name": ["Paces", "Pace X"], "id": "paceX"},
-                                ],
-                            style_table={
-                                'overflowX': 'scroll', 
-                                'maxHeight': '300',
-                                'overflowY': 'scroll'},
-                            css=[{
-                                    'selector': '.dash-cell div.dash-cell-value',
-                                    'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                                }],
-                            style_cell={
-                                'whiteSpace': 'no-wrap',
-                                'overflow': 'hidden',
-                                'textOverflow': 'ellipsis',
-                                'minWidth': '70px', 'maxWidth': '100px'
-                            },
-                            #n_fixed_columns=1,
-                            n_fixed_rows=2,
-                            style_as_list_view=True,
-                            merge_duplicate_headers=True,
-                            style_header={
-                                    'backgroundColor': 'white',
-                                    'fontWeight': 'bold'
-                                },
-                            sorting=True,
-                            sorting_type="multi",
-                        ),
-            ], style={'width': '49%', 'display': 'inline-block'})
-        ])
+                dcc.Dropdown(
+                    id='xaxis-column2',
+                    options=[{'label': i, 'value': i} for i in time_agg_options],
+                    value='week'
+                ),
+            ],style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
+            dcc.Graph(id='agg_graph') #graph!
+        ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'430px'}),
+        #display:flex;justify-content:center;align-items:center
+
+        html.Div([
+            html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
+            dash_table.DataTable(
+                    id='weekly_agg_table',
+                    data=df.to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    #columns=[
+                    #        {"name": ["", "Date"], "id": "date"},
+                    #        {"name": ["", "Type"], "id": "type"},
+                    #        {"name": ["", "Dist."], "id": "distance"},
+                    #        {"name": ["", "Climb"], "id": "climb"},
+                    #        {"name": ["", "Time"], "id": "time"},
+                    #        {"name": ["", "Where"], "id": "where"},
+                    #        {"name": ["", "Notes"], "id": "notes"},
+                    #        {"name": ["", "Avg. Pace"], "id": "avg_pace"},
+                    #    ],
+                    style_table={
+                        'overflowX': 'scroll', 
+                        'maxHeight': '400',
+                        'overflowY': 'scroll'},
+                    css=[{
+                            'selector': '.dash-cell div.dash-cell-value',
+                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                        }],
+                    style_cell={
+                        'whiteSpace': 'no-wrap',
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'minWidth': '60px', 'maxWidth': '100px'
+                    },
+                    #n_fixed_columns=1,
+                    n_fixed_rows=1,
+                    style_as_list_view=True,
+                    merge_duplicate_headers=True,
+                    style_header={
+                            'backgroundColor': 'white',
+                            'fontWeight': 'bold'
+                        },
+                    sorting=True,
+                    sorting_type="multi",
+                ),
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'430px'}),
+
+        html.Div([
+            html.Div([html.H5("Monthly summary:"),],style={'height':'30px', 'textAlign':'center'}),
+            dash_table.DataTable(
+                    id='monthly_agg_table',
+                    data=df.to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    style_table={
+                        'overflowX': 'scroll', 
+                        'maxHeight': '360',
+                        'overflowY': 'scroll'},
+                    css=[{
+                            'selector': '.dash-cell div.dash-cell-value',
+                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                        }],
+                    style_cell={
+                        'whiteSpace': 'no-wrap',
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'minWidth': '60px', 'maxWidth': '100px'
+                    },
+                    #n_fixed_columns=1,
+                    n_fixed_rows=1,
+                    style_as_list_view=True,
+                    merge_duplicate_headers=True,
+                    style_header={
+                            'backgroundColor': 'white',
+                            'fontWeight': 'bold'
+                        },
+                    sorting=True,
+                    sorting_type="multi",
+                ),
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left'}),
+        html.Div([
+            html.Div([html.H5("Yearly summary:"),],style={'height':'30px', 'textAlign':'center'}),
+            dash_table.DataTable(
+                    id='yearly_agg_table',
+                    data=df.to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    style_table={
+                        'overflowX': 'scroll', 
+                        'maxHeight': '360',
+                        'overflowY': 'scroll'},
+                    css=[{
+                            'selector': '.dash-cell div.dash-cell-value',
+                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                        }],
+                    style_cell={
+                        'whiteSpace': 'no-wrap',
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'minWidth': '60px', 'maxWidth': '100px'
+                    },
+                    #n_fixed_columns=1,
+                    n_fixed_rows=1,
+                    style_as_list_view=True,
+                    merge_duplicate_headers=True,
+                    style_header={
+                            'backgroundColor': 'white',
+                            'fontWeight': 'bold'
+                        },
+                    sorting=True,
+                    sorting_type="multi",
+                ),
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center'})
     ])
 
     @app.callback(
@@ -251,6 +307,151 @@ def main():
 
         return df_agg.to_json(date_format='iso', orient='split')
 
+
+    def time_aggregate(chosen_basic_runTypes, chosen_year, start_date, end_date, time_option):
+        if time_option == 'week':
+            agg_option = 'W'
+        elif time_option == 'month':
+            agg_option = 'MS'
+        elif time_option == 'year':
+            agg_option = 'YS'
+        else:
+            agg_option = 'W'
+
+        #Apply filters
+        if chosen_year == df.date.dt.year.max()+1:
+            filt_df = df
+        else:
+            filt_df = df[df.date.dt.year == chosen_year]
+
+        filt_df = filt_df[filt_df.type.isin(chosen_basic_runTypes)]
+
+        filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
+        #END apply filters
+
+        #if ycol is distance, segment it by types
+        distance_cols = 'dist%s'
+
+        needed_cols = ['date', 'distance', 'time', 'climb']
+        df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').sum()
+        df_agg[time_option] = df_agg.index
+        if time_option == 'week':
+            pattern = '%Y-%m-%d'
+        elif time_option == 'month':
+            pattern = '%Y-%m'
+        elif time_option == 'year':
+            pattern = '%Y'
+        df_agg[time_option] = df_agg[time_option].apply(lambda x: x.strftime(pattern))
+
+        df_agg_notX = filt_df[filt_df.type != blockNames.RunTypes.X][needed_cols].resample(agg_option, on='date').sum()
+        df_agg_notX['run_avg_pace'] = df_agg_notX['time']*60/df_agg_notX['distance']
+
+        df_agg = pd.concat([df_agg, df_agg_notX['run_avg_pace']], axis=1)
+
+        decimals = pd.Series([1, 1, 0, 0], index=['distance', 'time', 'climb', 'run_avg_pace'])
+
+        return df_agg.round(decimals).to_json(date_format='iso', orient='split')
+
+    @app.callback(
+        dash.dependencies.Output('weekly_agg', 'children'),
+        [dash.dependencies.Input('type-dropdown', 'value'),
+        dash.dependencies.Input('year-slider', 'value'),
+        dash.dependencies.Input('date-picker-range', 'start_date'),
+        dash.dependencies.Input('date-picker-range', 'end_date')])
+    def weekly_summary(chosen_basic_runTypes, chosen_year, start_date, end_date):
+        return time_aggregate(chosen_basic_runTypes, chosen_year, start_date, end_date,'week')
+
+    @app.callback(
+        dash.dependencies.Output('weekly_agg_table', 'data'),
+        [dash.dependencies.Input('weekly_agg', 'children')])
+    def update_figure(df_agg_json):
+        df_agg = pd.read_json(df_agg_json, orient='split')
+
+        df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
+        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+
+        return df_agg.to_dict('rows')
+
+    @app.callback(
+        dash.dependencies.Output('weekly_agg_table', 'columns'),
+        [dash.dependencies.Input('weekly_agg', 'children')])
+    def update_figure(df_agg_json):
+        columns=[
+                {"name": "Week", "id": "week"},
+                {"name": "Dist.", "id": "distance"},
+                {"name": "Time", "id": "time"},
+                {"name": "Climb", "id": "climb"},
+                {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
+            ]
+        return columns
+
+    @app.callback(
+        dash.dependencies.Output('monthly_agg', 'children'),
+        [dash.dependencies.Input('type-dropdown', 'value'),
+        dash.dependencies.Input('year-slider', 'value'),
+        dash.dependencies.Input('date-picker-range', 'start_date'),
+        dash.dependencies.Input('date-picker-range', 'end_date')])
+    def weekly_summary(chosen_basic_runTypes, chosen_year, start_date, end_date):
+        return time_aggregate(chosen_basic_runTypes, chosen_year, start_date, end_date,'month')
+
+    @app.callback(
+        dash.dependencies.Output('monthly_agg_table', 'data'),
+        [dash.dependencies.Input('monthly_agg', 'children')])
+    def update_figure(df_agg_json):
+        df_agg = pd.read_json(df_agg_json, orient='split')
+
+        df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
+        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+
+        return df_agg.to_dict('rows')
+
+    @app.callback(
+        dash.dependencies.Output('monthly_agg_table', 'columns'),
+        [dash.dependencies.Input('monthly_agg', 'children')])
+    def update_figure(df_agg_json):
+        columns=[
+                {"name": "Month", "id": "month"},
+                {"name": "Dist.", "id": "distance"},
+                {"name": "Time", "id": "time"},
+                {"name": "Climb", "id": "climb"},
+                {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
+            ]
+        return columns
+
+    @app.callback(
+        dash.dependencies.Output('yearly_agg', 'children'),
+        [dash.dependencies.Input('type-dropdown', 'value'),
+        dash.dependencies.Input('year-slider', 'value'),
+        dash.dependencies.Input('date-picker-range', 'start_date'),
+        dash.dependencies.Input('date-picker-range', 'end_date')])
+    def weekly_summary(chosen_basic_runTypes, chosen_year, start_date, end_date):
+        agg_df = time_aggregate(chosen_basic_runTypes, chosen_year, start_date, end_date,'year')
+        return agg_df
+
+    @app.callback(
+        dash.dependencies.Output('yearly_agg_table', 'data'),
+        [dash.dependencies.Input('yearly_agg', 'children')])
+    def update_figure(df_agg_json):
+        df_agg = pd.read_json(df_agg_json, orient='split')
+
+        df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
+        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+
+        return df_agg.to_dict('rows')
+
+    @app.callback(
+        dash.dependencies.Output('yearly_agg_table', 'columns'),
+        [dash.dependencies.Input('yearly_agg', 'children')])
+    def update_figure(df_agg_json):
+        columns=[
+                {"name": "Year", "id": "year"},
+                {"name": "Dist.", "id": "distance"},
+                {"name": "Time", "id": "time"},
+                {"name": "Climb", "id": "climb"},
+                {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
+            ]
+        return columns
+
     @app.callback(
         dash.dependencies.Output('agg_graph', 'figure'),
         [dash.dependencies.Input('xaxis-column2', 'value'),
@@ -288,6 +489,8 @@ def main():
         return {
             'data': traces,
             'layout': go.Layout(
+                height=400,
+                width=600,
                 barmode='stack',
                 xaxis=xaxis_dict,
                 yaxis=yaxis_dict,
@@ -299,8 +502,9 @@ def main():
         }
 
 
-    return app
 
+
+    return app
 
 if __name__ == '__main__':
     app = main()

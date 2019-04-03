@@ -61,8 +61,8 @@ def get_runType_colors(runType_order):
 def get_ordered_runType_long_name(runType_order):
     return [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
 
-def get_available_columns(df):
-    available_cols = list(df.columns)
+def get_available_columns():
+    available_cols = ['distance', 'time', 'climb', 'avg_pace']
     #available_cols.append('week')
     return available_cols
 
@@ -83,7 +83,7 @@ def main():
     df = read_pandas_pickle()
 
     year_marks = get_year_marks(df)
-    available_cols = get_available_columns(df)
+    available_cols = get_available_columns()
 
     filt_df = df.copy()
 
@@ -122,7 +122,7 @@ def main():
             dcc.Dropdown(
                 id='type-dropdown',
                 options=runTypes_long_name,
-                value=[blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.E],
+                value=[blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.M, blockNames.RunTypes.E],
                 multi = True
             )], style={'padding':'10px 10px 10px 10px'}),
         html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data
@@ -222,7 +222,7 @@ def main():
                     sorting=True,
                     sorting_type="multi",
                 ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left'}),
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left', 'padding-top':'10px'}),
         html.Div([
             html.Div([html.H5("Yearly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
@@ -254,7 +254,7 @@ def main():
                     sorting=True,
                     sorting_type="multi",
                 ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center'})
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'padding-top':'10px'})
     ])
 
     @app.callback(
@@ -370,7 +370,7 @@ def main():
         df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
         df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
 
-        return df_agg.to_dict('rows')
+        return df_agg.sort_values(by=['week'], ascending=False).to_dict('rows')
 
     @app.callback(
         dash.dependencies.Output('weekly_agg_table', 'columns'),
@@ -403,7 +403,7 @@ def main():
         df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
         df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
 
-        return df_agg.to_dict('rows')
+        return df_agg.sort_values(by=['month'], ascending=False).to_dict('rows')
 
     @app.callback(
         dash.dependencies.Output('monthly_agg_table', 'columns'),
@@ -437,7 +437,7 @@ def main():
         df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
         df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
 
-        return df_agg.to_dict('rows')
+        return df_agg.sort_values(by=['year'],ascending=False).to_dict('rows')
 
     @app.callback(
         dash.dependencies.Output('yearly_agg_table', 'columns'),

@@ -145,14 +145,14 @@ def main():
                 ),
             ],style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
             dcc.Graph(id='agg_graph') #graph!
-        ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'430px'}),
+        ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
         #display:flex;justify-content:center;align-items:center
 
         html.Div([
             html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
                     id='weekly_agg_table',
-                    data=df.to_dict('rows'),
+                    data=df[0:0].to_dict('rows'),
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     #columns=[
                     #        {"name": ["", "Date"], "id": "date"},
@@ -166,7 +166,7 @@ def main():
                     #    ],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '400',
+                        'maxHeight': '300',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -189,17 +189,17 @@ def main():
                     sorting=True,
                     sorting_type="multi",
                 ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'430px'}),
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
 
         html.Div([
             html.Div([html.H5("Monthly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
                     id='monthly_agg_table',
-                    data=df.to_dict('rows'),
+                    data=df[0:0].to_dict('rows'),
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '360',
+                        'maxHeight': '150',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -227,11 +227,11 @@ def main():
             html.Div([html.H5("Yearly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
                     id='yearly_agg_table',
-                    data=df.to_dict('rows'),
+                    data=df[0:0].to_dict('rows'),
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '360',
+                        'maxHeight': '150',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -489,7 +489,7 @@ def main():
         return {
             'data': traces,
             'layout': go.Layout(
-                height=400,
+                height=300,
                 width=600,
                 barmode='stack',
                 xaxis=xaxis_dict,

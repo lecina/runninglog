@@ -70,6 +70,13 @@ def get_time_options():
     time_agg_options = ['day', 'week', 'month', 'year']
     return time_agg_options
 
+def get_running_location_count(df):
+    counts = pd.crosstab(index=df['where'], columns="count") 
+    rel_counts = counts/counts.sum()*100
+    counts = pd.concat([counts, rel_counts], axis=1)
+    counts.columns = ['counts','rel_counts']
+    return counts
+
 def main():
     basic_runType_order = get_basic_runTypes_order() #E,M,T,I,R,X
 
@@ -154,19 +161,9 @@ def main():
                     id='weekly_agg_table',
                     data=df[0:0].to_dict('rows'),
                     columns=[{'id': c, 'name': c} for c in df.columns],
-                    #columns=[
-                    #        {"name": ["", "Date"], "id": "date"},
-                    #        {"name": ["", "Type"], "id": "type"},
-                    #        {"name": ["", "Dist."], "id": "distance"},
-                    #        {"name": ["", "Climb"], "id": "climb"},
-                    #        {"name": ["", "Time"], "id": "time"},
-                    #        {"name": ["", "Where"], "id": "where"},
-                    #        {"name": ["", "Notes"], "id": "notes"},
-                    #        {"name": ["", "Avg. Pace"], "id": "avg_pace"},
-                    #    ],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '300',
+                        'maxHeight': '280',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -222,7 +219,7 @@ def main():
                     sorting=True,
                     sorting_type="multi",
                 ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left', 'padding-top':'10px'}),
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left', 'padding-top':'10px', 'height':'200px'}),
         html.Div([
             html.Div([html.H5("Yearly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
@@ -254,7 +251,10 @@ def main():
                     sorting=True,
                     sorting_type="multi",
                 ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'padding-top':'10px'})
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'padding-top':'10px', 'height':'200px'}),
+        html.Div([
+            dcc.Graph(id='freq_graph') #graph!
+        ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
     ])
 
     @app.callback(
@@ -501,6 +501,50 @@ def main():
             )
         }
 
+    @app.callback(
+        dash.dependencies.Output('freq_graph', 'figure'),
+        [dash.dependencies.Input('type-dropdown', 'value'),
+        dash.dependencies.Input('year-slider', 'value'),
+        dash.dependencies.Input('date-picker-range', 'start_date'),
+        dash.dependencies.Input('date-picker-range', 'end_date')])
+    def update_figure(chosen_basic_runTypes, chosen_year,
+                        start_date, end_date):
+        #Apply filters
+        if chosen_year == df.date.dt.year.max()+1:
+            filt_df = df
+        else:
+            filt_df = df[df.date.dt.year == chosen_year]
+
+        filt_df = filt_df[filt_df.type.isin(chosen_basic_runTypes)]
+
+        filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
+        counts = get_running_location_count(filt_df)
+
+        traces = [
+            go.Bar(
+                y=counts.index,
+                x=counts.counts,
+                opacity=0.5,
+                marker={ 'color': '#1f77b4' },
+                name='All',
+                orientation='h'
+            ) 
+        ]
+
+        return {
+            'data': traces,
+            'layout': go.Layout(
+                height=300,
+                width=600,
+                barmode='stack',
+                yaxis={'title':'location'},
+                xaxis={'title': 'counts'},
+                bargap=0.05,
+                margin={'l': 150, 'b': 40, 't': 10, 'r': 10},
+                legend={'x': 0, 'y': 1},
+                hovermode='closest'
+            )
+        }
 
 
 

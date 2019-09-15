@@ -381,7 +381,6 @@ def main():
         df_agg = pd.concat([df_agg, df_agg_notX['run_avg_pace']], axis=1)
 
         decimals = pd.Series([1, 1, 0, 0], index=['distance', 'time', 'climb', 'run_avg_pace'])
-
         return df_agg.round(decimals).to_json(date_format='iso', orient='split')
 
     @app.callback(
@@ -592,7 +591,7 @@ def main():
         y_agg = pd.read_json(yearly_agg_json, orient='split')
 
         index = ['W', 'M', 'Y']
-        columns = ['avg_dist', 'sd_dist', 'min_dist', 'max_dist', 'avg_time', 'sd_time', 'min_time', 'max_time', 'avg_climb', 'sd_climb', 'min_climb', 'max_climb']
+        columns = ['avg_dist', 'sd_dist', 'avg_time', 'sd_time', 'avg_climb', 'sd_climb']
         summary_df = pd.DataFrame(index=index, columns=columns)
 
         aggs = [w_agg, m_agg, y_agg]
@@ -601,11 +600,15 @@ def main():
             df_agg = aggs[i]
             metrics = []
             for var in variables:
-                metrics.extend([df_agg[var].mean(), df_agg[var].std(), df_agg[var].min(), df_agg[var].max()])
+                stats = np.around([df_agg[var].mean(), df_agg[var].std()],1)
+                vf = np.vectorize(lambda x:'{:d}h {:0>2d}m'.format(int(x//60),int(x%60)))
+                if var == 'time':
+                    stats = vf(stats)
+                metrics.extend(stats)
             summary_df.iloc[i] = metrics
 
-        print summary_df.round(3)
-        return summary_df.round(1).to_dict('rows')
+        summary_df['period'] = ['Week', 'Month', 'Year']
+        return summary_df.to_dict('rows')
 
     @app.callback(
         dash.dependencies.Output('summary_table', 'columns'),
@@ -616,18 +619,13 @@ def main():
         ])
     def update_figure(weekly_agg_json, monthly_agg_json, yearly_agg_json):
         columns=[
+                {"name": "Period", "id": "period"},
                 {"name": "Dist.Avg", "id": "avg_dist"},
                 {"name": "Dist.SD", "id": "sd_dist"},
-                {"name": "Dist.Min", "id": "min_dist"},
-                {"name": "Dist.Max", "id": "max_dist"},
                 {"name": "Time.Avg", "id": "avg_time"},
                 {"name": "Time.SD", "id": "sd_time"},
-                {"name": "Time.Min", "id": "min_time"},
-                {"name": "Time.Max", "id": "max_time"},
                 {"name": "Climb.Avg", "id": "avg_climb"},
                 {"name": "Clim.SD", "id": "sd_climb"},
-                {"name": "Climb.Min", "id": "min_climb"},
-                {"name": "Climb.Max", "id": "max_climb"},
             ]
         return columns
 

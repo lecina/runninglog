@@ -255,6 +255,38 @@ def main():
         html.Div([
             dcc.Graph(id='freq_graph') #graph!
         ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
+        html.Div([
+            html.Div([html.H5("Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
+            dash_table.DataTable(
+                    id='summary_table',
+                    data=df[0:0].to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    style_table={
+                        'overflowX': 'scroll', 
+                        'maxHeight': '150',
+                        'overflowY': 'scroll'},
+                    css=[{
+                            'selector': '.dash-cell div.dash-cell-value',
+                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                        }],
+                    style_cell={
+                        'whiteSpace': 'no-wrap',
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'minWidth': '60px', 'maxWidth': '100px'
+                    },
+                    #n_fixed_columns=1,
+                    n_fixed_rows=1,
+                    style_as_list_view=True,
+                    merge_duplicate_headers=True,
+                    style_header={
+                            'backgroundColor': 'white',
+                            'fontWeight': 'bold'
+                        },
+                    sorting=True,
+                    sorting_type="multi",
+                ),
+        ],style={'display':'inline-block', 'width':'49%', 'float':'right', 'height':'330px'}),
     ])
 
     @app.callback(
@@ -368,7 +400,7 @@ def main():
         df_agg = pd.read_json(df_agg_json, orient='split')
 
         df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
-        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
 
         return df_agg.sort_values(by=['week'], ascending=False).to_dict('rows')
 
@@ -401,7 +433,7 @@ def main():
         df_agg = pd.read_json(df_agg_json, orient='split')
 
         df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
-        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
 
         return df_agg.sort_values(by=['month'], ascending=False).to_dict('rows')
 
@@ -435,7 +467,7 @@ def main():
         df_agg = pd.read_json(df_agg_json, orient='split')
 
         df_agg['time'] = df_agg['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
-        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        df_agg['run_avg_pace'] = df_agg['run_avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
 
         return df_agg.sort_values(by=['year'],ascending=False).to_dict('rows')
 
@@ -519,6 +551,7 @@ def main():
 
         filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
         counts = get_running_location_count(filt_df)
+        counts = counts.loc[counts.counts >1]
 
         traces = [
             go.Bar(
@@ -546,6 +579,57 @@ def main():
             )
         }
 
+    @app.callback(
+        dash.dependencies.Output('summary_table', 'data'),
+        [
+        dash.dependencies.Input('weekly_agg', 'children'),
+        dash.dependencies.Input('monthly_agg', 'children'),
+        dash.dependencies.Input('yearly_agg', 'children')
+        ])
+    def update_figure(weekly_agg_json, monthly_agg_json, yearly_agg_json):
+        w_agg = pd.read_json(weekly_agg_json, orient='split')
+        m_agg = pd.read_json(monthly_agg_json, orient='split')
+        y_agg = pd.read_json(yearly_agg_json, orient='split')
+
+        index = ['W', 'M', 'Y']
+        columns = ['avg_dist', 'sd_dist', 'min_dist', 'max_dist', 'avg_time', 'sd_time', 'min_time', 'max_time', 'avg_climb', 'sd_climb', 'min_climb', 'max_climb']
+        summary_df = pd.DataFrame(index=index, columns=columns)
+
+        aggs = [w_agg, m_agg, y_agg]
+        variables = ['distance', 'time', 'climb']
+        for i in range(3):
+            df_agg = aggs[i]
+            metrics = []
+            for var in variables:
+                metrics.extend([df_agg[var].mean(), df_agg[var].std(), df_agg[var].min(), df_agg[var].max()])
+            summary_df.iloc[i] = metrics
+
+        print summary_df.round(3)
+        return summary_df.round(1).to_dict('rows')
+
+    @app.callback(
+        dash.dependencies.Output('summary_table', 'columns'),
+        [
+        dash.dependencies.Input('weekly_agg', 'children'),
+        dash.dependencies.Input('monthly_agg', 'children'),
+        dash.dependencies.Input('yearly_agg', 'children')
+        ])
+    def update_figure(weekly_agg_json, monthly_agg_json, yearly_agg_json):
+        columns=[
+                {"name": "Dist.Avg", "id": "avg_dist"},
+                {"name": "Dist.SD", "id": "sd_dist"},
+                {"name": "Dist.Min", "id": "min_dist"},
+                {"name": "Dist.Max", "id": "max_dist"},
+                {"name": "Time.Avg", "id": "avg_time"},
+                {"name": "Time.SD", "id": "sd_time"},
+                {"name": "Time.Min", "id": "min_time"},
+                {"name": "Time.Max", "id": "max_time"},
+                {"name": "Climb.Avg", "id": "avg_climb"},
+                {"name": "Clim.SD", "id": "sd_climb"},
+                {"name": "Climb.Min", "id": "min_climb"},
+                {"name": "Climb.Max", "id": "max_climb"},
+            ]
+        return columns
 
 
     return app

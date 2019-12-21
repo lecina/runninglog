@@ -31,6 +31,7 @@ class AllRuns():
 
     def append_single_run_if_not_present(self, sr):
         sr_ds = pd.Series(sr.as_dict())
+        #sr_ds = pd.to_datetime(sr_ds.date)
     
         if self.df.size == 0:
             already_added = False

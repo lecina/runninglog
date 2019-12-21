@@ -31,7 +31,8 @@ def get_runType_order():
                      blockNames.RunTypes.I,
                      blockNames.RunTypes.R,
                      blockNames.RunTypes.C,
-                     blockNames.RunTypes.X]
+                     blockNames.RunTypes.X,
+                     blockNames.RunTypes.XB]
     return runType_order
 
 def get_basic_runTypes_order():
@@ -53,7 +54,8 @@ def get_runType_colors(runType_order):
                 #'#e377c2', # raspberry yogurt pink
                 #'#7f7f7f', # middle gray
                 #'#bcbd22', # curry yellow-green
-                '#8c564b'] # chestnut brown
+                '#8c564b', # chestnut brown
+                '#99660']
     runTypesToColors = {runType_order[i]:colors[i] for i in range(len(runType_order))}
 
     return runTypesToColors
@@ -590,24 +592,24 @@ def main():
         m_agg = pd.read_json(monthly_agg_json, orient='split')
         y_agg = pd.read_json(yearly_agg_json, orient='split')
 
-        index = ['W', 'M', 'Y']
+        index = ['4W', 'W', 'M', 'Y']
         columns = ['avg_dist', 'sd_dist', 'avg_time', 'sd_time', 'avg_climb', 'sd_climb']
         summary_df = pd.DataFrame(index=index, columns=columns)
 
-        aggs = [w_agg, m_agg, y_agg]
+        aggs = [w_agg.iloc[-5:-1], w_agg[:-1], m_agg.iloc[:-1], y_agg]
         variables = ['distance', 'time', 'climb']
-        for i in range(3):
+        for i in range(4):
             df_agg = aggs[i]
             metrics = []
             for var in variables:
                 stats = np.around([df_agg[var].mean(), df_agg[var].std()],1)
-                vf = np.vectorize(lambda x:'{:d}h {:0>2d}m'.format(int(x//60),int(x%60)))
+                vf = np.vectorize(lambda x: "-" if np.isnan(x) else '{:d}h {:0>2d}m'.format(int(x//60),int(x%60)))
                 if var == 'time':
                     stats = vf(stats)
                 metrics.extend(stats)
             summary_df.iloc[i] = metrics
 
-        summary_df['period'] = ['Week', 'Month', 'Year']
+        summary_df['period'] = ['Last 4 W', 'Week', 'Month', 'Year']
         return summary_df.to_dict('rows')
 
     @app.callback(

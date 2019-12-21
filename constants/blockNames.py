@@ -44,6 +44,7 @@ class RunTypes:
     X = "X" 
     WU = "WU"
     CD = "CD"
+    XB = "XB" 
 
 RUN_TYPES_LONG_NAME_DICTIONARY = {
     RunTypes.E : "Easy pace",
@@ -52,5 +53,6 @@ RUN_TYPES_LONG_NAME_DICTIONARY = {
     RunTypes.I : "Intervals",
     RunTypes.R : "Repetitions",
     RunTypes.C : "Race",
-    RunTypes.X : "Cross-training(Mountaineering)"
+    RunTypes.X : "Cross-training(Mountaineering)",
+    RunTypes.XB : "Cross-training(Bike)"
 }

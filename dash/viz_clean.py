@@ -377,7 +377,7 @@ def main():
             pattern = '%Y'
         df_agg[time_option] = df_agg[time_option].apply(lambda x: x.strftime(pattern))
 
-        df_agg_notX = filt_df[filt_df.type != blockNames.RunTypes.X][needed_cols].resample(agg_option, on='date').sum()
+        df_agg_notX = filt_df[~filt_df.type.isin([blockNames.RunTypes.X, blockNames.RunTypes.XB])][needed_cols].resample(agg_option, on='date').sum()
         df_agg_notX['run_avg_pace'] = df_agg_notX['time']*60/df_agg_notX['distance']
 
         df_agg = pd.concat([df_agg, df_agg_notX['run_avg_pace']], axis=1)

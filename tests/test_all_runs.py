@@ -128,7 +128,6 @@ class TestAllRuns(unittest.TestCase):
 
         self.assertEqual(added1, goldenAdded1)
         self.assertEqual(added2, goldenAdded2)
-        #self.assertEqual(df1.equals(df2), True)
         pd.testing.assert_frame_equal(df1, df2, check_less_precise=True)
 
     def test_adding_two_different_single_runs(self):
@@ -148,6 +147,33 @@ class TestAllRuns(unittest.TestCase):
 
         goldenAdded1 = True
         goldenAdded2 = True
+
+        self.assertEqual(added1, goldenAdded1)
+        self.assertEqual(added2, goldenAdded2)
+        self.assertEqual(df1.equals(df2), False)
+        self.assertEqual(df1.shape[0], 1)
+        self.assertEqual(df2.shape[0], 2)
+
+    def test_adding_two_different_single_runs_same_day(self):
+        allRuns = all_runs.AllRuns()
+
+        singleRun = single_run.SingleRun()
+        parsed_json = reader.read_file('tests/data/test_3.json')
+        singleRun.load_json(parsed_json)
+        added1 = allRuns.append_single_run_if_not_present(singleRun)
+        df1 = allRuns.df.copy()
+
+        singleRun = single_run.SingleRun()
+        parsed_json = reader.read_file('tests/data/test_4.json')
+        singleRun.load_json(parsed_json)
+        added2 = allRuns.append_single_run_if_not_present(singleRun)
+        df2 = allRuns.df.copy()
+
+        goldenAdded1 = True
+        goldenAdded2 = True
+
+        print df1.head()
+        print df2.head()
 
         self.assertEqual(added1, goldenAdded1)
         self.assertEqual(added2, goldenAdded2)

@@ -69,7 +69,7 @@ def get_available_columns():
     return available_cols
 
 def get_time_options():
-    time_agg_options = ['day', 'week', 'month', 'year']
+    time_agg_options = ['', 'day', 'week', 'month', 'year']
     return time_agg_options
 
 def get_running_location_count(df):
@@ -345,8 +345,6 @@ def main():
         filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
         #END apply filters
 
-        if xaxis_colname == 'day':
-            xaxis_colname = 'date'
 
         #if ycol is distance, segment it by types
         if yaxis_colname == 'distance':
@@ -540,6 +538,9 @@ def main():
 
         xaxis_dict = {'title':xaxis_colname}
         yaxis_dict = {'title':yaxis_colname}
+
+        if xaxis_colname == 'day':
+            xaxis_colname = 'date'
 
         if yaxis_colname == 'distance':
             distance_template = 'dist%s'

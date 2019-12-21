@@ -158,6 +158,38 @@ def main():
         #display:flex;justify-content:center;align-items:center
 
         html.Div([
+            html.Div([html.H5("Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
+            dash_table.DataTable(
+                    id='summary_table',
+                    data=df[0:0].to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    style_table={
+                        'overflowX': 'scroll', 
+                        'maxHeight': '150',
+                        'overflowY': 'scroll'},
+                    css=[{
+                            'selector': '.dash-cell div.dash-cell-value',
+                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                        }],
+                    style_cell={
+                        'whiteSpace': 'no-wrap',
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'minWidth': '60px', 'maxWidth': '100px'
+                    },
+                    #n_fixed_columns=1,
+                    n_fixed_rows=1,
+                    style_as_list_view=True,
+                    merge_duplicate_headers=True,
+                    style_header={
+                            'backgroundColor': 'white',
+                            'fontWeight': 'bold'
+                        },
+                    sorting=True,
+                    sorting_type="multi",
+                ),
+        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
+        html.Div([
             html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
                     id='weekly_agg_table',
@@ -188,8 +220,7 @@ def main():
                     sorting=True,
                     sorting_type="multi",
                 ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
-
+        ], style={'width':'80%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'border':'3px solid'}),
         html.Div([
             html.Div([html.H5("Monthly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
@@ -258,14 +289,14 @@ def main():
             dcc.Graph(id='freq_graph') #graph!
         ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
         html.Div([
-            html.Div([html.H5("Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
+            html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
-                    id='summary_table',
+                    id='weekly_agg_table2',
                     data=df[0:0].to_dict('rows'),
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '150',
+                        'maxHeight': '280',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -289,6 +320,7 @@ def main():
                     sorting_type="multi",
                 ),
         ],style={'display':'inline-block', 'width':'49%', 'float':'right', 'height':'330px'}),
+        #], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
     ])
 
     @app.callback(
@@ -366,7 +398,7 @@ def main():
         #if ycol is distance, segment it by types
         distance_cols = 'dist%s'
 
-        needed_cols = ['date', 'distance', 'time', 'climb']
+        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX']
         df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').sum()
         df_agg[time_option] = df_agg.index
         if time_option == 'week':
@@ -382,7 +414,14 @@ def main():
 
         df_agg = pd.concat([df_agg, df_agg_notX['run_avg_pace']], axis=1)
 
-        decimals = pd.Series([1, 1, 0, 0], index=['distance', 'time', 'climb', 'run_avg_pace'])
+        df_agg['%E'] = 100*df_agg['distE'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
+        df_agg['%M'] = 100*df_agg['distM'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
+        df_agg['%T'] = 100*df_agg['distT'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
+        df_agg['%I'] = 100*df_agg['distI'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
+        df_agg['%R'] = 100*df_agg['distR'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
+
+        decimals = pd.Series([1, 1, 0, 0, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'run_avg_pace', '%E', '%M', '%T', '%I', '%R'])
+
         return df_agg.round(decimals).to_json(date_format='iso', orient='split')
 
     @app.callback(
@@ -414,7 +453,12 @@ def main():
                 {"name": "Dist.", "id": "distance"},
                 {"name": "Time", "id": "time"},
                 {"name": "Climb", "id": "climb"},
-                {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
+                {"name": "Run Avg.Pace", "id": "run_avg_pace"},
+                {"name": "%E", "id": "%E"},
+                {"name": "%M", "id": "%M"},
+                {"name": "%T", "id": "%T"},
+                {"name": "%I", "id": "%I"},
+                {"name": "%R", "id": "%R"},
             ]
         return columns
 

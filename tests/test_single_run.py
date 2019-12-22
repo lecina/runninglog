@@ -38,47 +38,47 @@ class TestSingleRun(unittest.TestCase):
 
     def test_parse_totaltime1(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("1h")
+        parsed_time = singleRun.parse_time("1h")
         self.assertEqual(parsed_time, 60)
 
     def test_parse_totaltime2(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("1m")
+        parsed_time = singleRun.parse_time("1m")
         self.assertEqual(parsed_time, 1)
 
     def test_parse_totaltime3(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("30s")
+        parsed_time = singleRun.parse_time("30s")
         self.assertEqual(parsed_time, 0.5)
 
     def test_parse_totaltime4(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("1h 30 min 30s")
+        parsed_time = singleRun.parse_time("1h 30 min 30s")
         self.assertEqual(parsed_time, 90.5)
 
     def test_parse_totaltime5(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("1h30min30s")
+        parsed_time = singleRun.parse_time("1h30min30s")
         self.assertEqual(parsed_time, 90.5)
 
     def test_parse_totaltime6(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("1h30m30seg")
+        parsed_time = singleRun.parse_time("1h30m30seg")
         self.assertEqual(parsed_time, 90.5)
 
     def test_parse_totaltime7(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("1h30mi30seg")
+        parsed_time = singleRun.parse_time("1h30mi30seg")
         self.assertEqual(parsed_time, 90.5)
 
     def test_parse_totaltime8(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("1h30mn30seg")
+        parsed_time = singleRun.parse_time("1h30mn30seg")
         self.assertEqual(parsed_time, 90.5)
 
     def test_parse_totaltime9(self):
         singleRun = single_run.SingleRun()
-        parsed_time = singleRun.parse_total_time("1hr30mn30seg")
+        parsed_time = singleRun.parse_time("1hr30mn30seg")
         self.assertEqual(parsed_time, 90.5)
 
     def test_parse_pace(self):
@@ -179,6 +179,14 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.WU], 0)
         self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.CD], 0)
 
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.E], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.M], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.T], 1378.24)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.I], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.R], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.WU], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.CD], 0)
+
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T], 236)
@@ -186,6 +194,7 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.R], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.WU], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.CD], None)
+
 
     def test_load_json2(self):
         singleRun = single_run.SingleRun()
@@ -314,6 +323,7 @@ class TestSingleRun(unittest.TestCase):
         singleRun.where = "Park"
         singleRun.notes = "Good!"
         singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E]=12
+        singleRun.basic_time[runTypes.BASIC_RUN_TYPES.E]=4500
         singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E]=375
 
         golden_dict = {
@@ -331,6 +341,12 @@ class TestSingleRun(unittest.TestCase):
             blockNames.Colnames.distI : 0,
             blockNames.Colnames.distR : 0,
             blockNames.Colnames.distX : 0,
+            blockNames.Colnames.timeE : 4500,
+            blockNames.Colnames.timeM : 0, 
+            blockNames.Colnames.timeT : 0,
+            blockNames.Colnames.timeI : 0,
+            blockNames.Colnames.timeR : 0,
+            blockNames.Colnames.timeX : 0,
             blockNames.Colnames.paceE : 375,
             blockNames.Colnames.paceM : None,
             blockNames.Colnames.paceT : None,

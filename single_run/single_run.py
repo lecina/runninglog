@@ -29,12 +29,20 @@ class SingleRun:
         #distances split over basic running types
         self.basic_dist = {}
         self.basic_pace = {}
+        self.basic_time = {}
         for k in runTypes.BASIC_RUN_TYPES_DICTIONARY.iterkeys():
             self.basic_dist[k] = 0 
+            self.basic_time[k] = 0 
             self.basic_pace[k] = None
 
     def __eq__(self, other):
         for (a,b) in zip(self.basic_dist.values(), other.basic_dist.values()):
+            if (a is not None and b is not None) and not utilities.isclose(a,b,abs_tol=1e-3):
+                return False
+            if (a is None and b is not None) or (a is not None and b is None):
+                return False
+
+        for (a,b) in zip(self.basic_time.values(), other.basic_time.values()):
             if (a is not None and b is not None) and not utilities.isclose(a,b,abs_tol=1e-3):
                 return False
             if (a is None and b is not None) or (a is not None and b is None):
@@ -81,6 +89,13 @@ class SingleRun:
                 print_dist[blockname_type] = d
         str_to_return += "Distances (km): %s\n"%print_dist
 
+        print_time = {}
+        for (t, d) in self.basic_time.iteritems():
+            if d != 0:
+                blockname_type = runTypes.BASIC_RUN_TYPES_DICTIONARY[t]
+                print_time[blockname_type] = d
+        str_to_return += "Times (sec): %s\n"%print_time
+
         print_pace = {}
         for (t, p) in self.basic_pace.iteritems():
             if p is not None: 
@@ -106,6 +121,12 @@ class SingleRun:
             blockNames.Colnames.distI : self.basic_dist[runTypes.BASIC_RUN_TYPES.I],
             blockNames.Colnames.distR : self.basic_dist[runTypes.BASIC_RUN_TYPES.R],
             blockNames.Colnames.distX : self.basic_dist[runTypes.BASIC_RUN_TYPES.X],
+            blockNames.Colnames.timeE : self.basic_time[runTypes.BASIC_RUN_TYPES.E],
+            blockNames.Colnames.timeM : self.basic_time[runTypes.BASIC_RUN_TYPES.M],
+            blockNames.Colnames.timeT : self.basic_time[runTypes.BASIC_RUN_TYPES.T],
+            blockNames.Colnames.timeI : self.basic_time[runTypes.BASIC_RUN_TYPES.I],
+            blockNames.Colnames.timeR : self.basic_time[runTypes.BASIC_RUN_TYPES.R],
+            blockNames.Colnames.timeX : self.basic_time[runTypes.BASIC_RUN_TYPES.X],
             blockNames.Colnames.paceE : self.basic_pace[runTypes.BASIC_RUN_TYPES.E],
             blockNames.Colnames.paceM : self.basic_pace[runTypes.BASIC_RUN_TYPES.M],
             blockNames.Colnames.paceT : self.basic_pace[runTypes.BASIC_RUN_TYPES.T],
@@ -120,7 +141,7 @@ class SingleRun:
         parsed_json = dict((k.lower(), v) for k, v in parsed_json.iteritems())
 
         #Compulsory
-        self.total_time = self.parse_total_time(parsed_json[blockNames.FileParams.time])
+        self.total_time = self.parse_time(parsed_json[blockNames.FileParams.time])
         #Compulsory
         self.total_distance = self.parse_distance(parsed_json[blockNames.FileParams.distance])
         #Compulsory
@@ -210,7 +231,7 @@ class SingleRun:
                         sys.exit("Unknown date format")
         return dateObj.date()
 
-    def parse_total_time(self, time_str):
+    def parse_time(self, time_str):
         """
             Parses time and returns it in minutes
         """
@@ -265,13 +286,28 @@ class SingleRun:
                     if key==v1: dictkey = k1
 
                 #distance is compulsory
-                self.basic_dist[dictkey] = self.parse_distance(val[blockNames.FileParams.distance])
+                parsed_distance = self.parse_distance(val[blockNames.FileParams.distance])
+                self.basic_dist[dictkey] = parsed_distance
+
                 try:
                     pace_str = val[blockNames.FileParams.pace]
                 except KeyError:
                     pace_str = None
 
-                self.basic_pace[dictkey] = self.parse_pace(pace_str)
+                try:
+                    time_str = val[blockNames.FileParams.time]
+                except KeyError:
+                    time_str = None
+
+                #if pace is given, the corresponding time is computed
+                if pace_str is not None:
+                    parsed_pace = self.parse_pace(pace_str)
+                    self.basic_pace[dictkey] = parsed_pace
+                    self.basic_time[dictkey] = parsed_distance * parsed_pace
+                elif time_str is not None:
+                    parsed_time = self.parse_time(pace_str)
+                    self.basic_time[dictkey] = parsed_time
+                    self.basic_pace[dictkey] = parsed_time / parsed_distance
 
             else:
                 sys.exit("Unknown sub-run type: %s", key)

@@ -24,6 +24,11 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.E] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.T] = 1378.24
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E] = None
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T] = 236
@@ -74,6 +79,11 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.E] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.T] = 1378.24
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E] = None
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T] = 236
@@ -93,6 +103,11 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 0
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.E] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.T] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.E] = 295.081967213
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.T] = None
@@ -172,9 +187,6 @@ class TestAllRuns(unittest.TestCase):
         goldenAdded1 = True
         goldenAdded2 = True
 
-        print df1.head()
-        print df2.head()
-
         self.assertEqual(added1, goldenAdded1)
         self.assertEqual(added2, goldenAdded2)
         self.assertEqual(df1.equals(df2), False)
@@ -198,6 +210,11 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.E] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.T] = 1378.24
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E] = None
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T] = 236
@@ -217,6 +234,11 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 0
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
         goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.E] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.T] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.E] = 295.081967213
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.T] = None

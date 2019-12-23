@@ -136,58 +136,61 @@ def main():
                 multi = True
             )], style={'padding':'10px 10px 10px 10px'}),
         html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data
+        html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='weekly_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='monthly_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='yearly_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div([
             html.Div([
-                dcc.Dropdown(
-                    id='yaxis-column2',
-                    options=[{'label': i, 'value': i} for i in available_cols],
-                    value='distance'
-                ),
-            ], style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
-            html.Div([
-                dcc.Dropdown(
-                    id='xaxis-column2',
-                    options=[{'label': i, 'value': i} for i in time_agg_options],
-                    value='week'
-                ),
-            ],style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
-            dcc.Graph(id='agg_graph') #graph!
-        ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
-        #display:flex;justify-content:center;align-items:center
+                html.Div([
+                    dcc.Dropdown(
+                        id='yaxis-column2',
+                        options=[{'label': i, 'value': i} for i in available_cols],
+                        value='distance'
+                    ),
+                ], style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
+                html.Div([
+                    dcc.Dropdown(
+                        id='xaxis-column2',
+                        options=[{'label': i, 'value': i} for i in time_agg_options],
+                        value='week'
+                    ),
+                ],style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
+                dcc.Graph(id='agg_graph') #graph!
+            ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
+            #display:flex;justify-content:center;align-items:center
 
-        html.Div([
-            html.Div([html.H5("Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
-            dash_table.DataTable(
-                    id='summary_table',
-                    data=df[0:0].to_dict('rows'),
-                    columns=[{'id': c, 'name': c} for c in df.columns],
-                    style_table={
-                        'overflowX': 'scroll', 
-                        'maxHeight': '150px',
-                        'overflowY': 'scroll'},
-                    css=[{
-                            'selector': '.dash-cell div.dash-cell-value',
-                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                        }],
-                    style_cell={
-                        'whiteSpace': 'no-wrap',
-                        'overflow': 'hidden',
-                        'textOverflow': 'ellipsis',
-                        'minWidth': '60px', 'maxWidth': '100px'
-                    },
-                    style_as_list_view=True,
-                    merge_duplicate_headers=True,
-                    style_header={
-                            'backgroundColor': 'white',
-                            'fontWeight': 'bold'
+            html.Div([
+                html.Div([html.H5("Running log:"),],style={'height':'30px', 'textAlign':'center'}),
+                dash_table.DataTable(
+                        id='total_runs_table',
+                        data=df[0:0].to_dict('rows'),
+                        columns=[{'id': c, 'name': c} for c in df.columns],
+                        style_table={
+                            'overflowX': 'scroll', 
+                            'maxHeight': '250px',
+                            'overflowY': 'scroll'},
+                        css=[{
+                                'selector': '.dash-cell div.dash-cell-value',
+                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                            }],
+                        style_cell={
+                            'whiteSpace': 'no-wrap',
+                            'overflow': 'hidden',
+                            'textOverflow': 'ellipsis',
+                            'minWidth': '60px', 'maxWidth': '100px'
                         },
-                    sort_action = 'native',
-                    fixed_rows = { 'headers': True, 'data': 0 }
-                ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
+                        style_as_list_view=True,
+                        merge_duplicate_headers=True,
+                        style_header={
+                                'backgroundColor': 'white',
+                                'fontWeight': 'bold'
+                            },
+                        sort_action = 'native',
+                        fixed_rows = { 'headers': True, 'data': 0 }
+                    ),
+            ], style={'width':'49%', 'display':'inline-block', 'height':'330px'}),
+        ], style={'width':'100%', 'display':'block', 'height':'350px'}),
         html.Div([
             html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
@@ -282,14 +285,14 @@ def main():
             dcc.Graph(id='freq_graph') #graph!
         ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
         html.Div([
-            html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
+            html.Div([html.H5("Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
-                    id='weekly_agg_table2',
+                    id='summary_table',
                     data=df[0:0].to_dict('rows'),
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '280',
+                        'maxHeight': '150px',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -313,6 +316,65 @@ def main():
         ],style={'display':'inline-block', 'width':'49%', 'float':'right', 'height':'330px'}),
         #], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
     ])
+
+    @app.callback(
+        dash.dependencies.Output('total_runs', 'children'),
+        [dash.dependencies.Input('type-dropdown', 'value'),
+        dash.dependencies.Input('year-slider', 'value'),
+        dash.dependencies.Input('date-picker-range', 'start_date'),
+        dash.dependencies.Input('date-picker-range', 'end_date')])
+    def selected_runs(chosen_basic_runTypes, chosen_year, start_date, end_date):
+        if chosen_year == df.date.dt.year.max()+1:
+            filt_df = df
+        else:
+            filt_df = df[df.date.dt.year == chosen_year]
+        filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
+        return filt_df.to_json(date_format='iso', orient='split')
+
+    @app.callback(
+        dash.dependencies.Output('total_runs_table', 'data'),
+        [dash.dependencies.Input('total_runs', 'children')])
+    def update_figure(total_runs_json):
+        df_total_runs = pd.read_json(total_runs_json, orient='split')
+
+        df_total_runs['time'] = df_total_runs['time'].apply(lambda x: '{:d}h {:0>2d}m'.format(int(x//60), int(x%60)))
+        df_total_runs['avg_pace'] = df_total_runs['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        df_total_runs['paceE'] = df_total_runs['paceE'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        df_total_runs['paceM'] = df_total_runs['paceM'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        df_total_runs['paceT'] = df_total_runs['paceT'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        df_total_runs['paceI'] = df_total_runs['paceI'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        df_total_runs['paceR'] = df_total_runs['paceR'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR'])
+
+        #df_total_runs.date = df_total_runs.date.dt.strftime("%d-%m-%y")
+        df_total_runs.date = df_total_runs.date.apply(lambda x: x.strftime("%y/%m/%d"))
+        return df_total_runs.round(decimals).sort_values(by=['date'], ascending=False).to_dict('rows')
+
+    @app.callback(
+        dash.dependencies.Output('total_runs_table', 'columns'),
+        [dash.dependencies.Input('total_runs', 'children')])
+    def update_figure(df_agg_json):
+        columns=[
+                {"name": "Date", "id": "date"},
+                {"name": "Type", "id": "type"},
+                {"name": "Dist.", "id": "distance"},
+                {"name": "Time", "id": "time"},
+                {"name": "Climb", "id": "climb"},
+                {"name": "Avg.Pace", "id": "avg_pace"},
+                {"name": "Where", "id": "where"},
+                {"name": "Notes", "id": "notes"},
+                {"name": "Dist.E", "id": "distE"},
+                {"name": "Dist.M", "id": "distM"},
+                {"name": "Dist.T", "id": "distT"},
+                {"name": "Dist.I", "id": "distI"},
+                {"name": "Dist.R", "id": "distR"},
+                {"name": "Pace.E", "id": "paceE"},
+                {"name": "Pace.M", "id": "paceM"},
+                {"name": "Pace.T", "id": "paceT"},
+                {"name": "Pace.I", "id": "paceI"},
+                {"name": "Pace.R", "id": "paceR"},
+            ]
+        return columns
 
     @app.callback(
         dash.dependencies.Output('agg_df', 'children'),

@@ -2,7 +2,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
-import plotly.figure_factory as ff
+from plotly.tools import FigureFactory as ff
 import seaborn as sns
 import matplotlib.pyplot as plt
 import dash_table
@@ -166,7 +166,7 @@ def main():
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '150',
+                        'maxHeight': '150px',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -178,16 +178,14 @@ def main():
                         'textOverflow': 'ellipsis',
                         'minWidth': '60px', 'maxWidth': '100px'
                     },
-                    #n_fixed_columns=1,
-                    n_fixed_rows=1,
                     style_as_list_view=True,
                     merge_duplicate_headers=True,
                     style_header={
                             'backgroundColor': 'white',
                             'fontWeight': 'bold'
                         },
-                    sorting=True,
-                    sorting_type="multi",
+                    sort_action = 'native',
+                    fixed_rows = { 'headers': True, 'data': 0 }
                 ),
         ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
         html.Div([
@@ -198,7 +196,7 @@ def main():
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '280',
+                        'maxHeight': '280px',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -210,16 +208,14 @@ def main():
                         'textOverflow': 'ellipsis',
                         'minWidth': '60px', 'maxWidth': '100px'
                     },
-                    #n_fixed_columns=1,
-                    n_fixed_rows=1,
                     style_as_list_view=True,
                     merge_duplicate_headers=True,
                     style_header={
                             'backgroundColor': 'white',
                             'fontWeight': 'bold'
                         },
-                    sorting=True,
-                    sorting_type="multi",
+                    sort_action = 'native',
+                    fixed_rows = { 'headers': True, 'data': 0 }
                 ),
         ], style={'width':'80%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'border':'3px solid'}),
         html.Div([
@@ -230,7 +226,7 @@ def main():
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '150',
+                        'maxHeight': '150px',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -242,16 +238,14 @@ def main():
                         'textOverflow': 'ellipsis',
                         'minWidth': '60px', 'maxWidth': '100px'
                     },
-                    #n_fixed_columns=1,
-                    n_fixed_rows=1,
                     style_as_list_view=True,
                     merge_duplicate_headers=True,
                     style_header={
                             'backgroundColor': 'white',
                             'fontWeight': 'bold'
                         },
-                    sorting=True,
-                    sorting_type="multi",
+                    sort_action = 'native',
+                    fixed_rows = { 'headers': True, 'data': 0 }
                 ),
         ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left', 'padding-top':'10px', 'height':'200px'}),
         html.Div([
@@ -262,7 +256,7 @@ def main():
                     columns=[{'id': c, 'name': c} for c in df.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '150',
+                        'maxHeight': '150px',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -274,16 +268,14 @@ def main():
                         'textOverflow': 'ellipsis',
                         'minWidth': '60px', 'maxWidth': '100px'
                     },
-                    #n_fixed_columns=1,
-                    n_fixed_rows=1,
                     style_as_list_view=True,
                     merge_duplicate_headers=True,
                     style_header={
                             'backgroundColor': 'white',
                             'fontWeight': 'bold'
                         },
-                    sorting=True,
-                    sorting_type="multi",
+                    sort_action = 'native',
+                    fixed_rows = { 'headers': True, 'data': 0 }
                 ),
         ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'padding-top':'10px', 'height':'200px'}),
         html.Div([
@@ -309,16 +301,14 @@ def main():
                         'textOverflow': 'ellipsis',
                         'minWidth': '60px', 'maxWidth': '100px'
                     },
-                    #n_fixed_columns=1,
-                    n_fixed_rows=1,
                     style_as_list_view=True,
                     merge_duplicate_headers=True,
                     style_header={
                             'backgroundColor': 'white',
                             'fontWeight': 'bold'
                         },
-                    sorting=True,
-                    sorting_type="multi",
+                    sort_action = 'native',
+                    fixed_rows = { 'headers': True, 'data': 0 }
                 ),
         ],style={'display':'inline-block', 'width':'49%', 'float':'right', 'height':'330px'}),
         #], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
@@ -550,6 +540,7 @@ def main():
                     x=df_agg[:][xaxis_colname],
                     y=df_agg[:][distance_template%i],
                     opacity=0.5,
+                    hovertext = df_agg[:]['distance'],
                     marker={ 'color': runTypesToColors[i] },
                     name=i
                 ) for i in basic_runType_order if i in chosen_basic_runTypes

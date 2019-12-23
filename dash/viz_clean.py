@@ -41,7 +41,8 @@ def get_basic_runTypes_order():
                      blockNames.RunTypes.T,
                      blockNames.RunTypes.I,
                      blockNames.RunTypes.R,
-                     blockNames.RunTypes.X]
+                     blockNames.RunTypes.X,
+                     blockNames.RunTypes.XB]
     return runType_order
 
 def get_runType_colors(runType_order):
@@ -55,7 +56,7 @@ def get_runType_colors(runType_order):
                 #'#7f7f7f', # middle gray
                 #'#bcbd22', # curry yellow-green
                 '#8c564b', # chestnut brown
-                '#99660']
+                '#bb6600']
     runTypesToColors = {runType_order[i]:colors[i] for i in range(len(runType_order))}
 
     return runTypesToColors
@@ -396,7 +397,7 @@ def main():
         #if ycol is distance, segment it by types
         distance_cols = 'dist%s'
 
-        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX']
+        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB']
         df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').sum()
         df_agg[time_option] = df_agg.index
         if time_option == 'week':

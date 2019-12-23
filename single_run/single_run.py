@@ -121,18 +121,21 @@ class SingleRun:
             blockNames.Colnames.distI : self.basic_dist[runTypes.BASIC_RUN_TYPES.I],
             blockNames.Colnames.distR : self.basic_dist[runTypes.BASIC_RUN_TYPES.R],
             blockNames.Colnames.distX : self.basic_dist[runTypes.BASIC_RUN_TYPES.X],
+            blockNames.Colnames.distXB : self.basic_dist[runTypes.BASIC_RUN_TYPES.XB],
             blockNames.Colnames.timeE : self.basic_time[runTypes.BASIC_RUN_TYPES.E],
             blockNames.Colnames.timeM : self.basic_time[runTypes.BASIC_RUN_TYPES.M],
             blockNames.Colnames.timeT : self.basic_time[runTypes.BASIC_RUN_TYPES.T],
             blockNames.Colnames.timeI : self.basic_time[runTypes.BASIC_RUN_TYPES.I],
             blockNames.Colnames.timeR : self.basic_time[runTypes.BASIC_RUN_TYPES.R],
             blockNames.Colnames.timeX : self.basic_time[runTypes.BASIC_RUN_TYPES.X],
+            blockNames.Colnames.timeXB : self.basic_time[runTypes.BASIC_RUN_TYPES.XB],
             blockNames.Colnames.paceE : self.basic_pace[runTypes.BASIC_RUN_TYPES.E],
             blockNames.Colnames.paceM : self.basic_pace[runTypes.BASIC_RUN_TYPES.M],
             blockNames.Colnames.paceT : self.basic_pace[runTypes.BASIC_RUN_TYPES.T],
             blockNames.Colnames.paceI : self.basic_pace[runTypes.BASIC_RUN_TYPES.I],
             blockNames.Colnames.paceR : self.basic_pace[runTypes.BASIC_RUN_TYPES.R],
-            blockNames.Colnames.paceX : self.basic_pace[runTypes.BASIC_RUN_TYPES.X]
+            blockNames.Colnames.paceX : self.basic_pace[runTypes.BASIC_RUN_TYPES.X],
+            blockNames.Colnames.paceXB : self.basic_pace[runTypes.BASIC_RUN_TYPES.XB]
         }
         return rdict
 
@@ -299,13 +302,15 @@ class SingleRun:
                 except KeyError:
                     time_str = None
 
-                #if pace is given, the corresponding time is computed
+                #if pace is given, the corresponding time is computed regadrless of 
+                # whether it is provided or not
+                #if time is given and  pace is not, the latter is guessed
                 if pace_str is not None:
                     parsed_pace = self.parse_pace(pace_str)
                     self.basic_pace[dictkey] = parsed_pace
                     self.basic_time[dictkey] = parsed_distance * parsed_pace
                 elif time_str is not None:
-                    parsed_time = self.parse_time(pace_str)
+                    parsed_time = self.parse_time(time_str)
                     self.basic_time[dictkey] = parsed_time
                     self.basic_pace[dictkey] = parsed_time / parsed_distance
 

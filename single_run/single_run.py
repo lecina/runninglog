@@ -191,7 +191,6 @@ class SingleRun:
         else:
             self.fill_basic_runtype_info_with_global_type()
 
-
         #notes
         try:
             self.notes = parsed_json[blockNames.FileParams.notes]
@@ -200,8 +199,9 @@ class SingleRun:
 
         #compute other measures
         self.avg_pace = self.compute_avg_pace()
-        self.redistribute_distances()
+        self.redistribute_distances_and_times()
 
+        self.compute_basic_types_avg_paces()
 
     def parse_type(self, type_str):
         """
@@ -290,7 +290,7 @@ class SingleRun:
 
                 #distance is compulsory
                 parsed_distance = self.parse_distance(val[blockNames.FileParams.distance])
-                self.basic_dist[dictkey] = parsed_distance
+                self.basic_dist[dictkey] += parsed_distance
 
                 try:
                     pace_str = val[blockNames.FileParams.pace]
@@ -307,12 +307,10 @@ class SingleRun:
                 #if time is given and  pace is not, the latter is guessed
                 if pace_str is not None:
                     parsed_pace = self.parse_pace(pace_str)
-                    self.basic_pace[dictkey] = parsed_pace
-                    self.basic_time[dictkey] = parsed_distance * parsed_pace
+                    self.basic_time[dictkey] += parsed_distance * parsed_pace
                 elif time_str is not None:
                     parsed_time = self.parse_time(time_str)
-                    self.basic_time[dictkey] = parsed_time
-                    self.basic_pace[dictkey] = parsed_time / parsed_distance
+                    self.basic_time[dictkey] += parsed_time
 
             else:
                 sys.exit("Unknown sub-run type: %s", key)
@@ -335,6 +333,7 @@ class SingleRun:
             dictkey = runTypes.BASIC_RUN_TYPES.E
 
         self.basic_dist[dictkey] = self.total_distance
+        self.basic_time[dictkey] = self.total_time * 60
         self.basic_pace[dictkey] = self.total_time * 60 / self.total_distance
 
     def compute_avg_pace(self):
@@ -343,7 +342,7 @@ class SingleRun:
         else:
             return None
 
-    def redistribute_distances(self):
+    def redistribute_distances_and_times(self):
         #grouping into basic run types 
         self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.basic_dist[runTypes.BASIC_RUN_TYPES.WU]
         self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.basic_dist[runTypes.BASIC_RUN_TYPES.CD]
@@ -353,3 +352,18 @@ class SingleRun:
 
         #to account for innacuracies, e.g due to jogging in between intervals
         self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.total_distance - sum(self.basic_dist.values())
+
+        assigned_time = 0
+        for tm in self.basic_time.itervalues():
+            assigned_time += tm
+
+        unassigned_time = self.total_time*60 - assigned_time
+        self.basic_time[runTypes.BASIC_RUN_TYPES.E] += unassigned_time
+
+    def compute_basic_types_avg_paces(self):
+        for i in range(len(self.basic_pace)):
+            try:
+                if self.basic_time[i] != 0:
+                    self.basic_pace[i] = self.basic_time[i] / self.basic_dist[i]
+            except ZeroDivisionError:
+                pass

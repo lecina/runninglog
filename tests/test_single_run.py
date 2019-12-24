@@ -341,18 +341,21 @@ class TestSingleRun(unittest.TestCase):
             blockNames.Colnames.distI : 0,
             blockNames.Colnames.distR : 0,
             blockNames.Colnames.distX : 0,
+            blockNames.Colnames.distXB : 0,
             blockNames.Colnames.timeE : 4500,
             blockNames.Colnames.timeM : 0, 
             blockNames.Colnames.timeT : 0,
             blockNames.Colnames.timeI : 0,
             blockNames.Colnames.timeR : 0,
             blockNames.Colnames.timeX : 0,
+            blockNames.Colnames.timeXB : 0,
             blockNames.Colnames.paceE : 375,
             blockNames.Colnames.paceM : None,
             blockNames.Colnames.paceT : None,
             blockNames.Colnames.paceI : None,
             blockNames.Colnames.paceR : None,
-            blockNames.Colnames.paceX : None
+            blockNames.Colnames.paceX : None,
+            blockNames.Colnames.paceXB : None
         }
 
         self.assertEqual(singleRun.as_dict(), golden_dict)

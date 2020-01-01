@@ -101,11 +101,11 @@ class TestSingleRun(unittest.TestCase):
     def test_fill_info_with_dict(self):
         singleRun = single_run.SingleRun()
 
-        input_dict = {
-            "WU" : {"distance" : 2.36},
-            "T" : {"distance": 5.84, "pace":"3:56"},
-            "CD" : {"distance" : 2.2}
-        }
+        input_dict = [
+            {"type": "WU", "distance" : 2.36},
+            {"type":"T", "distance": 5.84, "pace":"3:56"},
+            {"type":"CD", "distance" : 2.2}
+        ]
 
         singleRun.fill_basic_runtype_info_with_dict(input_dict)
 
@@ -116,11 +116,16 @@ class TestSingleRun(unittest.TestCase):
     def test_redistribute_distances_and_times(self):
         singleRun = single_run.SingleRun()
 
-        input_dict = {
-            "WU" : {"distance" : 2.36},
-            "T" : {"distance": 5.84, "pace":"3:56"},
-            "CD" : {"distance" : 2.2}
-        }
+        input_dict = [
+            {"type": "WU", "distance" : 2.36},
+            {"type":"T", "distance": 5.84, "pace":"3:56"},
+            {"type":"CD", "distance" : 2.2}
+        ]
+        #input_dict = {
+        #    "WU" : {"distance" : 2.36},
+        #    "T" : {"distance": 5.84, "pace":"3:56"},
+        #    "CD" : {"distance" : 2.2}
+        #}
 
         singleRun.total_distance = 10.40
 
@@ -145,11 +150,11 @@ class TestSingleRun(unittest.TestCase):
                         "climb": 110, 
                         "where":"Park",
                         "notes": "Feeling good!",
-                        "structure":{
-                            "E" : {"distance" : 2.36},
-                            "T" : {"distance": 5.84, "pace":"3:56"},
-                            "E" : {"distance" : 2.2}
-                        }
+                        "structure":[
+                            {"type":"E", "distance" : 2.36},
+                            {"type":"T", "distance": 5.84, "pace":"3:56"},
+                            {"type":"E", "distance" : 2.2}
+                        ]
                       }
 
         singleRun.load_json(parsed_json)
@@ -276,9 +281,9 @@ class TestSingleRun(unittest.TestCase):
                         "date": "26-11-2018",
                         "time": "1h 15m",
                         "distance": 15,
-                        "structure": {
-                            "M":{"distance":15}
-                        }
+                        "structure": [
+                            {"type":"M", "distance":15}
+                        ]
                       }
 
         singleRun.load_json(parsed_json)
@@ -307,6 +312,55 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.R], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.WU], None)
         self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.CD], None)
+
+    def test_load_json5(self):
+        singleRun = single_run.SingleRun()
+
+        parsed_json = {
+                        "type": "T",
+                        "date": "01-01-2020",
+                        "time": "1h",
+                        "distance": 14,
+                        "structure": [
+                            {"type":"T", "distance":5, "time":"18min"},
+                            {"type":"T", "distance":5, "time":"22min"}
+                        ]
+                      }
+
+        singleRun.load_json(parsed_json)
+
+        self.assertEqual(singleRun.total_time, 60)
+
+        self.assertEqual(singleRun.climb, 0)
+
+        self.assertEqual(singleRun.where, "")
+
+        dateObj = datetime.datetime.strptime("01/01/2020", "%d/%m/%Y").date()
+        self.assertEqual(singleRun.date, dateObj)
+
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E], 4)
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M], 0)
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T], 10)
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I], 0)
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R], 0)
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.WU], 0)
+        self.assertEqual(singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.CD], 0)
+
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E], 300)
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M], None)
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T], 240)
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.I], None)
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.R], None)
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.WU], None)
+        self.assertEqual(singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.CD], None)
+
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.E], 20*60)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.M], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.T], 40*60)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.I], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.R], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.WU], 0)
+        self.assertEqual(singleRun.basic_time[runTypes.BASIC_RUN_TYPES.CD], 0)
 
     def test_as_dict(self):
         singleRun = single_run.SingleRun()

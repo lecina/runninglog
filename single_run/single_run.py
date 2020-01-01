@@ -280,25 +280,26 @@ class SingleRun:
 
         return pace
 
-    def fill_basic_runtype_info_with_dict(self, struct_dict):
-        for key,val in struct_dict.iteritems():
-            val = dict((k.lower(), v) for k, v in val.iteritems())
-            if key in runTypes.BASIC_RUN_TYPES_DICTIONARY.values():
+    def fill_basic_runtype_info_with_dict(self, struct_list_dict):
+        for item in struct_list_dict:
+            item_dict = dict((k.lower(), v) for k, v in item.iteritems())
+            type_str = item_dict[blockNames.FileParams.type]
+            if type_str in runTypes.BASIC_RUN_TYPES_DICTIONARY.values():
                 dictkey = 0
                 for (k1,v1) in runTypes.BASIC_RUN_TYPES_DICTIONARY.iteritems():
-                    if key==v1: dictkey = k1
+                    if type_str==v1: dictkey = k1
 
                 #distance is compulsory
-                parsed_distance = self.parse_distance(val[blockNames.FileParams.distance])
+                parsed_distance = self.parse_distance(item_dict[blockNames.FileParams.distance])
                 self.basic_dist[dictkey] += parsed_distance
 
                 try:
-                    pace_str = val[blockNames.FileParams.pace]
+                    pace_str = item_dict[blockNames.FileParams.pace]
                 except KeyError:
                     pace_str = None
 
                 try:
-                    time_str = val[blockNames.FileParams.time]
+                    time_str = item_dict[blockNames.FileParams.time]
                 except KeyError:
                     time_str = None
 
@@ -310,7 +311,7 @@ class SingleRun:
                     self.basic_time[dictkey] += parsed_distance * parsed_pace
                 elif time_str is not None:
                     parsed_time = self.parse_time(time_str)
-                    self.basic_time[dictkey] += parsed_time
+                    self.basic_time[dictkey] += parsed_time * 60
 
             else:
                 sys.exit("Unknown sub-run type: %s", key)

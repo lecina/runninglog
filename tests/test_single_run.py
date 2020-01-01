@@ -101,11 +101,11 @@ class TestSingleRun(unittest.TestCase):
     def test_fill_info_with_dict(self):
         singleRun = single_run.SingleRun()
 
-        input_dict = {
-            "WU" : {"distance" : 2.36},
-            "T" : {"distance": 5.84, "pace":"3:56"},
-            "CD" : {"distance" : 2.2}
-        }
+        input_dict = [
+            {"type": "WU", "distance" : 2.36},
+            {"type":"T", "distance": 5.84, "pace":"3:56"},
+            {"type":"CD", "distance" : 2.2}
+        ]
 
         singleRun.fill_basic_runtype_info_with_dict(input_dict)
 
@@ -116,11 +116,16 @@ class TestSingleRun(unittest.TestCase):
     def test_redistribute_distances_and_times(self):
         singleRun = single_run.SingleRun()
 
-        input_dict = {
-            "WU" : {"distance" : 2.36},
-            "T" : {"distance": 5.84, "pace":"3:56"},
-            "CD" : {"distance" : 2.2}
-        }
+        input_dict = [
+            {"type": "WU", "distance" : 2.36},
+            {"type":"T", "distance": 5.84, "pace":"3:56"},
+            {"type":"CD", "distance" : 2.2}
+        ]
+        #input_dict = {
+        #    "WU" : {"distance" : 2.36},
+        #    "T" : {"distance": 5.84, "pace":"3:56"},
+        #    "CD" : {"distance" : 2.2}
+        #}
 
         singleRun.total_distance = 10.40
 
@@ -145,11 +150,11 @@ class TestSingleRun(unittest.TestCase):
                         "climb": 110, 
                         "where":"Park",
                         "notes": "Feeling good!",
-                        "structure":{
-                            "E" : {"distance" : 2.36},
-                            "T" : {"distance": 5.84, "pace":"3:56"},
-                            "E" : {"distance" : 2.2}
-                        }
+                        "structure":[
+                            {"type":"E", "distance" : 2.36},
+                            {"type":"T", "distance": 5.84, "pace":"3:56"},
+                            {"type":"E", "distance" : 2.2}
+                        ]
                       }
 
         singleRun.load_json(parsed_json)
@@ -276,9 +281,9 @@ class TestSingleRun(unittest.TestCase):
                         "date": "26-11-2018",
                         "time": "1h 15m",
                         "distance": 15,
-                        "structure": {
-                            "M":{"distance":15}
-                        }
+                        "structure": [
+                            {"type":"M", "distance":15}
+                        ]
                       }
 
         singleRun.load_json(parsed_json)

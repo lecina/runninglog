@@ -35,7 +35,7 @@ class RunningLog():
 
     def load_all_runs(self):
         if os.path.isfile(self.fname%"pkl"):
-            self.allRuns.load_all_runs(self.fname)
+            self.allRuns.load_all_runs(self.fname%"pkl")
 
     def save_all_runs(self, ext="pkl"):
         utilities.make_dir(self.all_runs_output_dir)
@@ -46,7 +46,7 @@ class RunningLog():
             self.allRuns.save_all_runs_as_csv(self.fname%ext)
 
     def load_files_in_directory(self, directory):
-        loaded_files = self.allRuns.load_files_in_dir(directory)
+        loaded_files = self.allRuns.load_files_in_dir(directory, verbose=False)
         return loaded_files
 
     def generate_empty_json(self):

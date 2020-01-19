@@ -1,13 +1,16 @@
 from constants import blockNames
 from utilities import utilities
 import runTypes
+import segment
 
 import datetime
 import re
 import numbers
 import sys
 
-class SingleRun:
+class SingleRun(segment.Segment):
+    #Single run contains all info from single run
+    #Segment contains basic info such as parsers
     def __init__(self):
         self.type = ""
 
@@ -34,6 +37,8 @@ class SingleRun:
             self.basic_dist[k] = 0 
             self.basic_time[k] = 0 
             self.basic_pace[k] = None
+
+        self.run_structure = [] #to fill with provided structure
 
     def __eq__(self, other):
         for (a,b) in zip(self.basic_dist.values(), other.basic_dist.values()):
@@ -214,72 +219,6 @@ class SingleRun:
         #If run_type is not found, set it to E
         return runTypes.RUN_TYPES.E
 
-    def parse_date(self, date_str):
-        fmt="%d/%m/%Y"
-        try:
-            dateObj = datetime.datetime.strptime(date_str, fmt)
-        except ValueError:
-            fmt="%d/%m/%y"
-            try:
-                dateObj = datetime.datetime.strptime(date_str, fmt)
-            except ValueError:
-                fmt="%d-%m-%Y"
-                try:
-                    dateObj = datetime.datetime.strptime(date_str, fmt)
-                except ValueError:
-                    fmt="%d-%m-%y"
-                    try:
-                        dateObj = datetime.datetime.strptime(date_str, fmt)
-                    except ValueError:
-                        sys.exit("Unknown date format")
-        return dateObj.date()
-
-    def parse_time(self, time_str):
-        """
-            Parses time and returns it in minutes
-        """
-        #solution based on https://stackoverflow.com/questions/4628122/how-to-construct-a-timedelta-object-from-a-simple-string
-        #work out regex a little bit more: only math r if h was matched
-        regex = re.compile(r'((?P<hours>\d+?)h)?([r])?((?P<minutes>\d+?)m)?([i])?([n])?((?P<seconds>\d+?)s)?')
-        time_str = time_str.replace(" ", "")
-        time = regex.search(time_str).groupdict()
-
-        time_in_minutes = 0
-        if time["hours"] is not None: 
-            time_in_minutes += int(time["hours"]) * 60 
-        if time["minutes"] is not None: 
-            time_in_minutes += int(time["minutes"])
-        if time["seconds"] is not None: 
-            time_in_minutes += float(time["seconds"])/60
-
-        return time_in_minutes
-
-    def parse_distance(self, dist_str):
-        """
-            Parses distance and returns it in km
-        """
-        if isinstance(dist_str, numbers.Number):
-            return dist_str #not actually a string
-
-        regex = re.compile(r'((?P<km>\d(.\d+)?))?')
-        dist = regex.search(dist_str).groupdict()
-
-        return float(dist["km"])
-    
-    def parse_pace(self, pace_str):
-        if pace_str is None:
-            return None
-
-        if isinstance(pace_str, numbers.Number):
-            return pace_str #not a string
-
-        regex = re.compile(r'((?P<min>\d):(?P<sec>\d+?))$')
-        pace_dict = regex.search(pace_str).groupdict()
-
-        pace = int(pace_dict["min"])*60 + int(pace_dict["sec"])
-
-        return pace
-
     def fill_basic_runtype_info_with_dict(self, struct_list_dict):
         for item in struct_list_dict:
             item_dict = dict((k.lower(), v) for k, v in item.iteritems())
@@ -308,10 +247,19 @@ class SingleRun:
                 #if time is given and  pace is not, the latter is guessed
                 if pace_str is not None:
                     parsed_pace = self.parse_pace(pace_str)
-                    self.basic_time[dictkey] += parsed_distance * parsed_pace
+                    parsed_time = parsed_distance * parsed_pace
+                    self.basic_time[dictkey] += parsed_time
                 elif time_str is not None:
-                    parsed_time = self.parse_time(time_str)
-                    self.basic_time[dictkey] += parsed_time * 60
+                    parsed_time = self.parse_time(time_str) * 60
+                    parsed_pace = parsed_time / parsed_distance #CHECK!!!
+                    self.basic_time[dictkey] += parsed_time
+                else:
+                    parsed_time = None
+                    parsed_pace = None
+
+                
+                #TODO: create new data structure
+                self.run_structure.append({"type":type_str, "distance":parsed_distance, "pace":parsed_pace, "time":parsed_time})
 
             else:
                 sys.exit("Unknown sub-run type: %s", key)

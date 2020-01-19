@@ -8,6 +8,7 @@ class FileParams:
     pace = "pace"
     where = "where"
     notes = "notes"
+    bpm = "bpm"
     list = "list"
 
 class Colnames:

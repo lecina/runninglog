@@ -3,6 +3,7 @@ from constants import blockNames
 class BASIC_RUN_TYPES:
     E, M, T, I, R, WU, CD, X, XB = range(9)
 
+#TODO:change name for SEGMENT_RUN_TYPES
 BASIC_RUN_TYPES_DICTIONARY = {
     BASIC_RUN_TYPES.E : blockNames.RunTypes.E, 
     BASIC_RUN_TYPES.M : blockNames.RunTypes.M, 

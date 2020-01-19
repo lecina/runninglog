@@ -71,7 +71,7 @@ class SingleRun(segment.Segment):
     def __str__(self):
         str_to_return = ""
         if self.date is not None:
-            str_to_return += "Date: %s\n"%self.date.date()
+            str_to_return += "Date: %s\n"%self.date
         if self.where is not None:
             str_to_return += "Location: %s\n"%self.where
 
@@ -221,48 +221,25 @@ class SingleRun(segment.Segment):
 
     def fill_basic_runtype_info_with_dict(self, struct_list_dict):
         for item in struct_list_dict:
-            item_dict = dict((k.lower(), v) for k, v in item.iteritems())
-            type_str = item_dict[blockNames.FileParams.type]
-            if type_str in runTypes.BASIC_RUN_TYPES_DICTIONARY.values():
-                dictkey = 0
-                for (k1,v1) in runTypes.BASIC_RUN_TYPES_DICTIONARY.iteritems():
-                    if type_str==v1: dictkey = k1
+            sgmnt = segment.Segment()
+            sgmnt.create_segment(item)
 
-                #distance is compulsory
-                parsed_distance = self.parse_distance(item_dict[blockNames.FileParams.distance])
-                self.basic_dist[dictkey] += parsed_distance
+            #if sgmnt.is_empty(): return
 
-                try:
-                    pace_str = item_dict[blockNames.FileParams.pace]
-                except KeyError:
-                    pace_str = None
+            dictkey = 0
+            #for (k1,v1) in runTypes.BASIC_RUN_TYPES_DICTIONARY.iteritems():
+            #    if sgmnt.type==v1: dictkey = k1
+            dictkey=sgmnt.type
 
-                try:
-                    time_str = item_dict[blockNames.FileParams.time]
-                except KeyError:
-                    time_str = None
+            self.basic_dist[dictkey] += sgmnt.distance
 
-                #if pace is given, the corresponding time is computed regadrless of 
-                # whether it is provided or not
-                #if time is given and  pace is not, the latter is guessed
-                if pace_str is not None:
-                    parsed_pace = self.parse_pace(pace_str)
-                    parsed_time = parsed_distance * parsed_pace
-                    self.basic_time[dictkey] += parsed_time
-                elif time_str is not None:
-                    parsed_time = self.parse_time(time_str) * 60
-                    parsed_pace = parsed_time / parsed_distance #CHECK!!!
-                    self.basic_time[dictkey] += parsed_time
-                else:
-                    parsed_time = None
-                    parsed_pace = None
+            time = sgmnt.time
+            if time is not None:
+                self.basic_time[dictkey] += time
 
-                
-                #TODO: create new data structure
-                self.run_structure.append({"type":type_str, "distance":parsed_distance, "pace":parsed_pace, "time":parsed_time})
+            sgmnt.date = self.date
 
-            else:
-                sys.exit("Unknown sub-run type: %s", key)
+            self.run_structure.append(sgmnt)
 
     def fill_basic_runtype_info_with_global_type(self):
         """

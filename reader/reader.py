@@ -1,4 +1,5 @@
 import json
+import sys
 
 def __unicodeToStr(data):
     #convert dict
@@ -16,5 +17,8 @@ def __unicodeToStr(data):
 
 def read_file(jsonParams):
     jsonFile = open(jsonParams, 'r').read()
-    parsedJSON = json.loads(jsonFile)
+    try:
+        parsedJSON = json.loads(jsonFile)
+    except ValueError:
+        sys.exit("Could not read: %s"%jsonParams)
     return parsedJSON

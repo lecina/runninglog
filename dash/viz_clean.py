@@ -132,7 +132,7 @@ def main():
             dcc.Dropdown(
                 id='type-dropdown',
                 options=runTypes_long_name,
-                value=[blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.M, blockNames.RunTypes.E],
+                value=[blockNames.RunTypes.XB, blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.M, blockNames.RunTypes.E],
                 multi = True
             )], style={'padding':'10px 10px 10px 10px'}),
         html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data

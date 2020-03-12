@@ -11,6 +11,7 @@ import pickle
 class AllRuns():
     def __init__(self):
         self.df = pd.DataFrame()
+        self.structures = pd.DataFrame() #TODO: append structures
 
     def read_single_run(self, filename, verbose=True):
         if verbose: print "Reading", filename
@@ -40,6 +41,7 @@ class AllRuns():
 
         if not already_added:
             self.df = self.df.append(sr_ds, ignore_index=True)
+            self.structures = pd.concat([self.structures, sr.get_structure_as_df()], axis=0)
 
         added_sr = not already_added
         return added_sr
@@ -94,3 +96,15 @@ class AllRuns():
 
     def load_all_runs_from_csv(self, fname):
         self.df = pd.from_csv(fname)
+
+    def save_all_runs_structures(self, fname):
+        self.structures.to_pickle(fname)
+
+    def load_all_runs_structures(self, fname):
+        self.structures = pd.read_pickle(fname)
+
+    def save_all_runs_structures_as_csv(self, fname):
+        self.structures.to_csv(fname, encoding='utf-8')
+
+    def load_all_runs_structures_from_csv(self, fname):
+        self.structures = pd.from_csv(fname)

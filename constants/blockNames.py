@@ -41,6 +41,8 @@ class Colnames:
     paceR = "paceR"
     paceX = "paceX"
     paceXB = "paceXB"
+    bpm = "bpm"
+    repetition = "#"
 
 class RunTypes:
     type = "type"

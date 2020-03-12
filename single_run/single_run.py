@@ -7,6 +7,7 @@ import datetime
 import re
 import numbers
 import sys
+import pandas as pd
 
 class SingleRun(segment.Segment):
     #Single run contains all info from single run
@@ -38,7 +39,7 @@ class SingleRun(segment.Segment):
             self.basic_time[k] = 0 
             self.basic_pace[k] = None
 
-        self.run_structure = [] #to fill with provided structure
+        self.run_structure = []
 
     def __eq__(self, other):
         for (a,b) in zip(self.basic_dist.values(), other.basic_dist.values()):
@@ -144,6 +145,13 @@ class SingleRun(segment.Segment):
         }
         return rdict
 
+    def get_structure_as_df(self):
+        df = pd.DataFrame()
+        for sgmnt in self.run_structure:
+            ds_sgmnt = pd.Series(sgmnt.as_dict())
+            df = df.append(ds_sgmnt, ignore_index=True)
+        return df
+
     def load_json(self, parsed_json):
         self.orig_json_string = parsed_json
         parsed_json = dict((k.lower(), v) for k, v in parsed_json.iteritems())
@@ -220,22 +228,17 @@ class SingleRun(segment.Segment):
         return runTypes.RUN_TYPES.E
 
     def fill_basic_runtype_info_with_dict(self, struct_list_dict):
-        for item in struct_list_dict:
+        for rep_num,item in enumerate(struct_list_dict):
             sgmnt = segment.Segment()
-            sgmnt.create_segment(item)
+            sgmnt.create_segment(item,rep_num)
 
-            #if sgmnt.is_empty(): return
+            if sgmnt.is_empty(): return
 
-            dictkey = 0
-            #for (k1,v1) in runTypes.BASIC_RUN_TYPES_DICTIONARY.iteritems():
-            #    if sgmnt.type==v1: dictkey = k1
             dictkey=sgmnt.type
 
             self.basic_dist[dictkey] += sgmnt.distance
 
-            time = sgmnt.time
-            if time is not None:
-                self.basic_time[dictkey] += time
+            if sgmnt.time is not None: self.basic_time[dictkey] += sgmnt.time
 
             sgmnt.date = self.date
 

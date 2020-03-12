@@ -8,6 +8,8 @@ import json
 import argparse
 import types
 
+import pdb
+
 def parseArgs():
     parser = argparse.ArgumentParser(description="Running log program.")
     parser.add_argument("-t", "--template", action='store_true', help="Generate template file")
@@ -30,20 +32,28 @@ class RunningLog():
 
         self.all_runs_output_dir = os.path.join(self.output_dir, "processed")
         self.pickled_df_filename = "df.%s"
+        self.pickled_structures_filename = "df_struct.%s"
 
-        self.fname = os.path.join(self.all_runs_output_dir, self.pickled_df_filename)
+        self.df_fname = os.path.join(self.all_runs_output_dir, self.pickled_df_filename)
+        self.df_struct_fname = os.path.join(self.all_runs_output_dir, self.pickled_structures_filename)
 
     def load_all_runs(self):
-        if os.path.isfile(self.fname%"pkl"):
-            self.allRuns.load_all_runs(self.fname%"pkl")
+        if os.path.isfile(self.df_fname%"pkl"):
+            self.allRuns.load_all_runs(self.df_fname%"pkl")
+
+        if os.path.isfile(self.df_struct_fname%"pkl"):
+            self.allRuns.load_all_runs_structures(self.df_struct_fname%"pkl")
 
     def save_all_runs(self, ext="pkl"):
         utilities.make_dir(self.all_runs_output_dir)
-        utilities.rm_file(self.fname%ext)
+        utilities.rm_file(self.df_fname%ext)
+        utilities.rm_file(self.df_struct_fname%ext)
         if ext=="pkl":
-            self.allRuns.save_all_runs(self.fname%ext)
+            self.allRuns.save_all_runs(self.df_fname%ext)
+            self.allRuns.save_all_runs_structures(self.df_struct_fname%ext)
         elif ext=="csv":
-            self.allRuns.save_all_runs_as_csv(self.fname%ext)
+            self.allRuns.save_all_runs_as_csv(self.df_fname%ext)
+            self.allRuns.save_all_runs_structures_as_csv(self.df_struct_fname%ext)
 
     def load_files_in_directory(self, directory):
         loaded_files = self.allRuns.load_files_in_dir(directory, verbose=False)

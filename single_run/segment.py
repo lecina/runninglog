@@ -14,28 +14,42 @@ class Segment:
         self.pace = None
         self.climb = 0
         self.bpm = None
-
         self.date = None
+        self.repetition = 0
 
     def __str__(self):
         str_to_return = ""
         if self.date is not None:
             str_to_return += "Date: %s\n"%self.date
 
+        str_to_return += "Repetition: %s\n"%self.repetition
         str_to_return += "Type: %s\n"%runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type]
 
         try:
-            str_to_return += "Total time: %dmin\n"%self.time
+            str_to_return += "Time: %dmin\n"%self.time
         except:
             pass
-        str_to_return += "Total distance: %.2fkm\n"%self.distance
-        str_to_return += "\nTotal climb: %d\n"%self.climb
+        str_to_return += "Distance: %.2fkm\n"%self.distance
+        str_to_return += "\nClimb: %d\n"%self.climb
         try:
-            str_to_return += "Avg pace: %d (in sec/km)\n"%self.avg_pace
+            str_to_return += "Pace: %d (in sec/km)\n"%self.avg_pace
         except:
             pass
 
         return str_to_return
+
+    def as_dict(self):
+        rdict = {
+            blockNames.Colnames.type :  runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type],
+            blockNames.Colnames.time : self.time,
+            blockNames.Colnames.distance : self.distance,
+            blockNames.Colnames.avg_pace : self.pace,
+            blockNames.Colnames.climb : self.climb,
+            blockNames.Colnames.bpm : self.bpm,
+            blockNames.Colnames.date : self.date,
+            blockNames.Colnames.repetition : self.repetition
+        }
+        return rdict
 
     def is_empty(self):
         return (self.type is None and
@@ -43,9 +57,10 @@ class Segment:
                 self.time is None and
                 self.pace is None and
                 self.climb == 0 and
-                self.bpm is None)
+                self.bpm is None and
+                self.repetition == 0)
 
-    def create_segment(self, segment_dict):
+    def create_segment(self, segment_dict, repetition_number=0):
         #Type and distance are compulsory
         #the rest are optional
         item_dict = dict((k.lower(), v) for k, v in segment_dict.iteritems())
@@ -58,6 +73,8 @@ class Segment:
 
         #distance is compulsory
         self.distance = self.parse_distance(item_dict[blockNames.FileParams.distance])
+
+        self.repetition = repetition_number
 
         #date is passed
         try:
@@ -90,11 +107,11 @@ class Segment:
             time_str = None
 
         if pace_str is not None:
-            parsed_pace = self.parse_pace(pace_str)
-            self.time = self.distance * parsed_pace
+            self.pace = self.parse_pace(pace_str)
+            self.time = self.distance * self.pace
         elif time_str is not None:
             self.time = self.parse_time(time_str) * 60
-            parsed_pace = self.time / self.distance
+            self.pace = self.time / self.distance
         else:
             parsed_time = None
             parsed_pace = None
@@ -168,7 +185,7 @@ class Segment:
         if isinstance(pace_str, numbers.Number):
             return pace_str #not a string
 
-        regex = re.compile(r'((?P<min>\d):(?P<sec>\d+?))$')
+        regex = re.compile(r'((?P<min>\d+):(?P<sec>\d+?))$')
         pace_dict = regex.search(pace_str).groupdict()
 
         pace = int(pace_dict["min"])*60 + int(pace_dict["sec"])

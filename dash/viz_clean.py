@@ -119,12 +119,6 @@ def main():
                 )
             ], style={'width': '35%', 'display': 'inline-block', 'padding': '0px 0px 0px 20px'}),
             html.Div([
-                dcc.DatePickerRange(
-                    id='date-picker-range',
-                    start_date=df.date.min(),
-                    end_date=df.date.max(),
-                    first_day_of_week=1,
-                    display_format = "D/M/YYYY")
             ], style={
                             'width': '35%',
                             'float': 'right',
@@ -152,7 +146,7 @@ def main():
                         id='yaxis-column2',
                         options=[{'label': i, 'value': i} for i in available_cols],
                         value='distance'
-                    ),
+                    )
                 ], style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
                 html.Div([
                     dcc.Dropdown(
@@ -325,10 +319,8 @@ def main():
     @app.callback(
         dash.dependencies.Output('total_runs', 'children'),
         [dash.dependencies.Input('type-dropdown', 'value'),
-        dash.dependencies.Input('year-slider', 'value'),
-        dash.dependencies.Input('date-picker-range', 'start_date'),
-        dash.dependencies.Input('date-picker-range', 'end_date')])
-    def selected_runs(chosen_basic_runTypes, chosen_year, start_date, end_date):
+        dash.dependencies.Input('year-slider', 'value')])
+    def selected_runs(chosen_basic_runTypes, chosen_year):
         if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
         elif chosen_year == df.date.dt.year.max()+1:
@@ -338,7 +330,6 @@ def main():
         else:
             filt_df = df[df.date.dt.year == chosen_year]
 
-        filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
         return filt_df.to_json(date_format='iso', orient='split')
 
     @app.callback(
@@ -391,12 +382,10 @@ def main():
         [dash.dependencies.Input('xaxis-column2', 'value'),
         dash.dependencies.Input('yaxis-column2', 'value'),
         dash.dependencies.Input('type-dropdown', 'value'),
-        dash.dependencies.Input('year-slider', 'value'),
-        dash.dependencies.Input('date-picker-range', 'start_date'),
-        dash.dependencies.Input('date-picker-range', 'end_date')])
+        dash.dependencies.Input('year-slider', 'value')]
+    )
     def agg_data(xaxis_colname, yaxis_colname, 
-                        chosen_basic_runTypes, chosen_year,
-                        start_date, end_date):
+                        chosen_basic_runTypes, chosen_year):
         #Apply filters
         if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
@@ -409,7 +398,6 @@ def main():
 
         filt_df = filt_df[filt_df.type.isin(chosen_basic_runTypes)]
 
-        filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
         #END apply filters
 
 
@@ -439,7 +427,7 @@ def main():
         return df_agg.to_json(date_format='iso', orient='split')
 
 
-    def time_aggregate(chosen_basic_runTypes, chosen_year, start_date, end_date, time_option):
+    def time_aggregate(chosen_basic_runTypes, time_option):
         if time_option == 'week':
             agg_option = 'W'
         elif time_option == 'month':
@@ -449,19 +437,8 @@ def main():
         else:
             agg_option = 'W'
 
-        #Apply filters
-        if chosen_year == df.date.dt.year.max()+2:
-            filt_df = df
-        elif chosen_year == df.date.dt.year.max()+1:
-            today = datetime.datetime.now()
-            last_year = subtract_weeks(today, 52)
-            filt_df = df[np.logical_and(df.date >= last_year, df.date <= today)]
-        else:
-            filt_df = df[df.date.dt.year == chosen_year]
+        filt_df = df[df.type.isin(chosen_basic_runTypes)]
 
-        filt_df = filt_df[filt_df.type.isin(chosen_basic_runTypes)]
-
-        filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
         #END apply filters
 
         #if ycol is distance, segment it by types
@@ -495,12 +472,10 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('weekly_agg', 'children'),
-        [dash.dependencies.Input('type-dropdown', 'value'),
-        dash.dependencies.Input('year-slider', 'value'),
-        dash.dependencies.Input('date-picker-range', 'start_date'),
-        dash.dependencies.Input('date-picker-range', 'end_date')])
-    def weekly_summary(chosen_basic_runTypes, chosen_year, start_date, end_date):
-        return time_aggregate(chosen_basic_runTypes, chosen_year, start_date, end_date,'week')
+        [dash.dependencies.Input('type-dropdown', 'value')]
+    )
+    def weekly_summary(chosen_basic_runTypes):
+        return time_aggregate(chosen_basic_runTypes, 'week')
 
     @app.callback(
         dash.dependencies.Output('weekly_agg_table', 'data'),
@@ -533,12 +508,10 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('monthly_agg', 'children'),
-        [dash.dependencies.Input('type-dropdown', 'value'),
-        dash.dependencies.Input('year-slider', 'value'),
-        dash.dependencies.Input('date-picker-range', 'start_date'),
-        dash.dependencies.Input('date-picker-range', 'end_date')])
-    def weekly_summary(chosen_basic_runTypes, chosen_year, start_date, end_date):
-        return time_aggregate(chosen_basic_runTypes, chosen_year, start_date, end_date,'month')
+        [dash.dependencies.Input('type-dropdown', 'value')]
+    )
+    def weekly_summary(chosen_basic_runTypes):
+        return time_aggregate(chosen_basic_runTypes, 'month')
 
     @app.callback(
         dash.dependencies.Output('monthly_agg_table', 'data'),
@@ -566,12 +539,10 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('yearly_agg', 'children'),
-        [dash.dependencies.Input('type-dropdown', 'value'),
-        dash.dependencies.Input('year-slider', 'value'),
-        dash.dependencies.Input('date-picker-range', 'start_date'),
-        dash.dependencies.Input('date-picker-range', 'end_date')])
-    def weekly_summary(chosen_basic_runTypes, chosen_year, start_date, end_date):
-        agg_df = time_aggregate(chosen_basic_runTypes, chosen_year, start_date, end_date,'year')
+        [dash.dependencies.Input('type-dropdown', 'value')]
+    )
+    def weekly_summary(chosen_basic_runTypes):
+        agg_df = time_aggregate(chosen_basic_runTypes,'year')
         return agg_df
 
     @app.callback(
@@ -654,11 +625,9 @@ def main():
     @app.callback(
         dash.dependencies.Output('freq_graph', 'figure'),
         [dash.dependencies.Input('type-dropdown', 'value'),
-        dash.dependencies.Input('year-slider', 'value'),
-        dash.dependencies.Input('date-picker-range', 'start_date'),
-        dash.dependencies.Input('date-picker-range', 'end_date')])
-    def update_figure(chosen_basic_runTypes, chosen_year,
-                        start_date, end_date):
+        dash.dependencies.Input('year-slider', 'value')]
+    )
+    def update_figure(chosen_basic_runTypes, chosen_year):
         #Apply filters
         if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
@@ -671,7 +640,6 @@ def main():
 
         filt_df = filt_df[filt_df.type.isin(chosen_basic_runTypes)]
 
-        filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
         counts = get_running_location_count(filt_df)
         counts = counts.loc[counts.counts >1]
 

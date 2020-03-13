@@ -6,6 +6,7 @@ from plotly.tools import FigureFactory as ff
 import seaborn as sns
 import matplotlib.pyplot as plt
 import dash_table
+import datetime
 
 import pandas as pd
 import numpy as np
@@ -19,8 +20,9 @@ def read_pandas_pickle(fname = "../../running_log_data/processed/df.pkl"):
 
 def get_year_marks(df):
     years = df.date.dt.year
-    year_marks={year: str(year) for year in np.hstack([years.unique(), [years.max()+1]])}
-    year_marks[years.max()+1] = 'All'
+    year_marks={year: str(year) for year in np.hstack([years.unique(), [years.max()+1], [years.max()+2]])}
+    year_marks[years.max()+1] = 'Last year'
+    year_marks[years.max()+2] = 'All'
 
     return year_marks
 
@@ -80,6 +82,9 @@ def get_running_location_count(df):
     counts.columns = ['counts','rel_counts']
     return counts
 
+def subtract_weeks(d, weeks=52):
+    return d - datetime.timedelta(days=d.weekday() + 7*weeks)
+
 def main():
     basic_runType_order = get_basic_runTypes_order() #E,M,T,I,R,X
 
@@ -107,7 +112,7 @@ def main():
                     id='year-slider',
                     min=min(year_marks.keys()),
                     max=max(year_marks.keys()),
-                    value=max(year_marks.keys()),
+                    value=max(year_marks.keys())-1,
                     step=1,
                     marks=year_marks,
                     included=False
@@ -324,10 +329,15 @@ def main():
         dash.dependencies.Input('date-picker-range', 'start_date'),
         dash.dependencies.Input('date-picker-range', 'end_date')])
     def selected_runs(chosen_basic_runTypes, chosen_year, start_date, end_date):
-        if chosen_year == df.date.dt.year.max()+1:
+        if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
+        elif chosen_year == df.date.dt.year.max()+1:
+            today = datetime.datetime.now()
+            last_year = subtract_weeks(today, weeks=52)
+            filt_df = df[np.logical_and(df.date >= last_year, df.date <= today)]
         else:
             filt_df = df[df.date.dt.year == chosen_year]
+
         filt_df = filt_df[np.logical_and(filt_df.date >= start_date, filt_df.date <= end_date)]
         return filt_df.to_json(date_format='iso', orient='split')
 
@@ -388,8 +398,12 @@ def main():
                         chosen_basic_runTypes, chosen_year,
                         start_date, end_date):
         #Apply filters
-        if chosen_year == df.date.dt.year.max()+1:
+        if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
+        elif chosen_year == df.date.dt.year.max()+1:
+            today = datetime.datetime.now()
+            last_year = subtract_weeks(today, 52)
+            filt_df = df[np.logical_and(df.date >= last_year, df.date <= today)]
         else:
             filt_df = df[df.date.dt.year == chosen_year]
 
@@ -436,8 +450,12 @@ def main():
             agg_option = 'W'
 
         #Apply filters
-        if chosen_year == df.date.dt.year.max()+1:
+        if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
+        elif chosen_year == df.date.dt.year.max()+1:
+            today = datetime.datetime.now()
+            last_year = subtract_weeks(today, 52)
+            filt_df = df[np.logical_and(df.date >= last_year, df.date <= today)]
         else:
             filt_df = df[df.date.dt.year == chosen_year]
 
@@ -642,8 +660,12 @@ def main():
     def update_figure(chosen_basic_runTypes, chosen_year,
                         start_date, end_date):
         #Apply filters
-        if chosen_year == df.date.dt.year.max()+1:
+        if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
+        elif chosen_year == df.date.dt.year.max()+1:
+            today = datetime.datetime.now()
+            last_year = subtract_weeks(today, weeks=52)
+            filt_df = df[np.logical_and(df.date >= last_year, df.date <= today)]
         else:
             filt_df = df[df.date.dt.year == chosen_year]
 

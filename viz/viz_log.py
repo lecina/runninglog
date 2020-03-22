@@ -13,7 +13,7 @@ import numpy as np
 
 from constants import blockNames
 
-def read_pandas_pickle(fname = "../../running_log_data/processed/df.pkl"):
+def read_pandas_pickle(fname = "data/processed/df.pkl"):
     df = pd.read_pickle(fname)
     df.date = pd.to_datetime(df.date)
     return df

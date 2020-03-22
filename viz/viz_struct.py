@@ -142,7 +142,7 @@ def main():
 
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-    df = utilities.read_pandas_pickle("../../running_log_data/processed/df_struct.pkl")
+    df = utilities.read_pandas_pickle("data/processed/df_struct.pkl")
 
     df.loc[:,'date_delta'] = (df['date'] - df['date'].min())  / np.timedelta64(1,'D')
     chosen_types = ['M', 'T', 'I', 'R']

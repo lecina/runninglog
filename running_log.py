@@ -27,7 +27,7 @@ class RunningLog():
         self.allRuns = all_runs.AllRuns()
 
         #move to config file
-        self.output_dir = "../running_log_data/"
+        self.output_dir = "data/"
         self.raw_json_output_dir = os.path.join(self.output_dir, "raw")
 
         self.all_runs_output_dir = os.path.join(self.output_dir, "processed")

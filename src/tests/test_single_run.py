@@ -64,6 +64,7 @@ class TestSingleRun(unittest.TestCase):
                         "distance": 13.8,
                         "climb": 110, 
                         "where":"Park",
+                        "route":"Lap 1",
                         "notes": "Feeling good!",
                         "structure":[
                             {"type":"E", "distance" : 2.36},
@@ -79,6 +80,8 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.climb, 110)
 
         self.assertEqual(singleRun.where, "Park")
+
+        self.assertEqual(singleRun.route, "Lap 1")
 
         self.assertEqual(singleRun.notes, "Feeling good!")
 
@@ -129,6 +132,8 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.where, "")
 
+        self.assertEqual(singleRun.route, "")
+
         self.assertEqual(singleRun.trail_running, True)
 
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
@@ -167,6 +172,8 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.climb, 0)
 
         self.assertEqual(singleRun.where, "")
+
+        self.assertEqual(singleRun.route, "")
 
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
@@ -212,6 +219,8 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.where, "")
 
+        self.assertEqual(singleRun.route, "")
+
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
@@ -253,6 +262,8 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.where, "")
 
+        self.assertEqual(singleRun.route, "")
+
         dateObj = datetime.datetime.strptime("01/01/2020", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
@@ -289,6 +300,7 @@ class TestSingleRun(unittest.TestCase):
         singleRun.avg_pace=375
         singleRun.date = datetime.datetime.strptime("01/01/19", "%d/%m/%y").date()
         singleRun.where = "Park"
+        singleRun.route  = "Lap 1"
         singleRun.notes = "Good!"
         singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E]=12
         singleRun.basic_time[runTypes.BASIC_RUN_TYPES.E]=4500
@@ -303,6 +315,7 @@ class TestSingleRun(unittest.TestCase):
             blockNames.Colnames.date : datetime.datetime.strptime("01/01/19", "%d/%m/%y").date(),
             blockNames.Colnames.trail : False,
             blockNames.Colnames.where : "Park",
+            blockNames.Colnames.route : "Lap 1",
             blockNames.Colnames.notes : "Good!",
             blockNames.Colnames.distE : 12,
             blockNames.Colnames.distM : 0, 

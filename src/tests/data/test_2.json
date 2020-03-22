@@ -6,6 +6,7 @@
     "distance": 13.8,
     "climb": 110, 
     "where":"Park",
+    "route":"Lap 1",
     "structure":[
         {"type":"WU", "distance" : 2.36},
         {"type":"T", "distance": 5.84, "pace":"3:56"},

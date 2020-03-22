@@ -26,8 +26,8 @@ class SingleRun(segment.Segment):
         self.trail_running = False
 
         self.where = None
-        #TODO: add route
-        #self.route = None
+
+        self.route = None
 
         self.notes = ""
         self.orig_json_string = ""
@@ -70,6 +70,7 @@ class SingleRun(segment.Segment):
                 self.date == other.date and\
                 self.trail_running == other.trail_running and\
                 self.where == other.where and\
+                self.route == other.route and\
                 self.notes == other.notes
 
     def __str__(self):
@@ -78,6 +79,8 @@ class SingleRun(segment.Segment):
             str_to_return += "Date: %s\n"%self.date
         if self.where is not None:
             str_to_return += "Location: %s\n"%self.where
+        if self.route is not None:
+            str_to_return += "Route: %s\n"%self.route
 
         str_to_return += "Type: %s\n"%runTypes.RUN_TYPES_DICTIONARY[self.type]
 
@@ -127,6 +130,7 @@ class SingleRun(segment.Segment):
             blockNames.Colnames.date : self.date,
             blockNames.Colnames.trail : self.trail_running,
             blockNames.Colnames.where : self.where,
+            blockNames.Colnames.route : self.route,
             blockNames.Colnames.notes : self.notes,
             blockNames.Colnames.distE : self.basic_dist[runTypes.BASIC_RUN_TYPES.E],
             blockNames.Colnames.distM : self.basic_dist[runTypes.BASIC_RUN_TYPES.M],
@@ -200,10 +204,21 @@ class SingleRun(segment.Segment):
             where_str = ""
         self.where = where_str
 
-        #trail: if exists, it is a trail running activity
+        #route
+        try:
+            route_str = parsed_json[blockNames.FileParams.route]
+        except KeyError:
+            route_str = ""
+        self.route = route_str
+
+        #trail: if exists, it is a trail running activity except
+        # if 0 or false are stated
         try:
             trail_str = parsed_json[blockNames.FileParams.trail]
-            self.trail_running = True
+            if trail_str == True:
+                self.trail_running = True
+            else:
+                self.trail_running = False
         except:
             self.trail_running = False
 

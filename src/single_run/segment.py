@@ -9,6 +9,7 @@ import sys
 class Segment:
     def __init__(self):
         self.type = None
+        self.trail = False
         self.distance = None
         self.time = None
         self.pace = None
@@ -24,6 +25,9 @@ class Segment:
 
         str_to_return += "Repetition: %s\n"%self.repetition
         str_to_return += "Type: %s\n"%runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type]
+
+        if self.trail == True:
+            str_to_return += "Trail running segment\n"
 
         try:
             str_to_return += "Time: %dmin\n"%self.time
@@ -41,6 +45,7 @@ class Segment:
     def as_dict(self):
         rdict = {
             blockNames.Colnames.type :  runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type],
+            blockNames.Colnames.trail : self.trail,
             blockNames.Colnames.time : self.time,
             blockNames.Colnames.distance : self.distance,
             blockNames.Colnames.avg_pace : self.pace,
@@ -53,6 +58,7 @@ class Segment:
 
     def is_empty(self):
         return (self.type is None and
+                self.trail is False and
                 self.distance is None and
                 self.time is None and
                 self.pace is None and

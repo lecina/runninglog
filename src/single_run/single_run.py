@@ -23,6 +23,8 @@ class SingleRun(segment.Segment):
 
         self.date = None
 
+        self.trail_running = False
+
         self.where = None
         #TODO: add route
         #self.route = None
@@ -66,6 +68,7 @@ class SingleRun(segment.Segment):
                 self.climb == other.climb and\
                 utilities.isclose(self.avg_pace, other.avg_pace, abs_tol=1e-3) and\
                 self.date == other.date and\
+                self.trail_running == other.trail_running and\
                 self.where == other.where and\
                 self.notes == other.notes
 
@@ -77,6 +80,9 @@ class SingleRun(segment.Segment):
             str_to_return += "Location: %s\n"%self.where
 
         str_to_return += "Type: %s\n"%runTypes.RUN_TYPES_DICTIONARY[self.type]
+
+        if self.trail_running == True:
+            str_to_return += "Trail run"
 
         str_to_return += "Total time: %dmin\n"%self.total_time
         str_to_return += "Total distance: %.2fkm\n"%self.total_distance
@@ -119,6 +125,7 @@ class SingleRun(segment.Segment):
             blockNames.Colnames.climb : self.climb,
             blockNames.Colnames.avg_pace : self.avg_pace,
             blockNames.Colnames.date : self.date,
+            blockNames.Colnames.trail : self.trail_running,
             blockNames.Colnames.where : self.where,
             blockNames.Colnames.notes : self.notes,
             blockNames.Colnames.distE : self.basic_dist[runTypes.BASIC_RUN_TYPES.E],
@@ -193,6 +200,13 @@ class SingleRun(segment.Segment):
             where_str = ""
         self.where = where_str
 
+        #trail: if exists, it is a trail running activity
+        try:
+            trail_str = parsed_json[blockNames.FileParams.trail]
+            self.trail_running = True
+        except:
+            self.trail_running = False
+
         #struct
         try:
             struct_str = parsed_json[blockNames.FileParams.structure]
@@ -232,7 +246,10 @@ class SingleRun(segment.Segment):
             sgmnt = segment.Segment()
             sgmnt.create_segment(item,rep_num)
 
+            #empty segment if type is invalid for example
             if sgmnt.is_empty(): return
+
+            sgmnt.trail = self.trail_running
 
             dictkey=sgmnt.type
 

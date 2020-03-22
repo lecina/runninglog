@@ -115,6 +115,7 @@ class TestSingleRun(unittest.TestCase):
 
         parsed_json = {
                         "type": "E",
+                        "trail": True,
                         "date": "26-11-2018",
                         "time": "1h15min",
                         "distance": 15,
@@ -127,6 +128,8 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.climb, 0)
 
         self.assertEqual(singleRun.where, "")
+
+        self.assertEqual(singleRun.trail_running, True)
 
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
@@ -298,6 +301,7 @@ class TestSingleRun(unittest.TestCase):
             blockNames.Colnames.climb : 110,
             blockNames.Colnames.avg_pace : 375,
             blockNames.Colnames.date : datetime.datetime.strptime("01/01/19", "%d/%m/%y").date(),
+            blockNames.Colnames.trail : False,
             blockNames.Colnames.where : "Park",
             blockNames.Colnames.notes : "Good!",
             blockNames.Colnames.distE : 12,

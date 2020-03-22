@@ -18,6 +18,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.climb = 110
         goldenSingleRun.avg_pace = 326.087
         goldenSingleRun.where = "Park"
+        goldenSingleRun.trail_running = True
         goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 7.96
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
@@ -47,6 +48,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.total_distance = 12.2
         goldenSingleRun.climb = 100
         goldenSingleRun.avg_pace = 295.081967213 
+        goldenSingleRun.trail_running = False
         goldenSingleRun.where = "Park2"
         goldenSingleRun.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y").date()
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 12.2

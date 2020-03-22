@@ -66,6 +66,7 @@ class TestSingleRun(unittest.TestCase):
                         "where":"Park",
                         "route":"Lap 1",
                         "notes": "Feeling good!",
+                        "feeling": 5,
                         "structure":[
                             {"type":"E", "distance" : 2.36},
                             {"type":"T", "distance": 5.84, "pace":"3:56"},
@@ -84,6 +85,8 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.route, "Lap 1")
 
         self.assertEqual(singleRun.notes, "Feeling good!")
+
+        self.assertEqual(singleRun.feeling, 5)
 
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
@@ -134,6 +137,8 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.route, "")
 
+        self.assertEqual(singleRun.feeling, None)
+
         self.assertEqual(singleRun.trail_running, True)
 
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
@@ -174,6 +179,8 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.where, "")
 
         self.assertEqual(singleRun.route, "")
+
+        self.assertEqual(singleRun.feeling, None)
 
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
@@ -221,6 +228,8 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.route, "")
 
+        self.assertEqual(singleRun.feeling, None)
+
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
@@ -264,6 +273,8 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.route, "")
 
+        self.assertEqual(singleRun.feeling, None)
+
         dateObj = datetime.datetime.strptime("01/01/2020", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
@@ -302,6 +313,7 @@ class TestSingleRun(unittest.TestCase):
         singleRun.where = "Park"
         singleRun.route  = "Lap 1"
         singleRun.notes = "Good!"
+        singleRun.feeling = 5
         singleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E]=12
         singleRun.basic_time[runTypes.BASIC_RUN_TYPES.E]=4500
         singleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E]=375
@@ -317,6 +329,7 @@ class TestSingleRun(unittest.TestCase):
             blockNames.Colnames.where : "Park",
             blockNames.Colnames.route : "Lap 1",
             blockNames.Colnames.notes : "Good!",
+            blockNames.Colnames.feeling : 5,
             blockNames.Colnames.distE : 12,
             blockNames.Colnames.distM : 0, 
             blockNames.Colnames.distT : 0,

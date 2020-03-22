@@ -17,6 +17,7 @@ class Segment:
         self.bpm = None
         self.date = None
         self.repetition = 0
+        self.feeling = 0
 
     def __str__(self):
         str_to_return = ""
@@ -28,6 +29,8 @@ class Segment:
 
         if self.trail == True:
             str_to_return += "Trail running segment\n"
+
+        str_to_return += "Feeling: %d\n"%self.feeling
 
         try:
             str_to_return += "Time: %dmin\n"%self.time
@@ -46,6 +49,7 @@ class Segment:
         rdict = {
             blockNames.Colnames.type :  runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type],
             blockNames.Colnames.trail : self.trail,
+            blockNames.Colnames.feeling : self.feeling,
             blockNames.Colnames.time : self.time,
             blockNames.Colnames.distance : self.distance,
             blockNames.Colnames.avg_pace : self.pace,
@@ -64,6 +68,7 @@ class Segment:
                 self.pace is None and
                 self.climb == 0 and
                 self.bpm is None and
+                self.feeling == 0 and
                 self.repetition == 0)
 
     def create_segment(self, segment_dict, repetition_number=0):

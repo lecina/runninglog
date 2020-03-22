@@ -29,6 +29,7 @@ class SingleRun(segment.Segment):
 
         self.route = None
 
+        self.feeling = None
         self.notes = ""
         self.orig_json_string = ""
 
@@ -71,6 +72,7 @@ class SingleRun(segment.Segment):
                 self.trail_running == other.trail_running and\
                 self.where == other.where and\
                 self.route == other.route and\
+                self.feeling == other.feeling and\
                 self.notes == other.notes
 
     def __str__(self):
@@ -86,6 +88,9 @@ class SingleRun(segment.Segment):
 
         if self.trail_running == True:
             str_to_return += "Trail run"
+
+        if self.feeling is not None:
+            str_to_return += "Feeling: %d\n"%self.feeling
 
         str_to_return += "Total time: %dmin\n"%self.total_time
         str_to_return += "Total distance: %.2fkm\n"%self.total_distance
@@ -132,6 +137,7 @@ class SingleRun(segment.Segment):
             blockNames.Colnames.where : self.where,
             blockNames.Colnames.route : self.route,
             blockNames.Colnames.notes : self.notes,
+            blockNames.Colnames.feeling : self.feeling,
             blockNames.Colnames.distE : self.basic_dist[runTypes.BASIC_RUN_TYPES.E],
             blockNames.Colnames.distM : self.basic_dist[runTypes.BASIC_RUN_TYPES.M],
             blockNames.Colnames.distT : self.basic_dist[runTypes.BASIC_RUN_TYPES.T],
@@ -221,6 +227,13 @@ class SingleRun(segment.Segment):
                 self.trail_running = False
         except:
             self.trail_running = False
+
+        #feeling
+        try:
+            feeling = parsed_json[blockNames.FileParams.feeling]
+        except KeyError:
+            feeling = None
+        self.feeling = feeling
 
         #struct
         try:

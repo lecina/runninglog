@@ -358,11 +358,13 @@ def main():
         columns=[
                 {"name": "Date", "id": "date"},
                 {"name": "Type", "id": "type"},
+                {"name": "Trail", "id": "trail"},
                 {"name": "Dist.", "id": "distance"},
                 {"name": "Time", "id": "time"},
                 {"name": "Climb", "id": "climb"},
                 {"name": "Avg.Pace", "id": "avg_pace"},
                 {"name": "Where", "id": "where"},
+                {"name": "Route", "id": "route"},
                 {"name": "Notes", "id": "notes"},
                 {"name": "Dist.E", "id": "distE"},
                 {"name": "Dist.M", "id": "distM"},

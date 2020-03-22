@@ -11,13 +11,13 @@ import types
 import pdb
 
 def parseArgs():
-    parser = argparse.ArgumentParser(description="Running log program.")
+    desc_str = "Running log program.\n"\
+                "Processes JSON files with running events and generates\n"\
+                "both pickle and CSV files ofr further exploitation"
+    parser = argparse.ArgumentParser(description=desc_str)
+
     parser.add_argument("-t", "--template", action='store_true', help="Generate template file")
-    parser.add_argument("-lj", "--load_json", type=str, default="", nargs='*', help="Directory to load")
-
-    parser.add_argument("-l", "--load_df", action='store_true', help="Load data frame existing data")
-
-    parser.add_argument("-ns", "--dont_save_df", action='store_true', help="Do not save the resulting data frame")
+    parser.add_argument("-lj", "--load_json", type=str, default=[], nargs='*', help="Directory to load")
 
     args = parser.parse_args()
     return args
@@ -121,8 +121,7 @@ def main():
         print "Generating template\n"
         rl.generate_empty_json()
 
-    if args.load_df:
-        rl.load_all_runs()
+    rl.load_all_runs()
 
     if args.load_json==[]:
         print "Loading files to load\n"
@@ -133,10 +132,9 @@ def main():
             rl.load_files_in_directory(directory)
         print ""
 
-    if args.load_df == True and args.dont_save_df != True:
-        print "Saving all runs"
-        rl.save_all_runs("pkl")
-        rl.save_all_runs("csv")
+    print "Saving all runs"
+    rl.save_all_runs("pkl")
+    rl.save_all_runs("csv")
 
 
 if __name__ == "__main__":

@@ -117,23 +117,22 @@ def main():
                     marks=year_marks,
                     included=False
                 )
-            ], style={'width': '35%', 'display': 'inline-block', 'padding': '0px 0px 0px 20px'}),
+            ], style={'width': '30%', 'display': 'inline-block', 'padding': '0px 0px 0px 0px'}),
             html.Div([
+                dcc.Dropdown(
+                    id='type-dropdown',
+                    options=runTypes_long_name,
+                    value=[blockNames.RunTypes.XB, blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.M, blockNames.RunTypes.E],
+                    multi = True
+                )
             ], style={
-                            'width': '35%',
+                            'width': '70%',
                             'float': 'right',
                             'display': 'inline-block',
                             'align-items': 'center',
-                            'padding': '0px 0px 5px 0px'
+                            'padding': '0px 0px 0px 0px'
                         })
         ]),
-        html.Div([
-            dcc.Dropdown(
-                id='type-dropdown',
-                options=runTypes_long_name,
-                value=[blockNames.RunTypes.XB, blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.M, blockNames.RunTypes.E],
-                multi = True
-            )], style={'padding':'10px 10px 10px 10px'}),
         html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='weekly_agg', style={'display': 'none'}), #hidden, in order to share data

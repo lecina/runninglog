@@ -69,8 +69,8 @@ RUN_TYPES_LONG_NAME_DICTIONARY = {
     RunTypes.M : "Marathon pace",
     RunTypes.T : "Threshold",
     RunTypes.I : "Intervals",
-    RunTypes.R : "Repetitions",
+    RunTypes.R : "Reps",
     RunTypes.C : "Race",
-    RunTypes.X : "Cross-training(Mountaineering)",
-    RunTypes.XB : "Cross-training(Bike)"
+    RunTypes.X : "XT(Mountaineering)",
+    RunTypes.XB : "XT(Bike)"
 }

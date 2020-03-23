@@ -366,6 +366,7 @@ def main():
                 {"name": "Where", "id": "where"},
                 {"name": "Route", "id": "route"},
                 {"name": "Notes", "id": "notes"},
+                {"name": "Feel", "id": "feeling"},
                 {"name": "Dist.E", "id": "distE"},
                 {"name": "Dist.M", "id": "distM"},
                 {"name": "Dist.T", "id": "distT"},

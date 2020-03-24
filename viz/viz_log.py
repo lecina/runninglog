@@ -468,6 +468,9 @@ def main():
         df_agg['%I'] = 100*df_agg['distI'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
         df_agg['%R'] = 100*df_agg['distR'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
 
+        cols = ['%E','%M','%T','%I','%R']
+        df_agg['pct_blocks'] = df_agg[cols].apply(lambda row: "%.0f(%.0f)%%/%.0f%%/%.0f%%/%.0f%%"%(row.values[0]+row.values[1],row.values[1],row.values[2],row.values[3],row.values[4]), axis=1)
+
         decimals = pd.Series([1, 1, 0, 0, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'run_avg_pace', '%E', '%M', '%T', '%I', '%R'])
 
         return df_agg.round(decimals).to_json(date_format='iso', orient='split')
@@ -500,11 +503,7 @@ def main():
                 {"name": "Time", "id": "time"},
                 {"name": "Climb", "id": "climb"},
                 {"name": "Run Avg.Pace", "id": "run_avg_pace"},
-                {"name": "%E", "id": "%E"},
-                {"name": "%M", "id": "%M"},
-                {"name": "%T", "id": "%T"},
-                {"name": "%I", "id": "%I"},
-                {"name": "%R", "id": "%R"},
+                {"name": "E(M)%/T%/I%/R%", "id": "pct_blocks"},
             ]
         return columns
 

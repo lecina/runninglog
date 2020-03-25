@@ -67,7 +67,7 @@ def get_ordered_runType_long_name(runType_order):
     return [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
 
 def get_available_columns():
-    available_cols = ['distance', 'time', 'climb', 'avg_pace']
+    available_cols = ['distance', 'time', 'climb', 'avg_pace', 'run_avg_pace', '%types']
     #available_cols.append('week')
     return available_cols
 
@@ -133,11 +133,12 @@ def main():
                             'padding': '0px 0px 0px 0px'
                         })
         ]),
-        html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='weekly_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='monthly_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='yearly_agg', style={'display': 'none'}), #hidden, in order to share data
+        html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data
+
         html.Div([
             html.Div([
                 html.Div([
@@ -383,51 +384,35 @@ def main():
         dash.dependencies.Output('agg_df', 'children'),
         [dash.dependencies.Input('xaxis-column2', 'value'),
         dash.dependencies.Input('yaxis-column2', 'value'),
-        dash.dependencies.Input('type-dropdown', 'value'),
+        dash.dependencies.Input('weekly_agg', 'children'),
+        dash.dependencies.Input('monthly_agg', 'children'),
+        dash.dependencies.Input('yearly_agg', 'children'),
         dash.dependencies.Input('year-slider', 'value')]
     )
-    def agg_data(xaxis_colname, yaxis_colname, 
-                        chosen_basic_runTypes, chosen_year):
-        #Apply filters
+    def agg_data(xaxis_colname, yaxis_colname,
+            df_w_agg, df_m_agg, df_y_agg, chosen_year):
+
+        if xaxis_colname == 'week':
+            filt_df = pd.read_json(df_w_agg, orient='split')
+        elif xaxis_colname == 'month':
+            filt_df = pd.read_json(df_m_agg, orient='split')
+        elif xaxis_colname == 'year':
+            filt_df = pd.read_json(df_y_agg, orient='split')
+
+        filt_df['date'] = filt_df.index
+
+
         if chosen_year == df.date.dt.year.max()+2:
-            filt_df = df
+            pass #do nothing
         elif chosen_year == df.date.dt.year.max()+1:
             today = datetime.datetime.now()
             last_year = subtract_weeks(today, 52)
-            filt_df = df[np.logical_and(df.date >= last_year, df.date <= today)]
+            filt_df = filt_df[np.logical_and(filt_df.date >= last_year, filt_df.date <= today)]
         else:
-            filt_df = df[df.date.dt.year == chosen_year]
-
-        filt_df = filt_df[filt_df.type.isin(chosen_basic_runTypes)]
-
-        #END apply filters
+            filt_df = filt_df[filt_df.date.dt.year == chosen_year]
 
 
-        #if ycol is distance, segment it by types
-        if yaxis_colname == 'distance':
-            distance_cols = 'dist%s'
-            needed_cols = [distance_cols%bt for bt in basic_runType_order]
-            needed_cols.extend(['distance', 'date'])
-        else:
-            needed_cols = [yaxis_colname, 'date']
-
-        if xaxis_colname == 'week':
-            agg_str = 'W'
-        elif xaxis_colname == 'month':
-            agg_str = 'MS'
-        elif xaxis_colname == 'year':
-            agg_str = 'YS'
-        else:
-            agg_str = None
-
-        if not agg_str is None:
-            df_agg = filt_df[:][needed_cols].resample(agg_str, on='date').sum()
-            df_agg[xaxis_colname] = df_agg.index
-        else:
-            df_agg = filt_df
-
-        return df_agg.to_json(date_format='iso', orient='split')
-
+        return filt_df.to_json(date_format='iso', orient='split')
 
     def time_aggregate(chosen_basic_runTypes, time_option):
         if time_option == 'week':
@@ -440,14 +425,12 @@ def main():
             agg_option = 'W'
 
         filt_df = df[df.type.isin(chosen_basic_runTypes)]
-
         #END apply filters
 
-        #if ycol is distance, segment it by types
-        distance_cols = 'dist%s'
 
-        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB']
+        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB', 'timeE', 'timeI', 'timeM', 'timeR', 'timeT', 'timeX', 'timeXB']
         df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').sum()
+
         df_agg[time_option] = df_agg.index
         if time_option == 'week':
             pattern = '%Y-%m-%d'
@@ -457,6 +440,10 @@ def main():
             pattern = '%Y'
         df_agg[time_option] = df_agg[time_option].apply(lambda x: x.strftime(pattern))
 
+        #avg pace all activities
+        df_agg['avg_pace'] = df_agg['time']*60/df_agg['distance']
+
+        #running avg pace
         df_agg_notX = filt_df[~filt_df.type.isin([blockNames.RunTypes.X, blockNames.RunTypes.XB])][needed_cols].resample(agg_option, on='date').sum()
         df_agg_notX['run_avg_pace'] = df_agg_notX['time']*60/df_agg_notX['distance']
 
@@ -469,7 +456,7 @@ def main():
         df_agg['%R'] = 100*df_agg['distR'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
 
         cols = ['%E','%M','%T','%I','%R']
-        df_agg['pct_blocks'] = df_agg[cols].apply(lambda row: "%.0f(%.0f)%%/%.0f%%/%.0f%%/%.0f%%"%(row.values[0]+row.values[1],row.values[1],row.values[2],row.values[3],row.values[4]), axis=1)
+        df_agg['%types'] = df_agg[cols].apply(lambda row: "%.0f(%.0f)%%/%.0f%%/%.0f%%/%.0f%%"%(row.values[0]+row.values[1],row.values[1],row.values[2],row.values[3],row.values[4]), axis=1)
 
         decimals = pd.Series([1, 1, 0, 0, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'run_avg_pace', '%E', '%M', '%T', '%I', '%R'])
 
@@ -503,7 +490,7 @@ def main():
                 {"name": "Time", "id": "time"},
                 {"name": "Climb", "id": "climb"},
                 {"name": "Run Avg.Pace", "id": "run_avg_pace"},
-                {"name": "E(M)%/T%/I%/R%", "id": "pct_blocks"},
+                {"name": "E(M)%/T%/I%/R%", "id": "%types"},
             ]
         return columns
 
@@ -543,8 +530,7 @@ def main():
         [dash.dependencies.Input('type-dropdown', 'value')]
     )
     def weekly_summary(chosen_basic_runTypes):
-        agg_df = time_aggregate(chosen_basic_runTypes,'year')
-        return agg_df
+        return time_aggregate(chosen_basic_runTypes,'year')
 
     @app.callback(
         dash.dependencies.Output('yearly_agg_table', 'data'),
@@ -582,17 +568,25 @@ def main():
         xaxis_dict = {'title':xaxis_colname}
         yaxis_dict = {'title':yaxis_colname}
 
+
         if xaxis_colname == 'day':
             xaxis_colname = 'date'
 
-        if yaxis_colname == 'distance':
-            distance_template = 'dist%s'
+        if yaxis_colname in ('distance', 'time', '%types'):
+            if yaxis_colname == 'distance':
+                str_template = 'dist%s'
+            elif yaxis_colname == 'time':
+                str_template = 'time%s'
+            elif yaxis_colname == '%types':
+                str_template = '%%%s'
+                chosen_basic_runTypes = ['R','I','T','M','E']
+
             traces = [
                 go.Bar(
                     x=df_agg[:][xaxis_colname],
-                    y=df_agg[:][distance_template%i],
+                    y=df_agg[:][str_template%i],
                     opacity=0.5,
-                    hovertext = df_agg[:]['distance'],
+                    hovertext = df_agg[:][yaxis_colname],
                     marker={ 'color': runTypesToColors[i] },
                     name=i
                 ) for i in basic_runType_order if i in chosen_basic_runTypes

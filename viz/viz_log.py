@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 
 from constants import blockNames
+from viz.viz_constants import viz_constants
 
 def read_pandas_pickle(fname = "data/processed/df.pkl"):
     df = pd.read_pickle(fname)
@@ -47,22 +48,6 @@ def get_basic_runTypes_order():
                      blockNames.RunTypes.XB]
     return runType_order
 
-def get_runType_colors(runType_order):
-    colors = [  '#1f77b4', # muted blue
-                '#ff7f0e', # safety orange
-                '#2ca02c', # cooked asparagus green
-                '#d62728', # brick red
-                '#9467bd', # muted purple
-                '#17becf', # blue-teal
-                #'#e377c2', # raspberry yogurt pink
-                #'#7f7f7f', # middle gray
-                #'#bcbd22', # curry yellow-green
-                '#8c564b', # chestnut brown
-                '#bb6600']
-    runTypesToColors = {runType_order[i]:colors[i] for i in range(len(runType_order))}
-
-    return runTypesToColors
-
 def get_ordered_runType_long_name(runType_order):
     return [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
 
@@ -88,7 +73,7 @@ def main():
     basic_runType_order = get_basic_runTypes_order() #E,M,T,I,R,X
 
     runType_order = get_runType_order() #E,M,T,I,R,X,C
-    runTypesToColors = get_runType_colors(runType_order)
+    runTypesToColors = viz_constants.get_runType_colors()
     runTypes_long_name = get_ordered_runType_long_name(runType_order)
 
     time_agg_options = get_time_options()

@@ -9,6 +9,7 @@ from sklearn.linear_model import LinearRegression
 #import matplotlib.pyplot as plt
 
 from utilities import utilities
+from viz.viz_constants import viz_constants
 
 
 def find_coefficient(df, xcol, ycol):
@@ -33,15 +34,6 @@ def compute_models(df_all, xcol, ycol, chosen_types):
         models[running_type] = model
 
     return(models)
-
-def get_runType_colors():
-    runType_colors = {  'M':'#ff7f0e', # safety orange
-                        'T':'#2ca02c', # cooked asparagus green
-                        'I':'#d62728', # brick red
-                        'R':'#9467bd' # muted purple
-                    }
-
-    return runType_colors
 
 def get_figure(df, models, running_type, runType_colors):
     model = models[running_type]
@@ -167,7 +159,7 @@ def main():
 
     models = compute_models(df, xcol='date_delta', ycol='avg_pace', chosen_types=chosen_types)
 
-    runType_colors = get_runType_colors()
+    runType_colors = viz_constants.get_runType_colors()
 
     app.layout = html.Div([
         html.Div([

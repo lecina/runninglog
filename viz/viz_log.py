@@ -68,7 +68,6 @@ def get_ordered_runType_long_name(runType_order):
 
 def get_available_columns():
     available_cols = ['distance', 'time', 'climb', 'avg_pace', 'run_avg_pace', '%types']
-    #available_cols.append('week')
     return available_cols
 
 def get_time_options():
@@ -160,7 +159,38 @@ def main():
             #display:flex;justify-content:center;align-items:center
 
             html.Div([
-                html.Div([html.H5("Running log:"),],style={'height':'30px', 'textAlign':'center'}),
+                html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
+                dash_table.DataTable(
+                    id='weekly_agg_table',
+                    data=df[0:0].to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    style_table={
+                        'overflowX': 'scroll', 
+                        'maxHeight': '280px',
+                        'overflowY': 'scroll'},
+                    css=[{
+                            'selector': '.dash-cell div.dash-cell-value',
+                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                        }],
+                    style_cell={
+                        'whiteSpace': 'no-wrap',
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'minWidth': '60px', 'maxWidth': '100px'
+                    },
+                    style_as_list_view=True,
+                    merge_duplicate_headers=True,
+                    style_header={
+                            'backgroundColor': 'white',
+                            'fontWeight': 'bold'
+                        },
+                    sort_action = 'native',
+                    fixed_rows = { 'headers': True, 'data': 0 }
+                ),
+            ], style={'width':'49%', 'display':'inline-block', 'height':'330px'}),
+        ], style={'width':'100%', 'display':'block', 'height':'350px'}),
+        html.Div([
+                html.Div([html.H5("All activities:"),],style={'height':'30px', 'textAlign':'center'}),
                 dash_table.DataTable(
                         id='total_runs_table',
                         data=df[0:0].to_dict('rows'),
@@ -188,38 +218,7 @@ def main():
                         sort_action = 'native',
                         fixed_rows = { 'headers': True, 'data': 0 }
                     ),
-            ], style={'width':'49%', 'display':'inline-block', 'height':'330px'}),
-        ], style={'width':'100%', 'display':'block', 'height':'350px'}),
-        html.Div([
-            html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
-            dash_table.DataTable(
-                    id='weekly_agg_table',
-                    data=df[0:0].to_dict('rows'),
-                    columns=[{'id': c, 'name': c} for c in df.columns],
-                    style_table={
-                        'overflowX': 'scroll', 
-                        'maxHeight': '280px',
-                        'overflowY': 'scroll'},
-                    css=[{
-                            'selector': '.dash-cell div.dash-cell-value',
-                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                        }],
-                    style_cell={
-                        'whiteSpace': 'no-wrap',
-                        'overflow': 'hidden',
-                        'textOverflow': 'ellipsis',
-                        'minWidth': '60px', 'maxWidth': '100px'
-                    },
-                    style_as_list_view=True,
-                    merge_duplicate_headers=True,
-                    style_header={
-                            'backgroundColor': 'white',
-                            'fontWeight': 'bold'
-                        },
-                    sort_action = 'native',
-                    fixed_rows = { 'headers': True, 'data': 0 }
-                ),
-        ], style={'width':'80%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'border':'3px solid'}),
+        ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'border':'3px solid'}),
         html.Div([
             html.Div([html.H5("Monthly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
@@ -579,7 +578,13 @@ def main():
                 str_template = 'time%s'
             elif yaxis_colname == '%types':
                 str_template = '%%%s'
-                chosen_basic_runTypes = ['R','I','T','M','E']
+                chosen_basic_runTypes = [
+                                         blockNames.RunTypes.E, 
+                                         blockNames.RunTypes.M,
+                                         blockNames.RunTypes.T,
+                                         blockNames.RunTypes.I,
+                                         blockNames.RunTypes.R
+                                        ]
 
             traces = [
                 go.Bar(

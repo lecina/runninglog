@@ -6,7 +6,10 @@ from utilities import utilities
 import os
 import fnmatch
 import pandas as pd
+import numpy as np
 import pickle
+import umap
+from sklearn.preprocessing import MinMaxScaler
 
 class AllRuns():
     def __init__(self):
@@ -32,7 +35,6 @@ class AllRuns():
 
     def append_single_run_if_not_present(self, sr):
         sr_ds = pd.Series(sr.as_dict())
-        #sr_ds = pd.to_datetime(sr_ds.date)
     
         if self.df.size == 0:
             already_added = False
@@ -84,6 +86,20 @@ class AllRuns():
                         print "in %s"%f
 
         return parsed_single_runs
+
+    def compute_umap_projection(self, cols=['climb', 'distance', 'time', 'avg_pace']):
+        """
+            Dimensionality reduction.
+            Adds two columns: umap_X1, uma_X2 with projection
+        """
+        reducer = umap.UMAP(n_neighbors=15, min_dist=0.1)
+
+        scaler = MinMaxScaler()
+        df_scaled = scaler.fit_transform(self.df[cols])
+        embedding = reducer.fit_transform(df_scaled)
+        df_embedding = pd.DataFrame(embedding, columns=['umap_X1', 'umap_X2'])
+
+        self.df = pd.concat([self.df, df_embedding], axis=1, sort=False)
 
     def save_all_runs(self, fname):
         self.df.to_pickle(fname)

@@ -111,6 +111,8 @@ class RunningLog():
                     json_file.write(json.dumps(newdict, indent=4, separators=(',', ' : ')))
                 print "Wrote new file:", oname
 
+    def compute_embedding(self):
+        self.allRuns.compute_umap_projection()
 
 def main():
     args = parseArgs()
@@ -126,11 +128,16 @@ def main():
     if args.load_json==[]:
         print "Loading files to load\n"
         rl.load_files_to_load()
+        print "End loading files to load\n"
     elif type(args.load_json) == list:
         for directory in args.load:
             print "Loading files in ", directory
             rl.load_files_in_directory(directory)
         print ""
+
+    print "Computing embedding"
+    rl.compute_embedding()
+    print "End computing embedding"
 
     print "Saving all runs"
     rl.save_all_runs("pkl")

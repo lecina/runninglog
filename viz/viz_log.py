@@ -27,16 +27,6 @@ def get_year_marks(df):
 
     return year_marks
 
-def get_runType_order():
-    runType_order = [blockNames.RunTypes.E, 
-                     blockNames.RunTypes.M,
-                     blockNames.RunTypes.T,
-                     blockNames.RunTypes.I,
-                     blockNames.RunTypes.R,
-                     blockNames.RunTypes.C,
-                     blockNames.RunTypes.X,
-                     blockNames.RunTypes.XB]
-    return runType_order
 
 def get_basic_runTypes_order():
     runType_order = [blockNames.RunTypes.E, 
@@ -70,9 +60,9 @@ def subtract_weeks(d, weeks=52):
     return d - datetime.timedelta(days=d.weekday() + 7*weeks)
 
 def main():
-    basic_runType_order = get_basic_runTypes_order() #E,M,T,I,R,X
+    basic_runType_order = get_basic_runTypes_order()
 
-    runType_order = get_runType_order() #E,M,T,I,R,X,C
+    runType_order = viz_constants.get_runType_order()
     runTypesToColors = viz_constants.get_runType_colors()
     runTypes_long_name = get_ordered_runType_long_name(runType_order)
 

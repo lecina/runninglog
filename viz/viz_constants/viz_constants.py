@@ -11,3 +11,14 @@ def get_runType_colors():
                 blockNames.RunTypes.X:'#8c564b', # chestnut brown
                 blockNames.RunTypes.XB:'#bb6600'}
     return runType_colors
+
+def get_runType_order():
+    runType_order = [blockNames.RunTypes.E, 
+                     blockNames.RunTypes.M,
+                     blockNames.RunTypes.T,
+                     blockNames.RunTypes.I,
+                     blockNames.RunTypes.R,
+                     blockNames.RunTypes.C,
+                     blockNames.RunTypes.X,
+                     blockNames.RunTypes.XB]
+    return runType_order

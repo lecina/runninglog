@@ -2,16 +2,110 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+import plotly.figure_factory as ff
 
 import umap
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
 from utilities import utilities
 from constants import blockNames
 from viz.viz_constants import viz_constants
+
+
+
+def create_scatter(df, cols, colors=None, colortitle=None, symbols=None):
+        runTypesToColors = viz_constants.get_runType_colors()
+        if colors is None:
+            colors = [runTypesToColors[x] for x in df.type]
+        if symbols is None:
+            symbols = ['circle' if x==0 else 'diamond' for x in df.trail]
+
+        scatter = go.Scatter(
+            x=df.loc[:, 'umap_X1'],
+            y=df.loc[:, 'umap_X2'],
+            text=[df.loc[i,cols].to_string().replace("\n", "<br>") for i in range(len(df.index))],
+            mode='markers',
+            showlegend = True,
+            marker={
+                'size': 10,
+                'opacity': 0.5,
+                'line': {'width': 0.5, 'color': ['white' if x==0 else 'black' for x in df.trail]},
+                'symbol' : symbols, 
+                'color' : colors,
+                #'colorscale': runTypesToColors.values(),
+                'colorbar' : { 'title':colortitle},
+                'showscale' : True
+            }
+        )
+        return scatter
+
+def update_umap_figure(df, cols, title=None, colors=None, symbols=None):
+    runTypesToColors = viz_constants.get_runType_colors()
+    figure= {
+        'data': [create_scatter(df,cols, colors=colors, symbols=symbols)],
+        'layout': go.Layout(
+            xaxis={ 'title': 'X1'},
+            yaxis={ 'title': 'X2'},
+            title=title,
+            height=400,
+            margin={'l': 30, 'b': 30, 't': 30, 'r': 30},
+            showlegend = False,
+            hovermode='closest'
+        )
+    }
+    return figure
+
+def update_umap_explain_figure(df, cols, title, logColors=False):
+    runTypesToColors = viz_constants.get_runType_colors()
+    if logColors == True:
+        colors = np.log10(df[title]+min(df[title])+10) - 1
+    else:
+        colors = df[title]
+    figure= {
+        'data': [create_scatter(df,cols, colors=colors)],
+        'layout': go.Layout(
+            xaxis={ 'title': 'X1'},
+            yaxis={ 'title': 'X2'},
+            title=title,
+            height=200,
+            margin={'l': 30, 'b': 30, 't': 30, 'r': 30},
+            showlegend = False,
+            hovermode='closest'
+        )
+    }
+    return figure
+
+def update_distr_plot_figure(df, col, title=None, agg_all=False):
+    if not agg_all:
+        runTypesToColors = viz_constants.get_runType_colors()
+        groups = viz_constants.get_runType_order()
+        colors = [runTypesToColors[type] for type in groups]
+        x = [df[df.type == type][col] for type in groups]
+    else:
+        colors = ['#4682b4', '#00BB00', '#BB0000', '#0000BB']
+        df_notX = df[~df.type.isin([blockNames.RunTypes.X, blockNames.RunTypes.XB])]
+
+        x = [df_notX[col]]
+        groups = ['All']
+
+        years = set(df_notX.date.dt.year)
+        x.extend([df_notX[df_notX.date.dt.year == year][col] for year in years])
+        groups.extend([str(year) for year in years])
+
+    #rug_text #TODO...
+    fig = ff.create_distplot(x, groups, show_hist=False, colors=colors, curve_type='normal')
+    layout = go.Layout(
+        xaxis={ 'title': col},
+        yaxis={ 'title': 'Density'},
+        title=title,
+        height=400,
+        margin={'l': 30, 'b': 30, 't': 30, 'r': 30},
+        hovermode='closest'
+        )
+    fig.update_layout(layout)
+    return fig
 
 def main():
     #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -21,57 +115,112 @@ def main():
 
     df = utilities.read_pandas_pickle("data/processed/df.pkl")
 
-    runTypesToColors = viz_constants.get_runType_colors()
+    available_cols = list(df.columns)
 
-    cols = ['climb', u'distance', 'time']#, 'trail']
-
-    scaler = MinMaxScaler()
-    df_scaled = scaler.fit_transform(df[cols])
-    reducer = umap.UMAP(n_neighbors=5, min_dist=0.25)
-    embedding = reducer.fit_transform(df_scaled)
-    import pickle
-    #pickle.dump(embedding, open( "embedding.pkl", "wb" ) )
-    embedding = pickle.load( open( "embedding.pkl", "rb" ) )
-
-    df = pd.concat([df, pd.DataFrame(embedding, columns=['X1', 'X2'])], axis=1, sort=False)
-
-    cols.extend(['date', 'type', 'where', u'distE', u'distI', u'distM', u'distR', u'distT', u'distX', u'distXB', 'trail'])
+    cols = ['climb', u'distance', 'time', 'date', 'type', 'where', u'distE', u'distI', u'distM', u'distR', u'distT', u'distX', u'distXB', 'trail']
 
     app.layout = html.Div([
-        dcc.Graph(figure= {
-            'data': [go.Scatter(
-                x=df.loc[:, 'X1'],
-                y=df.loc[:, 'X2'],
-                text=[df.loc[i,cols].to_string().replace("\n", "<br>") for i in range(len(df.index))],
-                mode='markers',
-                showlegend = True,
-                marker={
-                    'size': 15,
-                    'opacity': 0.5,
-                    'line': {'width': 1, 'color': ['white' if x==0 else 'black' for x in df.trail]},
-                    'symbol' : ['circle' if x==0 else 'diamond' for x in df.trail],
-                    'color' : [runTypesToColors[x] for x in df.type]
-                }
-            )],
+        html.Div([
+            html.H1("UMAP projection"),
+            html.Div([
+                dcc.Graph(id='umap_graph', figure=update_umap_figure(df, cols, title='Runs - UMAP projection'))
+            ], style={'width':'60%', 'display':'inline-block', 'float':'left'}),
+            html.Div([
+                dcc.Graph(id='umap_graph_dist', figure=update_umap_explain_figure(df, cols, 'distance')),
+                dcc.Graph(id='umap_graph_climb', figure=update_umap_explain_figure(df, cols, 'climb', logColors=True))
+            ], style={'width':'20%', 'display':'inline-block'}),
+            html.Div([
+                dcc.Graph(id='umap_graph_time', figure=update_umap_explain_figure(df, cols, 'time', logColors=True)),
+                dcc.Graph(id='umap_graph_pace', figure=update_umap_explain_figure(df, cols, 'avg_pace', logColors=True))
+            ], style={'width':'20%', 'display':'inline-block'})
+        ], style={'width':'100%', 'display':'block', 'margin':'auto'}),
+        html.Div([
+            html.H1("Variable relation"),
+            html.Div([
+                dcc.Dropdown(
+                    id='yaxis-column',
+                    options=[{'label': i, 'value': i} for i in available_cols],
+                    value='distance'
+                ),
+                dcc.RadioItems(
+                    id='yaxis-type',
+                    options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                    value='Linear',
+                    labelStyle={'display': 'inline-block'}
+                )
+            ],
+            style={'width': '50%', 'display': 'inline-block', 'float':'left'}),
+
+            html.Div([
+                dcc.Dropdown(
+                    id='xaxis-column',
+                    options=[{'label': i, 'value': i} for i in available_cols],
+                    value='time'
+                ),
+                dcc.RadioItems(
+                    id='xaxis-type',
+                    options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                    value='Linear',
+                    labelStyle={'display': 'inline-block'}
+                )
+            ],style={'width': '50%', 'display': 'inline-block'}),
+        dcc.Graph(id='graph_scatter')
+        ], style={'width':'80%', 'display':'block', 'float':'center', 'margin':'auto'}),
+        html.Div([
+            html.Div([
+                dcc.Graph(id='graph_distr_dist', figure=update_distr_plot_figure(df,'distance', 'Dist. density', agg_all=True))
+            ], style={'width':'50%', 'display':'inline-block', 'float':'left', 'margin':'auto'}),
+            html.Div([
+                dcc.Graph(id='graph_distr_time', figure=update_distr_plot_figure(df,'time', 'Time density', agg_all=True))
+            ], style={'width':'50%', 'display':'inline-block', 'margin':'auto'}),
+            html.Div([
+                dcc.Graph(id='graph_distr_dist_types', figure=update_distr_plot_figure(df,'distance', 'Dist. density by type', agg_all=False))
+            ], style={'width':'50%', 'display':'inline-block', 'float':'left', 'margin':'auto'}),
+            html.Div([
+                dcc.Graph(id='graph_distr_time_types', figure=update_distr_plot_figure(df,'time', 'Time. density by type', agg_all=False))
+            ], style={'width':'50%', 'display':'inline-block', 'margin':'auto'}),
+        ], style={'width':'100%', 'display':'block', 'float':'center', 'margin':'auto'}),
+    ])
+
+
+    @app.callback(
+        dash.dependencies.Output('graph_scatter', 'figure'),
+        [dash.dependencies.Input('xaxis-column', 'value'),
+         dash.dependencies.Input('yaxis-column', 'value'),
+         dash.dependencies.Input('xaxis-type', 'value'),
+         dash.dependencies.Input('yaxis-type', 'value')])
+    def update_figure(xaxis_column_name, yaxis_column_name,
+                     xaxis_type, yaxis_type):
+        traces = [
+                    go.Scatter(
+                        x=df[df['type'] == i][xaxis_column_name],
+                        y=df[df['type'] == i][yaxis_column_name],
+                        mode='markers',
+                        text=[df.loc[j, cols].to_string().replace("\n", "<br>") for j in df[df.type==i].index],
+                        opacity=0.5,
+                        marker={
+                            'size': 15,
+                            'symbol': ['circle' if x==0 else 'diamond' for x in df[df.type==i].trail],
+                            'line': {'width': 0.5, 'color': 'white'}
+                        },
+                        name=i
+                    ) for i in ['E', 'M', 'T', 'I', 'R', 'X', 'XB']
+        ]
+
+        return {
+            'data': traces,
             'layout': go.Layout(
-                xaxis={
-                    'title': 'X1',
-                    'type': 'linear'
-                },
-                yaxis={
-                    'title': 'X2',
-                    'type': 'linear'
-                },
-                showlegend = True,
-                margin={'l': 40, 'b': 40, 't': 10, 'r': 0},
+                xaxis={'title': xaxis_column_name, 'type': 'linear' if xaxis_type == 'Linear' else 'log'},
+                yaxis={'title': yaxis_column_name, 'type': 'linear' if yaxis_type == 'Linear' else 'log'},
+                margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
+                legend={'x': 0, 'y': 1},
                 hovermode='closest'
             )
         }
-        )
-    ])
 
+
+    #return main app
     return app
-
 
 if __name__ == '__main__':
     app = main()

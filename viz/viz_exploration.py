@@ -169,10 +169,13 @@ def main():
         html.Div([
             html.Div([
                 dcc.Graph(id='graph_distr_dist', figure=update_distr_plot_figure(df,'distance', 'Dist. density', agg_all=True))
-            ], style={'width':'50%', 'display':'inline-block', 'float':'left', 'margin':'auto'}),
+            ], style={'width':'33%', 'display':'inline-block', 'float':'left', 'margin':'auto'}),
             html.Div([
                 dcc.Graph(id='graph_distr_time', figure=update_distr_plot_figure(df,'time', 'Time density', agg_all=True))
-            ], style={'width':'50%', 'display':'inline-block', 'margin':'auto'}),
+            ], style={'width':'33%', 'display':'inline-block', 'margin':'auto'}),
+            html.Div([
+                dcc.Graph(id='graph_distr_climb', figure=update_distr_plot_figure(df,'climb', 'Climb density', agg_all=True))
+            ], style={'width':'33%', 'display':'inline-block', 'margin':'auto'}),
             html.Div([
                 dcc.Graph(id='graph_distr_dist_types', figure=update_distr_plot_figure(df,'distance', 'Dist. density by type', agg_all=False))
             ], style={'width':'50%', 'display':'inline-block', 'float':'left', 'margin':'auto'}),

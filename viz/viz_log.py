@@ -59,6 +59,26 @@ def get_running_location_count(df):
 def subtract_weeks(d, weeks=52):
     return d - datetime.timedelta(days=d.weekday() + 7*weeks)
 
+def record_table_columns():
+    columns=[
+            {"name": "Date", "id": "date"},
+            {"name": "Type", "id": "type"},
+            {"name": "Trail", "id": "trail"},
+            {"name": "Dist.", "id": "distance"},
+            {"name": "Time", "id": "time"},
+            {"name": "Climb", "id": "climb"},
+            {"name": "Avg.Pace", "id": "avg_pace"},
+            {"name": "Where", "id": "where"},
+            {"name": "Route", "id": "route"},
+            {"name": "Notes", "id": "notes"},
+            {"name": "Feel", "id": "feeling"},
+            {"name": "Dist.E", "id": "distE"},
+            {"name": "Dist.M", "id": "distM"},
+            {"name": "Dist.T", "id": "distT"},
+            {"name": "Dist.I", "id": "distI"},
+    ]
+    return columns
+
 def main():
     basic_runType_order = get_basic_runTypes_order()
 
@@ -151,7 +171,8 @@ def main():
                         'whiteSpace': 'no-wrap',
                         'overflow': 'hidden',
                         'textOverflow': 'ellipsis',
-                        'minWidth': '60px', 'maxWidth': '100px'
+                        #'textOverflow': 'clip',
+                        'minWidth': '40px', 'maxWidth': '100px'
                     },
                     style_as_list_view=True,
                     merge_duplicate_headers=True,
@@ -162,7 +183,7 @@ def main():
                     sort_action = 'native',
                     fixed_rows = { 'headers': True, 'data': 0 }
                 ),
-            ], style={'width':'49%', 'display':'inline-block', 'height':'330px'}),
+            ], style={'width':'50%', 'display':'inline-block', 'height':'330px'}),
         ], style={'width':'100%', 'display':'block', 'height':'350px'}),
         html.Div([
                 html.Div([html.H5("All activities:"),],style={'height':'30px', 'textAlign':'center'}),
@@ -223,7 +244,7 @@ def main():
                     sort_action = 'native',
                     fixed_rows = { 'headers': True, 'data': 0 }
                 ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left', 'padding-top':'10px', 'height':'200px'}),
+        ], style={'width':'50%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left', 'padding-top':'10px', 'height':'200px'}),
         html.Div([
             html.Div([html.H5("Yearly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
@@ -253,41 +274,165 @@ def main():
                     sort_action = 'native',
                     fixed_rows = { 'headers': True, 'data': 0 }
                 ),
-        ], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'padding-top':'10px', 'height':'200px'}),
+        ], style={'width':'50%', 'display':'inline-block','justify-content':'center','align-items':'center', 'padding-top':'10px', 'height':'200px'}),
+        html.Div([html.H4("Statistics:"),],style={'height':'40px', 'textAlign':'Left'}),
         html.Div([
-            dcc.Graph(id='freq_graph') #graph!
-        ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
-        html.Div([
-            html.Div([html.H5("Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
-            dash_table.DataTable(
-                    id='summary_table',
-                    data=df[0:0].to_dict('rows'),
-                    columns=[{'id': c, 'name': c} for c in df.columns],
-                    style_table={
-                        'overflowX': 'scroll', 
-                        'maxHeight': '150px',
-                        'overflowY': 'scroll'},
-                    css=[{
-                            'selector': '.dash-cell div.dash-cell-value',
-                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                        }],
-                    style_cell={
-                        'whiteSpace': 'no-wrap',
-                        'overflow': 'hidden',
-                        'textOverflow': 'ellipsis',
-                        'minWidth': '60px', 'maxWidth': '100px'
-                    },
-                    style_as_list_view=True,
-                    merge_duplicate_headers=True,
-                    style_header={
-                            'backgroundColor': 'white',
-                            'fontWeight': 'bold'
+            html.Div([
+                dcc.Graph(id='freq_graph') #graph!
+            ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
+            html.Div([
+                html.Div([html.H5("Summary Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
+                dash_table.DataTable(
+                        id='summary_table',
+                        data=df[0:0].to_dict('rows'),
+                        columns=[{'id': c, 'name': c} for c in df.columns],
+                        style_table={
+                            'overflowX': 'scroll', 
+                            'maxHeight': '150px',
+                            'overflowY': 'scroll'},
+                        css=[{
+                                'selector': '.dash-cell div.dash-cell-value',
+                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                            }],
+                        style_cell={
+                            'whiteSpace': 'no-wrap',
+                            'overflow': 'hidden',
+                            'textOverflow': 'ellipsis',
+                            'minWidth': '60px', 'maxWidth': '100px'
                         },
-                    sort_action = 'native',
-                    fixed_rows = { 'headers': True, 'data': 0 }
-                ),
-        ],style={'display':'inline-block', 'width':'49%', 'float':'right', 'height':'330px'}),
-        #], style={'width':'49%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'}),
+                        style_as_list_view=True,
+                        merge_duplicate_headers=True,
+                        style_header={
+                                'backgroundColor': 'white',
+                                'fontWeight': 'bold'
+                            },
+                        sort_action = 'native',
+                        fixed_rows = { 'headers': True, 'data': 0 }
+                    ),
+            ],style={'display':'inline-block', 'width':'49%', 'float':'right', 'height':'330px'}),
+        ], style={'width':'100%', 'display':'block','float':'center', 'padding-top':'0px', 'margin':'auto'}),
+        html.Div([
+                    html.Div([
+                        html.Div([html.H6("Top distance:"),],style={'height':'30px', 'textAlign':'center'}),
+                        dash_table.DataTable(
+                                id='top_long_activity_table',
+                                data=df[0:0].to_dict('rows'),
+                                columns=record_table_columns(),
+                                style_table={
+                                    'overflowX': 'scroll', 
+                                    'maxHeight': '150px',
+                                    'overflowY': 'scroll'},
+                                css=[{
+                                        'selector': '.dash-cell div.dash-cell-value',
+                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                    }],
+                                style_cell={
+                                    'whiteSpace': 'no-wrap',
+                                    'overflow': 'hidden',
+                                    'textOverflow': 'ellipsis',
+                                    'minWidth': '60px', 'maxWidth': '100px'
+                                },
+                                style_as_list_view=True,
+                                merge_duplicate_headers=True,
+                                style_header={
+                                        'backgroundColor': 'white',
+                                        'fontWeight': 'bold'
+                                    },
+                                sort_action = 'native',
+                                fixed_rows = { 'headers': True, 'data': 0 }
+                            ),
+                        ],style={'display':'inline-block', 'width':'25%', 'float':'left', 'height':'330px'}),
+                    html.Div([
+                        html.Div([html.H6("Top time:"),],style={'height':'30px', 'textAlign':'center'}),
+                        dash_table.DataTable(
+                                id='top_time_activity_table',
+                                data=df[0:0].to_dict('rows'),
+                                columns=record_table_columns(),
+                                style_table={
+                                    'overflowX': 'scroll', 
+                                    'maxHeight': '150px',
+                                    'overflowY': 'scroll'},
+                                css=[{
+                                        'selector': '.dash-cell div.dash-cell-value',
+                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                    }],
+                                style_cell={
+                                    'whiteSpace': 'no-wrap',
+                                    'overflow': 'hidden',
+                                    'textOverflow': 'ellipsis',
+                                    'minWidth': '60px', 'maxWidth': '100px'
+                                },
+                                style_as_list_view=True,
+                                merge_duplicate_headers=True,
+                                style_header={
+                                        'backgroundColor': 'white',
+                                        'fontWeight': 'bold'
+                                    },
+                                sort_action = 'native',
+                                fixed_rows = { 'headers': True, 'data': 0 }
+                            ),
+                        ],style={'display':'inline-block', 'width':'25%', 'float':'left', 'height':'330px'}),
+                    html.Div([
+                        html.Div([html.H6("Top climb:"),],style={'height':'30px', 'textAlign':'center'}),
+                        dash_table.DataTable(
+                                id='top_climb_activity_table',
+                                data=df[0:0].to_dict('rows'),
+                                columns=record_table_columns(),
+                                style_table={
+                                    'overflowX': 'scroll', 
+                                    'maxHeight': '150px',
+                                    'overflowY': 'scroll'},
+                                css=[{
+                                        'selector': '.dash-cell div.dash-cell-value',
+                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                    }],
+                                style_cell={
+                                    'whiteSpace': 'no-wrap',
+                                    'overflow': 'hidden',
+                                    'textOverflow': 'ellipsis',
+                                    'minWidth': '60px', 'maxWidth': '100px'
+                                },
+                                style_as_list_view=True,
+                                merge_duplicate_headers=True,
+                                style_header={
+                                        'backgroundColor': 'white',
+                                        'fontWeight': 'bold'
+                                    },
+                                sort_action = 'native',
+                                fixed_rows = { 'headers': True, 'data': 0 }
+                            ),
+                        ],style={'display':'inline-block', 'width':'25%', 'float':'right', 'height':'330px'}),
+                    html.Div([
+                        html.Div([html.H6("Top speed:"),],style={'height':'30px', 'textAlign':'center'}),
+                        dash_table.DataTable(
+                                id='top_pace_activity_table',
+                                data=df[0:0].to_dict('rows'),
+                                columns=record_table_columns(),
+                                style_table={
+                                    'overflowX': 'scroll', 
+                                    'maxHeight': '150px',
+                                    'overflowY': 'scroll'},
+                                css=[{
+                                        'selector': '.dash-cell div.dash-cell-value',
+                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                    }],
+                                style_cell={
+                                    'whiteSpace': 'no-wrap',
+                                    'overflow': 'hidden',
+                                    'textOverflow': 'ellipsis',
+                                    'minWidth': '60px', 'maxWidth': '100px'
+                                },
+                                style_as_list_view=True,
+                                merge_duplicate_headers=True,
+                                style_header={
+                                        'backgroundColor': 'white',
+                                        'fontWeight': 'bold'
+                                    },
+                                sort_action = 'native',
+                                fixed_rows = { 'headers': True, 'data': 0 }
+                            ),
+                        ],style={'display':'inline-block', 'width':'25%', 'float':'right', 'height':'330px'}),
+        ], style={'width':'100%', 'display':'inline-block','justify-content':'center','align-items':'center', 'height':'330px'})
     ])
 
     @app.callback(
@@ -328,7 +473,7 @@ def main():
     @app.callback(
         dash.dependencies.Output('total_runs_table', 'columns'),
         [dash.dependencies.Input('total_runs', 'children')])
-    def update_figure(df_agg_json):
+    def update_figure(df_agg_json): #TODO: df_agg_json can be removed
         columns=[
                 {"name": "Date", "id": "date"},
                 {"name": "Type", "id": "type"},
@@ -402,8 +547,23 @@ def main():
         #END apply filters
 
 
-        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB', 'timeE', 'timeI', 'timeM', 'timeR', 'timeT', 'timeX', 'timeXB']
-        df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').sum()
+        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB', 'timeE', 'timeI', 'timeM', 'timeR', 'timeT', 'timeX', 'timeXB', 'feeling']
+        df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').agg(pd.Series.sum, skipna=True)
+
+        #Count all activities
+        df_count_all = filt_df[:][['date']].resample(agg_option, on='date').agg({'date':'size'}).rename(columns={'date':'N_all'})
+        df_agg = pd.concat([df_agg, df_count_all], axis=1, sort=False)
+
+        #Only count running activities
+        running_types = [blockNames.RunTypes.E, blockNames.RunTypes.M, blockNames.RunTypes.T, blockNames.RunTypes.I, blockNames.RunTypes.R]
+        df_running = filt_df[filt_df.type.isin(running_types)][['date', 'type', 'trail']]
+        df_count_running = df_running.resample(agg_option, on='date').agg({'type':'size', 'trail':'sum'}).rename(index=str, columns={'type': 'N_run', 'trail': 'N_trail'})
+
+        df_agg = pd.concat([df_agg, df_count_running], axis=1, sort=False)
+
+        cols = ['N_run', 'N_trail', 'N_all']
+        df_agg['Nrun_Ntrail_Nall'] = df_agg[cols].apply(lambda row: "%d(%d)/%d"%(row.values[0],row.values[1],row.values[2]), axis=1)
+
 
         df_agg[time_option] = df_agg.index
         if time_option == 'week':
@@ -432,7 +592,7 @@ def main():
         cols = ['%E','%M','%T','%I','%R']
         df_agg['%types'] = df_agg[cols].apply(lambda row: "%.0f(%.0f)%%/%.0f%%/%.0f%%/%.0f%%"%(row.values[0]+row.values[1],row.values[1],row.values[2],row.values[3],row.values[4]), axis=1)
 
-        decimals = pd.Series([1, 1, 0, 0, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'run_avg_pace', '%E', '%M', '%T', '%I', '%R'])
+        decimals = pd.Series([1, 1, 0, 0, 1, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'run_avg_pace', '%E', '%M', '%T', '%I', '%R', 'feeling'])
 
         return df_agg.round(decimals).to_json(date_format='iso', orient='split')
 
@@ -465,6 +625,8 @@ def main():
                 {"name": "Climb", "id": "climb"},
                 {"name": "Run Avg.Pace", "id": "run_avg_pace"},
                 {"name": "E(M)%/T%/I%/R%", "id": "%types"},
+                {"name": "Feel", "id": "feeling"},
+                {"name": "#run(#trail)/#all", "id": "Nrun_Ntrail_Nall"},
             ]
         return columns
 
@@ -496,6 +658,9 @@ def main():
                 {"name": "Time", "id": "time"},
                 {"name": "Climb", "id": "climb"},
                 {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
+                {"name": "E(M)%/T%/I%/R%", "id": "%types"},
+                {"name": "Feel", "id": "feeling"},
+                {"name": "#run(#trail)/#all", "id": "Nrun_Ntrail_Nall"},
             ]
         return columns
 
@@ -527,6 +692,9 @@ def main():
                 {"name": "Time", "id": "time"},
                 {"name": "Climb", "id": "climb"},
                 {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
+                {"name": "E(M)%/T%/I%/R%", "id": "%types"},
+                {"name": "Feel", "id": "feeling"},
+                {"name": "#run(#trail)/#all", "id": "Nrun_Ntrail_Nall"},
             ]
         return columns
 
@@ -558,7 +726,8 @@ def main():
                                          blockNames.RunTypes.M,
                                          blockNames.RunTypes.T,
                                          blockNames.RunTypes.I,
-                                         blockNames.RunTypes.R
+                                         blockNames.RunTypes.R,
+                                         blockNames.RunTypes.C
                                         ]
 
             traces = [
@@ -657,11 +826,11 @@ def main():
         y_agg = pd.read_json(yearly_agg_json, orient='split')
 
         index = ['4W', 'W', 'M', 'Y']
-        columns = ['avg_dist', 'sd_dist', 'avg_time', 'sd_time', 'avg_climb', 'sd_climb']
+        columns = ['avg_dist', 'sd_dist', 'avg_time', 'sd_time', 'avg_climb', 'sd_climb', 'avg_N_run', 'sd_N_run', 'avg_N_trail', 'sd_N_trail', 'avg_N_all', 'sd_N_all']
         summary_df = pd.DataFrame(index=index, columns=columns)
 
         aggs = [w_agg.iloc[-5:-1], w_agg[:-1], m_agg.iloc[:-1], y_agg]
-        variables = ['distance', 'time', 'climb']
+        variables = ['distance', 'time', 'climb', 'N_run', 'N_trail', 'N_all']
         for i in range(4):
             df_agg = aggs[i]
             metrics = []
@@ -672,6 +841,9 @@ def main():
                     stats = vf(stats)
                 metrics.extend(stats)
             summary_df.iloc[i] = metrics
+
+        cols = ['avg_N_run', 'avg_N_trail', 'avg_N_all']
+        summary_df['N_avg'] = summary_df[cols].apply(lambda row: "%.1f(%.1f)/%.1f"%(row.values[0],row.values[1],row.values[2]), axis=1)
 
         summary_df['period'] = ['Last 4 W', 'Week', 'Month', 'Year']
         return summary_df.to_dict('rows')
@@ -692,8 +864,75 @@ def main():
                 {"name": "Time.SD", "id": "sd_time"},
                 {"name": "Climb.Avg", "id": "avg_climb"},
                 {"name": "Clim.SD", "id": "sd_climb"},
+                {"name": "#Run.Avg", "id": "N_avg"},
             ]
         return columns
+
+
+    def return_top_values(df, column, n, ascending=False):
+        return df.sort_values(by=column,ascending=ascending).iloc[0:n]
+
+    @app.callback(
+        dash.dependencies.Output('top_long_activity_table', 'data'),
+        [dash.dependencies.Input('total_runs', 'children'),
+        dash.dependencies.Input('type-dropdown', 'value')])
+    def record_table(df_json, chosen_basic_runTypes):
+        df = pd.read_json(df_json, orient='split')
+        #TODO: round numbers
+        df = df[df.type.isin(chosen_basic_runTypes)]
+        return return_top_values(df, 'distance', 10).to_dict('rows')
+
+    @app.callback(
+        dash.dependencies.Output('top_time_activity_table', 'data'),
+        [dash.dependencies.Input('total_runs', 'children'),
+        dash.dependencies.Input('type-dropdown', 'value')])
+    def record_table(df_json, chosen_basic_runTypes):
+        df = pd.read_json(df_json, orient='split')
+        #TODO: round numbers
+        df = df[df.type.isin(chosen_basic_runTypes)]
+        return return_top_values(df, 'time', 10).to_dict('rows')
+
+    @app.callback(
+        dash.dependencies.Output('top_climb_activity_table', 'data'),
+        [dash.dependencies.Input('total_runs', 'children'),
+        dash.dependencies.Input('type-dropdown', 'value')])
+    def record_table(df_json, chosen_basic_runTypes):
+        df = pd.read_json(df_json, orient='split')
+        #TODO: round numbers
+        df = df[df.type.isin(chosen_basic_runTypes)]
+        return return_top_values(df, 'time', 10).to_dict('rows')
+
+    @app.callback(
+        dash.dependencies.Output('top_pace_activity_table', 'data'),
+        [dash.dependencies.Input('total_runs', 'children'),
+        dash.dependencies.Input('type-dropdown', 'value')])
+    def record_table(df_json, chosen_basic_runTypes):
+        df = pd.read_json(df_json, orient='split')
+        #TODO: round numbers
+        df = df[df.type.isin(chosen_basic_runTypes)]
+        return return_top_values(df, 'avg_pace', 10, ascending=True).to_dict('rows')
+
+
+    #@app.callback(
+    #    dash.dependencies.Output('top_climb_activity_table', 'data'),
+    #    [dash.dependencies.Input('total_runs', 'children'),
+    #    dash.dependencies.Input('type-dropdown', 'value')])
+    #def record_table(df_json, chosen_basic_runTypes):
+    #    df = pd.read_json(df_json, orient='split')
+    #    #TODO: round numbers
+    #    df = df[df.type.isin(chosen_basic_runTypes)]
+    #    return return_top_values(df, 'climb', 10).to_dict('rows')
+
+    #@app.callback(
+    #    dash.dependencies.Output('top_time_activity_table', 'data'),
+    #    [dash.dependencies.Input('total_runs', 'children'),
+    #    dash.dependencies.Input('type-dropdown', 'value')])
+    #def record_table(df_json, chosen_basic_runTypes):
+    #    df = pd.read_json(df_json, orient='split')
+    #    #TODO: round numbers
+    #    df = df[df.type.isin(chosen_basic_runTypes)]
+    #    return return_top_values(df, 'time', 10).to_dict('rows')
+
 
 
     return app

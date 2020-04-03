@@ -19,7 +19,8 @@ class SingleRun(segment.Segment):
         self.total_distance = 0 #km
         self.climb = 0 #m
 
-        self.avg_pace = None #sec
+        self.avg_pace = None #sec/km
+        self.vspeed = 0 #m/h
 
         self.date = None
 
@@ -32,6 +33,7 @@ class SingleRun(segment.Segment):
         self.feeling = None
         self.notes = ""
         self.orig_json_string = ""
+
 
         #distances split over basic running types
         self.basic_dist = {}
@@ -68,6 +70,7 @@ class SingleRun(segment.Segment):
                 utilities.isclose(self.total_distance, other.total_distance, abs_tol=1e-3) and\
                 self.climb == other.climb and\
                 utilities.isclose(self.avg_pace, other.avg_pace, abs_tol=1e-3) and\
+                utilities.isclose(self.vspeed, other.vspeed, abs_tol=1e-3) and\
                 self.date == other.date and\
                 self.trail_running == other.trail_running and\
                 self.where == other.where and\
@@ -97,6 +100,7 @@ class SingleRun(segment.Segment):
         str_to_return += "\nTotal climb: %d\n"%self.climb
 
         str_to_return += "Avg pace: %d (in sec/km)\n"%self.avg_pace
+        str_to_return += "Avg vert. speed: %d (in m/h)\n"%self.vspeed
 
         str_to_return += "\nWith basic types:"
         str_to_return += "\nStats by training speeds:"
@@ -132,6 +136,7 @@ class SingleRun(segment.Segment):
             blockNames.Colnames.distance : self.total_distance,
             blockNames.Colnames.climb : self.climb,
             blockNames.Colnames.avg_pace : self.avg_pace,
+            blockNames.Colnames.vspeed : self.vspeed,
             blockNames.Colnames.date : self.date,
             blockNames.Colnames.trail : self.trail_running,
             blockNames.Colnames.where : self.where,
@@ -202,6 +207,8 @@ class SingleRun(segment.Segment):
             self.climb = int(climb_str)  
         else:
             self.climb = 0 
+
+        self.vspeed = int(self.climb * 60. / self.total_time)
 
         #where
         try:

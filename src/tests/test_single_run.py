@@ -80,6 +80,8 @@ class TestSingleRun(unittest.TestCase):
 
         self.assertEqual(singleRun.climb, 110)
 
+        self.assertAlmostEqual(singleRun.vspeed, 88.0, 2)
+
         self.assertEqual(singleRun.where, "Park")
 
         self.assertEqual(singleRun.route, "Lap 1")
@@ -308,6 +310,7 @@ class TestSingleRun(unittest.TestCase):
         singleRun.total_time=75
         singleRun.total_distance=12
         singleRun.climb=110
+        singleRun.vspeed=88
         singleRun.avg_pace=375
         singleRun.date = datetime.datetime.strptime("01/01/19", "%d/%m/%y").date()
         singleRun.where = "Park"
@@ -323,6 +326,7 @@ class TestSingleRun(unittest.TestCase):
             blockNames.Colnames.time : 75, 
             blockNames.Colnames.distance : 12, 
             blockNames.Colnames.climb : 110,
+            blockNames.Colnames.vspeed : 88,
             blockNames.Colnames.avg_pace : 375,
             blockNames.Colnames.date : datetime.datetime.strptime("01/01/19", "%d/%m/%y").date(),
             blockNames.Colnames.trail : False,

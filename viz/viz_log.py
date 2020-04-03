@@ -72,10 +72,6 @@ def record_table_columns():
             {"name": "Route", "id": "route"},
             {"name": "Notes", "id": "notes"},
             {"name": "Feel", "id": "feeling"},
-            {"name": "Dist.E", "id": "distE"},
-            {"name": "Dist.M", "id": "distM"},
-            {"name": "Dist.T", "id": "distT"},
-            {"name": "Dist.I", "id": "distI"},
     ]
     return columns
 
@@ -116,7 +112,7 @@ def main():
                 dcc.Dropdown(
                     id='type-dropdown',
                     options=runTypes_long_name,
-                    value=[blockNames.RunTypes.XB, blockNames.RunTypes.X, blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.M, blockNames.RunTypes.E],
+                    value=[blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.M, blockNames.RunTypes.E],
                     multi = True
                 )
             ], style={
@@ -464,10 +460,11 @@ def main():
         df_total_runs['paceT'] = df_total_runs['paceT'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
         df_total_runs['paceI'] = df_total_runs['paceI'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
         df_total_runs['paceR'] = df_total_runs['paceR'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
-        decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR'])
 
         #df_total_runs.date = df_total_runs.date.dt.strftime("%d-%m-%y")
         df_total_runs.date = df_total_runs.date.apply(lambda x: x.strftime("%y/%m/%d"))
+
+        decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR'])
         return df_total_runs.round(decimals).sort_values(by=['date'], ascending=False).to_dict('rows')
 
     @app.callback(
@@ -588,6 +585,8 @@ def main():
         df_agg['%T'] = 100*df_agg['distT'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
         df_agg['%I'] = 100*df_agg['distI'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
         df_agg['%R'] = 100*df_agg['distR'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
+
+        df_agg.fillna(value={'%E':0, '%M':0, '%T':0, '%I':0, '%R':0}, inplace=True)
 
         cols = ['%E','%M','%T','%I','%R']
         df_agg['%types'] = df_agg[cols].apply(lambda row: "%.0f(%.0f)%%/%.0f%%/%.0f%%/%.0f%%"%(row.values[0]+row.values[1],row.values[1],row.values[2],row.values[3],row.values[4]), axis=1)
@@ -878,9 +877,12 @@ def main():
         dash.dependencies.Input('type-dropdown', 'value')])
     def record_table(df_json, chosen_basic_runTypes):
         df = pd.read_json(df_json, orient='split')
-        #TODO: round numbers
+
         df = df[df.type.isin(chosen_basic_runTypes)]
-        return return_top_values(df, 'distance', 10).to_dict('rows')
+
+        df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
+        decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR', 'feel'])
+        return return_top_values(df.round(decimals), 'distance', 10).to_dict('rows')
 
     @app.callback(
         dash.dependencies.Output('top_time_activity_table', 'data'),
@@ -888,9 +890,13 @@ def main():
         dash.dependencies.Input('type-dropdown', 'value')])
     def record_table(df_json, chosen_basic_runTypes):
         df = pd.read_json(df_json, orient='split')
-        #TODO: round numbers
+
         df = df[df.type.isin(chosen_basic_runTypes)]
-        return return_top_values(df, 'time', 10).to_dict('rows')
+
+        df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
+        df['avg_pace'] = df['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR', 'feel'])
+        return return_top_values(df.round(decimals), 'time', 10).to_dict('rows')
 
     @app.callback(
         dash.dependencies.Output('top_climb_activity_table', 'data'),
@@ -898,9 +904,13 @@ def main():
         dash.dependencies.Input('type-dropdown', 'value')])
     def record_table(df_json, chosen_basic_runTypes):
         df = pd.read_json(df_json, orient='split')
-        #TODO: round numbers
+
         df = df[df.type.isin(chosen_basic_runTypes)]
-        return return_top_values(df, 'time', 10).to_dict('rows')
+
+        df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
+        df['avg_pace'] = df['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR', 'feel'])
+        return return_top_values(df.round(decimals), 'climb', 10).to_dict('rows')
 
     @app.callback(
         dash.dependencies.Output('top_pace_activity_table', 'data'),
@@ -908,9 +918,14 @@ def main():
         dash.dependencies.Input('type-dropdown', 'value')])
     def record_table(df_json, chosen_basic_runTypes):
         df = pd.read_json(df_json, orient='split')
-        #TODO: round numbers
+
         df = df[df.type.isin(chosen_basic_runTypes)]
-        return return_top_values(df, 'avg_pace', 10, ascending=True).to_dict('rows')
+
+        df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
+        decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR', 'feel'])
+        df_pace = return_top_values(df.round(decimals), 'avg_pace', 10, ascending=True)
+        df_pace['avg_pace'] = df_pace['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
+        return df_pace.to_dict('rows')
 
 
     #@app.callback(

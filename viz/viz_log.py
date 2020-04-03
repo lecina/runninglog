@@ -625,7 +625,7 @@ def main():
                 {"name": "Run Avg.Pace", "id": "run_avg_pace"},
                 {"name": "E(M)%/T%/I%/R%", "id": "%types"},
                 {"name": "Feel", "id": "feeling"},
-                {"name": "#run(#trail)/#all", "id": "Nrun_Ntrail_Nall"},
+                {"name": "#r(#t)/#A", "id": "Nrun_Ntrail_Nall"},
             ]
         return columns
 
@@ -754,7 +754,7 @@ def main():
             'data': traces,
             'layout': go.Layout(
                 height=300,
-                width=600,
+                #width=600,
                 barmode='stack',
                 xaxis=xaxis_dict,
                 yaxis=yaxis_dict,
@@ -801,7 +801,7 @@ def main():
             'data': traces,
             'layout': go.Layout(
                 height=300,
-                width=600,
+                #width=600,
                 barmode='stack',
                 yaxis={'title':'location'},
                 xaxis={'title': 'counts'},

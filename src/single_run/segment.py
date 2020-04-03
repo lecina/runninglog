@@ -14,6 +14,7 @@ class Segment:
         self.time = None
         self.pace = None
         self.climb = 0
+        self.vspeed = 0
         self.bpm = None
         self.date = None
         self.repetition = 0
@@ -42,6 +43,7 @@ class Segment:
             str_to_return += "Pace: %d (in sec/km)\n"%self.avg_pace
         except:
             pass
+        str_to_return += "\nVert. speed:: %.0f\n"%self.vspeed
 
         return str_to_return
 
@@ -67,6 +69,7 @@ class Segment:
                 self.time is None and
                 self.pace is None and
                 self.climb == 0 and
+                self.vspeed == 0 and
                 self.bpm is None and
                 self.feeling == 0 and
                 self.repetition == 0)
@@ -126,6 +129,9 @@ class Segment:
         else:
             parsed_time = None
             parsed_pace = None
+
+        if self.time is not None:
+            self.vspeed = int(self.climb * 3600./ self.time) #vspeed in m/h
 
     def parse_type(self, type_str):
         """

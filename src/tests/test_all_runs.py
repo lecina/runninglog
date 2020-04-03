@@ -16,6 +16,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.total_time = 75
         goldenSingleRun.total_distance = 13.80
         goldenSingleRun.climb = 110
+        goldenSingleRun.vspeed = 88
         goldenSingleRun.avg_pace = 326.087
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = "Lap 1"
@@ -48,6 +49,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.total_time = 60
         goldenSingleRun.total_distance = 12.2
         goldenSingleRun.climb = 100
+        goldenSingleRun.vspeed = 100
         goldenSingleRun.avg_pace = 295.081967213 
         goldenSingleRun.trail_running = False
         goldenSingleRun.where = "Park2"
@@ -80,6 +82,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.total_time = 75
         goldenSingleRun.total_distance = 13.80
         goldenSingleRun.climb = 110
+        goldenSingleRun.vspeed = 88
         goldenSingleRun.avg_pace = 326.087
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = ""
@@ -105,6 +108,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.total_time = 60
         goldenSingleRun2.total_distance = 12.2
         goldenSingleRun2.climb = 100
+        goldenSingleRun2.vspeed = 100
         goldenSingleRun2.avg_pace = 295.082
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
@@ -213,6 +217,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.total_time = 75
         goldenSingleRun.total_distance = 13.80
         goldenSingleRun.climb = 110
+        goldenSingleRun.vspeed = 88
         goldenSingleRun.avg_pace = 326.086957
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = ""
@@ -238,6 +243,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.total_time = 60
         goldenSingleRun2.total_distance = 12.2
         goldenSingleRun2.climb = 100
+        goldenSingleRun2.vspeed = 100
         goldenSingleRun2.avg_pace = 295.081967213
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""

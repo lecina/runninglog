@@ -79,6 +79,8 @@ def record_table_columns():
     return columns
 
 def main():
+    df_empty = pd.DataFrame()
+
     basic_runType_order = get_basic_runTypes_order()
 
     runType_order = viz_constants.get_runType_order()
@@ -95,8 +97,9 @@ def main():
 
     filt_df = df.copy()
 
-    external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-    app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+    #external_stylesheets = ['viz/data.css']
+    #app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+    app = dash.Dash(__name__)
 
     app.layout = html.Div([
         html.Div([
@@ -127,6 +130,7 @@ def main():
                         })
         ]),
         html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
+        html.Div(id='last4weeks_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='weekly_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='monthly_agg', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='yearly_agg', style={'display': 'none'}), #hidden, in order to share data
@@ -147,20 +151,25 @@ def main():
                         options=[{'label': i, 'value': i} for i in time_agg_options],
                         value='week'
                     ),
-                ],style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
+                ],style={'width':'50%', 'display': 'inline-block', 'height':'30px'}),
                 dcc.Graph(id='agg_graph') #graph!
-            ],style={'display':'inline-block', 'width':'49%', 'float':'left', 'height':'330px'}),
-            #display:flex;justify-content:center;align-items:center
+            ],style={'display':'inline-block', 'width':'50%', 'float':'left', 'height':'380px'}),
 
             html.Div([
+                html.Div([html.H5("Last 4 weeks:"),],style={'height':'30px', 'textAlign':'center'}),
+                html.Div([
+                    html.Div(
+                        [dcc.Markdown(id='last_4weeks')], 
+                    style={'white-space': 'pre', 'width':'400px', 'text-justify':'inter-word', 'display': 'inline-block', 'padding':'10px', 'border':'3px solid'}),
+                 ], style={'text-align':'center'}),
                 html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
                 dash_table.DataTable(
                     id='weekly_agg_table',
-                    data=df[0:0].to_dict('rows'),
-                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    data=df_empty.to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df_empty.columns],
                     style_table={
                         'overflowX': 'scroll', 
-                        'maxHeight': '280px',
+                        'maxHeight': '150px',
                         'overflowY': 'scroll'},
                     css=[{
                             'selector': '.dash-cell div.dash-cell-value',
@@ -182,14 +191,14 @@ def main():
                     sort_action = 'native',
                     fixed_rows = { 'headers': True, 'data': 0 }
                 ),
-            ], style={'width':'50%', 'display':'inline-block', 'height':'330px'}),
-        ], style={'width':'100%', 'display':'block', 'height':'350px'}),
+            ], style={'width':'50%', 'display':'inline-block', 'height':'380px'}),
+        ], style={'width':'100%', 'display':'block', 'height':'440px'}),
         html.Div([
                 html.Div([html.H5("All activities:"),],style={'height':'30px', 'textAlign':'center'}),
                 dash_table.DataTable(
                         id='total_runs_table',
-                        data=df[0:0].to_dict('rows'),
-                        columns=[{'id': c, 'name': c} for c in df.columns],
+                        data=df_empty.to_dict('rows'),
+                        columns=[{'id': c, 'name': c} for c in df_empty.columns],
                         style_table={
                             'overflowX': 'scroll', 
                             'maxHeight': '250px',
@@ -201,8 +210,9 @@ def main():
                         style_cell={
                             'whiteSpace': 'no-wrap',
                             'overflow': 'hidden',
-                            'textOverflow': 'ellipsis',
-                            'minWidth': '60px', 'maxWidth': '100px'
+                            #'textOverflow': 'ellipsis',
+                            'textOverflow': 'clip',
+                            'minWidth': '40px', 'maxWidth': '90px'
                         },
                         style_as_list_view=True,
                         merge_duplicate_headers=True,
@@ -218,8 +228,8 @@ def main():
             html.Div([html.H5("Monthly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
                     id='monthly_agg_table',
-                    data=df[0:0].to_dict('rows'),
-                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    data=df_empty.to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df_empty.columns],
                     style_table={
                         'overflowX': 'scroll', 
                         'maxHeight': '150px',
@@ -232,7 +242,7 @@ def main():
                         'whiteSpace': 'no-wrap',
                         'overflow': 'hidden',
                         'textOverflow': 'ellipsis',
-                        'minWidth': '60px', 'maxWidth': '100px'
+                        'minWidth': '20px', 'maxWidth': '80px'
                     },
                     style_as_list_view=True,
                     merge_duplicate_headers=True,
@@ -243,13 +253,13 @@ def main():
                     sort_action = 'native',
                     fixed_rows = { 'headers': True, 'data': 0 }
                 ),
-        ], style={'width':'50%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left', 'padding-top':'10px', 'height':'200px'}),
+        ], style={'width':'45%', 'display':'inline-block','justify-content':'center','align-items':'center', 'float':'left', 'padding-top':'10px', 'height':'200px'}),
         html.Div([
             html.Div([html.H5("Yearly summary:"),],style={'height':'30px', 'textAlign':'center'}),
             dash_table.DataTable(
                     id='yearly_agg_table',
-                    data=df[0:0].to_dict('rows'),
-                    columns=[{'id': c, 'name': c} for c in df.columns],
+                    data=df_empty.to_dict('rows'),
+                    columns=[{'id': c, 'name': c} for c in df_empty.columns],
                     style_table={
                         'overflowX': 'scroll', 
                         'maxHeight': '150px',
@@ -262,7 +272,7 @@ def main():
                         'whiteSpace': 'no-wrap',
                         'overflow': 'hidden',
                         'textOverflow': 'ellipsis',
-                        'minWidth': '60px', 'maxWidth': '100px'
+                        'minWidth': '20px', 'maxWidth': '80px'
                     },
                     style_as_list_view=True,
                     merge_duplicate_headers=True,
@@ -273,50 +283,15 @@ def main():
                     sort_action = 'native',
                     fixed_rows = { 'headers': True, 'data': 0 }
                 ),
-        ], style={'width':'50%', 'display':'inline-block','justify-content':'center','align-items':'center', 'padding-top':'10px', 'height':'200px'}),
-        html.Div([html.H4("Statistics:"),],style={'height':'40px', 'textAlign':'Left'}),
-        html.Div([
-            html.Div([
-                dcc.Graph(id='freq_graph') #graph!
-            ],style={'display':'inline-block', 'width':'49%', 'float':'left'}),
-            html.Div([
-                html.Div([html.H5("Summary Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
-                dash_table.DataTable(
-                        id='summary_table',
-                        data=df[0:0].to_dict('rows'),
-                        columns=[{'id': c, 'name': c} for c in df.columns],
-                        style_table={
-                            'overflowX': 'scroll', 
-                            'maxHeight': '150px',
-                            'overflowY': 'scroll'},
-                        css=[{
-                                'selector': '.dash-cell div.dash-cell-value',
-                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                            }],
-                        style_cell={
-                            'whiteSpace': 'no-wrap',
-                            'overflow': 'hidden',
-                            'textOverflow': 'ellipsis',
-                            'minWidth': '60px', 'maxWidth': '100px'
-                        },
-                        style_as_list_view=True,
-                        merge_duplicate_headers=True,
-                        style_header={
-                                'backgroundColor': 'white',
-                                'fontWeight': 'bold'
-                            },
-                        sort_action = 'native',
-                        fixed_rows = { 'headers': True, 'data': 0 }
-                    ),
-            ],style={'display':'inline-block', 'width':'49%', 'float':'right'}),
-        ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'height':'300px'}),
+        ], style={'width':'45%', 'display':'inline-block','justify-content':'center','align-items':'center', 'padding-top':'10px', 'height':'200px'}),
+        html.Div([html.H4("Top activities:"),],style={'height':'40px', 'textAlign':'Left'}),
         html.Div([
             html.Div([
                     html.Div([
                         html.Div([html.H6("Top distance:"),],style={'height':'30px', 'textAlign':'center'}),
                         dash_table.DataTable(
                                 id='top_long_activity_table',
-                                data=df[0:0].to_dict('rows'),
+                                data=df_empty.to_dict('rows'),
                                 columns=record_table_columns(),
                                 style_table={
                                     'overflowX': 'scroll', 
@@ -346,7 +321,7 @@ def main():
                         html.Div([html.H6("Top time:"),],style={'height':'30px', 'textAlign':'center'}),
                         dash_table.DataTable(
                                 id='top_time_activity_table',
-                                data=df[0:0].to_dict('rows'),
+                                data=df_empty.to_dict('rows'),
                                 columns=record_table_columns(),
                                 style_table={
                                     'overflowX': 'scroll', 
@@ -376,7 +351,7 @@ def main():
                         html.Div([html.H6("Top climb:"),],style={'height':'30px', 'textAlign':'center'}),
                         dash_table.DataTable(
                                 id='top_climb_activity_table',
-                                data=df[0:0].to_dict('rows'),
+                                data=df_empty.to_dict('rows'),
                                 columns=record_table_columns(),
                                 style_table={
                                     'overflowX': 'scroll', 
@@ -408,7 +383,7 @@ def main():
                         html.Div([html.H6("Top Vert. speed:"),],style={'height':'30px', 'textAlign':'center'}),
                         dash_table.DataTable(
                                 id='top_vspeed_activity_table',
-                                data=df[0:0].to_dict('rows'),
+                                data=df_empty.to_dict('rows'),
                                 columns=record_table_columns(),
                                 style_table={
                                     'overflowX': 'scroll', 
@@ -438,7 +413,7 @@ def main():
                         html.Div([html.H6("Top speed:"),],style={'height':'30px', 'textAlign':'center'}),
                         dash_table.DataTable(
                                 id='top_pace_activity_table',
-                                data=df[0:0].to_dict('rows'),
+                                data=df_empty.to_dict('rows'),
                                 columns=record_table_columns(),
                                 style_table={
                                     'overflowX': 'scroll', 
@@ -466,6 +441,42 @@ def main():
                         ],style={'display':'inline-block', 'width':'30%'}),
             ], style={'width':'100%', 'display':'flex','justify-content':'space-around', 'height':'200px'}),
         ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'5px', 'margin':'auto', 'height':'400px'}),
+        html.Div([html.H4("Location:"),],style={'height':'40px', 'textAlign':'Left'}),
+        html.Div([
+            html.Div([
+                dcc.Graph(id='freq_graph') #graph!
+            ],style={'display':'inline-block', 'width':'49%', 'float':'left'}),
+            html.Div([
+                html.Div([html.H5("Summary Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
+                dash_table.DataTable(
+                        id='summary_table',
+                        data=df_empty.to_dict('rows'),
+                        columns=[{'id': c, 'name': c} for c in df.columns],
+                        style_table={
+                            'overflowX': 'scroll', 
+                            'maxHeight': '150px',
+                            'overflowY': 'scroll'},
+                        css=[{
+                                'selector': '.dash-cell div.dash-cell-value',
+                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                            }],
+                        style_cell={
+                            'whiteSpace': 'no-wrap',
+                            'overflow': 'hidden',
+                            'textOverflow': 'ellipsis',
+                            'minWidth': '60px', 'maxWidth': '100px'
+                        },
+                        style_as_list_view=True,
+                        merge_duplicate_headers=True,
+                        style_header={
+                                'backgroundColor': 'white',
+                                'fontWeight': 'bold'
+                            },
+                        sort_action = 'native',
+                        fixed_rows = { 'headers': True, 'data': 0 }
+                    ),
+            ],style={'display':'inline-block', 'width':'49%', 'float':'right'}),
+        ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'height':'300px'}),
     ])
 
     @app.callback(
@@ -568,13 +579,15 @@ def main():
 
         return filt_df.to_json(date_format='iso', orient='split')
 
-    def time_aggregate(chosen_basic_runTypes, time_option):
+    def time_aggregate(df, chosen_basic_runTypes, time_option=''):
         if time_option == 'week':
             agg_option = 'W'
         elif time_option == 'month':
             agg_option = 'MS'
         elif time_option == 'year':
             agg_option = 'YS'
+        elif time_option == 'all':
+            agg_option = '2Y'
         else:
             agg_option = 'W'
 
@@ -582,8 +595,11 @@ def main():
         #END apply filters
 
 
-        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB', 'timeE', 'timeI', 'timeM', 'timeR', 'timeT', 'timeX', 'timeXB', 'feeling']
+        needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB', 'timeE', 'timeI', 'timeM', 'timeR', 'timeT', 'timeX', 'timeXB']
         df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').agg(pd.Series.sum, skipna=True)
+
+        agg_feeling = filt_df[:][['date', 'feeling']].resample(agg_option, on='date').agg(pd.Series.mean, skipna=True)
+        df_agg = pd.concat([df_agg, agg_feeling], axis=1, sort=False)
 
         #Count all activities
         df_count_all = filt_df[:][['date']].resample(agg_option, on='date').agg({'date':'size'}).rename(columns={'date':'N_all'})
@@ -607,6 +623,9 @@ def main():
             pattern = '%Y-%m'
         elif time_option == 'year':
             pattern = '%Y'
+        elif time_option == 'all':
+            pattern = '%Y'
+
         df_agg[time_option] = df_agg[time_option].apply(lambda x: x.strftime(pattern))
 
         #avg pace all activities
@@ -643,7 +662,7 @@ def main():
         [dash.dependencies.Input('type-dropdown', 'value')]
     )
     def weekly_summary(chosen_basic_runTypes):
-        return time_aggregate(chosen_basic_runTypes, 'week')
+        return time_aggregate(df, chosen_basic_runTypes, 'week')
 
     @app.callback(
         dash.dependencies.Output('weekly_agg_table', 'data'),
@@ -669,7 +688,7 @@ def main():
                 {"name": "Run Avg.Pace", "id": "run_avg_pace"},
                 {"name": "E(M)%/T%/I%/R%", "id": "%types"},
                 {"name": "Feel", "id": "feeling"},
-                {"name": "#r(#t)/#A", "id": "Nrun_Ntrail_Nall"},
+                {"name": "#R(#T)/#A", "id": "Nrun_Ntrail_Nall"},
             ]
         return columns
 
@@ -678,7 +697,7 @@ def main():
         [dash.dependencies.Input('type-dropdown', 'value')]
     )
     def weekly_summary(chosen_basic_runTypes):
-        return time_aggregate(chosen_basic_runTypes, 'month')
+        return time_aggregate(df, chosen_basic_runTypes, 'month')
 
     @app.callback(
         dash.dependencies.Output('monthly_agg_table', 'data'),
@@ -704,7 +723,7 @@ def main():
                 {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
                 {"name": "E(M)%/T%/I%/R%", "id": "%types"},
                 {"name": "Feel", "id": "feeling"},
-                {"name": "#run(#trail)/#all", "id": "Nrun_Ntrail_Nall"},
+                {"name": "#R(#T)/#A", "id": "Nrun_Ntrail_Nall"},
             ]
         return columns
 
@@ -713,7 +732,7 @@ def main():
         [dash.dependencies.Input('type-dropdown', 'value')]
     )
     def weekly_summary(chosen_basic_runTypes):
-        return time_aggregate(chosen_basic_runTypes,'year')
+        return time_aggregate(df, chosen_basic_runTypes,'year')
 
     @app.callback(
         dash.dependencies.Output('yearly_agg_table', 'data'),
@@ -739,7 +758,7 @@ def main():
                 {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
                 {"name": "E(M)%/T%/I%/R%", "id": "%types"},
                 {"name": "Feel", "id": "feeling"},
-                {"name": "#run(#trail)/#all", "id": "Nrun_Ntrail_Nall"},
+                {"name": "#R(#T)/#A", "id": "Nrun_Ntrail_Nall"},
             ]
         return columns
 
@@ -799,7 +818,7 @@ def main():
         return {
             'data': traces,
             'layout': go.Layout(
-                height=300,
+                height=350,
                 #width=600,
                 barmode='stack',
                 xaxis=xaxis_dict,
@@ -857,6 +876,56 @@ def main():
                 hovermode='closest'
             )
         }
+
+    @app.callback(
+        dash.dependencies.Output('last4weeks_agg', 'children'),
+        [dash.dependencies.Input('type-dropdown', 'value')])
+    def update_last4weeks_df(chosen_basic_runTypes):
+        #consider last 28 days (starting today)
+        first_date = pd.Timestamp((pd.Timestamp.now() - datetime.timedelta(days=28)).date())
+        df_slice = df[df['date'] > first_date]
+        return time_aggregate(df_slice, chosen_basic_runTypes, 'all')
+
+    @app.callback(
+        dash.dependencies.Output(component_id='last_4weeks', component_property='children'),
+        [dash.dependencies.Input('last4weeks_agg', 'children')])
+    def update_output_div(df_agg):
+        agg = pd.read_json(df_agg, orient='split').iloc[0]
+
+        avg_time = '{:d}h {:0>2d}m'.format(int(agg.time/4.//60),int(agg.time/4.%60))
+        avg_pace = "{:d}:{:0>2d}".format(int(agg.avg_pace//60),int(agg.avg_pace%60))
+        return '**Avg. distance:** {:.1f} km    **Avg. time:** {};\n'\
+                '**Avg.pace:** {} min/km    **Avg. vert. speed:** {} m/h\n'\
+                '**#Activities _Run(Trail)/All_:**{}    **Avg. feel:** {} \n'\
+                '**Distance _E(M)%/T%/I%/R%_:** {}'.format(agg.distance/4, 
+                                                                                    avg_time, 
+                                                                                    avg_pace, 
+                                                                                    agg.vspeed, 
+                                                                                    agg.Nrun_Ntrail_Nall, 
+                                                                                    agg.feeling, 
+                                                                                    agg['%types'])
+    #@app.callback(
+    #    dash.dependencies.Output(component_id='last_4weeks', component_property='children'),
+    #    [dash.dependencies.Input('type-dropdown', 'value')])
+    #def update_output_div(chosen_basic_runTypes):
+    #    #consider last 28 days (starting today)
+    #    first_date = pd.Timestamp((pd.Timestamp.now() - datetime.timedelta(days=28)).date())
+    #    df_slice = df[df['date'] > first_date]
+    #    df_agg_json = time_aggregate(df_slice, chosen_basic_runTypes, 'all')
+    #    agg = pd.read_json(df_agg_json, orient='split').iloc[0]
+
+    #    avg_time = '{:d}h {:0>2d}m'.format(int(agg.time/4.//60),int(agg.time/4.%60))
+    #    avg_pace = "{:d}:{:0>2d}".format(int(agg.avg_pace//60),int(agg.avg_pace%60))
+    #    return '**Avg. distance:** {:.1f} km;    **Avg. time:** {};\n'\
+    #            '**Avg.pace:** {} min/km;    **Avg. vert. speed:** {} m/h\n'\
+    #            '**#Activities _Run(Trail)/All_:**{};    **Avg. feel:** {} \n'\
+    #            '**Distance _E(M)%_/_T%_/_I%_/_R%_:** {}'.format(agg.distance/4, 
+    #                                                                                avg_time, 
+    #                                                                                avg_pace, 
+    #                                                                                agg.vspeed, 
+    #                                                                                agg.Nrun_Ntrail_Nall, 
+    #                                                                                agg.feeling, 
+    #                                                                                agg['%types'])
 
     @app.callback(
         dash.dependencies.Output('summary_table', 'data'),

@@ -12,7 +12,7 @@ class TestAllRuns(unittest.TestCase):
         singleRun = allRuns.read_single_run("src/tests/data/test_2.json", verbose=False)
 
         goldenSingleRun = single_run.SingleRun()
-        goldenSingleRun.type = runTypes.RUN_TYPES.T
+        goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T
         goldenSingleRun.total_time = 75
         goldenSingleRun.total_distance = 13.80
         goldenSingleRun.climb = 110
@@ -22,21 +22,21 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.route = "Lap 1"
         goldenSingleRun.trail_running = True
         goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 7.96
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.E] = 3121.76
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.T] = 1378.24
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E] = 392.1809
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T] = 236
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.I] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.R] = None
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 7.96
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 5.84
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 3121.76
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 1378.24
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 392.1809
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = 236
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.R] = None
 
         self.assertEqual(singleRun, goldenSingleRun)
 
@@ -45,7 +45,7 @@ class TestAllRuns(unittest.TestCase):
         singleRun = allRuns.read_single_run("src/tests/data/test_3.json", verbose=False)
 
         goldenSingleRun = single_run.SingleRun()
-        goldenSingleRun.type = runTypes.RUN_TYPES.E
+        goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.E
         goldenSingleRun.total_time = 60
         goldenSingleRun.total_distance = 12.2
         goldenSingleRun.climb = 100
@@ -55,21 +55,21 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.where = "Park2"
         goldenSingleRun.route = ""
         goldenSingleRun.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y").date()
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 12.2
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.E] = 3600
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.T] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E] = 295.081967213
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.I] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.R] = None
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 12.2
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 3600
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 295.081967213
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.R] = None
 
         self.assertEqual(singleRun, goldenSingleRun)
 
@@ -78,7 +78,7 @@ class TestAllRuns(unittest.TestCase):
         singleRuns = allRuns.read_single_run("src/tests/data/test_1.json", verbose=False)
 
         goldenSingleRun = single_run.SingleRun()
-        goldenSingleRun.type = runTypes.RUN_TYPES.T
+        goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T
         goldenSingleRun.total_time = 75
         goldenSingleRun.total_distance = 13.80
         goldenSingleRun.climb = 110
@@ -87,24 +87,24 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = ""
         goldenSingleRun.date = datetime.datetime.strptime("26/12/2018", "%d/%m/%Y").date()
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 7.96
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.E] = 3121.76
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.T] = 1378.24
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E] = 392.1809
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T] = 236
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.I] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.R] = None
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 7.96
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 5.84
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 3121.76
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 1378.24
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 392.1809
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = 236
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.R] = None
 
         goldenSingleRun2 = single_run.SingleRun()
-        goldenSingleRun2.type = runTypes.RUN_TYPES.E
+        goldenSingleRun2.type = runTypes.RUN_TYPES_ENUM.E
         goldenSingleRun2.total_time = 60
         goldenSingleRun2.total_distance = 12.2
         goldenSingleRun2.climb = 100
@@ -113,21 +113,21 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
         goldenSingleRun2.date = datetime.datetime.strptime("27/12/2018", "%d/%m/%Y").date()
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 12.2
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 0
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.E] = 3600
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.T] = 0
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.E] = 295.081967213
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.T] = None
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.I] = None
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.R] = None
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 12.2
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 0
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 3600
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 295.081967213
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = None
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = None
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I] = None
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.R] = None
 
         self.assertEqual(singleRuns[0], goldenSingleRun)
         self.assertEqual(singleRuns[1], goldenSingleRun2)
@@ -213,7 +213,7 @@ class TestAllRuns(unittest.TestCase):
         added_single_runs = allRuns.load_files_in_dir("src/tests/data/test_load_files_in_dir", verbose=False)
 
         goldenSingleRun = single_run.SingleRun()
-        goldenSingleRun.type = runTypes.RUN_TYPES.T
+        goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T
         goldenSingleRun.total_time = 75
         goldenSingleRun.total_distance = 13.80
         goldenSingleRun.climb = 110
@@ -222,24 +222,24 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = ""
         goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 7.96
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 5.84
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.E] = 3121.76
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.T] = 1378.24
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.E] = 392.1809
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.T] = 236
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.I] = None
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES.R] = None
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 7.96
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 5.84
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 3121.76
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 1378.24
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 392.1809
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = 236
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I] = None
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.R] = None
 
         goldenSingleRun2 = single_run.SingleRun()
-        goldenSingleRun2.type = runTypes.RUN_TYPES.E
+        goldenSingleRun2.type = runTypes.RUN_TYPES_ENUM.E
         goldenSingleRun2.total_time = 60
         goldenSingleRun2.total_distance = 12.2
         goldenSingleRun2.climb = 100
@@ -248,21 +248,21 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
         goldenSingleRun2.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y").date()
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.E] = 12.2
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.T] = 0
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.E] = 3600
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.M] = 0
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.T] = 0
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.I] = 0
-        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES.R] = 0
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.E] = 295.081967213
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.M] = None
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.T] = None
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.I] = None
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES.R] = None
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 12.2
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 0
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun2.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 3600
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
+        goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 295.081967213
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = None
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = None
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I] = None
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.R] = None
 
         golden_df = pd.DataFrame()
         sr_ds = pd.Series(goldenSingleRun.as_dict())

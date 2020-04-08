@@ -143,27 +143,27 @@ class SingleRun(segment.Segment):
             blockNames.Colnames.route : self.route,
             blockNames.Colnames.notes : self.notes,
             blockNames.Colnames.feeling : self.feeling,
-            blockNames.Colnames.distE : self.basic_dist[runTypes.BASIC_RUN_TYPES.E],
-            blockNames.Colnames.distM : self.basic_dist[runTypes.BASIC_RUN_TYPES.M],
-            blockNames.Colnames.distT : self.basic_dist[runTypes.BASIC_RUN_TYPES.T],
-            blockNames.Colnames.distI : self.basic_dist[runTypes.BASIC_RUN_TYPES.I],
-            blockNames.Colnames.distR : self.basic_dist[runTypes.BASIC_RUN_TYPES.R],
-            blockNames.Colnames.distX : self.basic_dist[runTypes.BASIC_RUN_TYPES.X],
-            blockNames.Colnames.distXB : self.basic_dist[runTypes.BASIC_RUN_TYPES.XB],
-            blockNames.Colnames.timeE : self.basic_time[runTypes.BASIC_RUN_TYPES.E],
-            blockNames.Colnames.timeM : self.basic_time[runTypes.BASIC_RUN_TYPES.M],
-            blockNames.Colnames.timeT : self.basic_time[runTypes.BASIC_RUN_TYPES.T],
-            blockNames.Colnames.timeI : self.basic_time[runTypes.BASIC_RUN_TYPES.I],
-            blockNames.Colnames.timeR : self.basic_time[runTypes.BASIC_RUN_TYPES.R],
-            blockNames.Colnames.timeX : self.basic_time[runTypes.BASIC_RUN_TYPES.X],
-            blockNames.Colnames.timeXB : self.basic_time[runTypes.BASIC_RUN_TYPES.XB],
-            blockNames.Colnames.paceE : self.basic_pace[runTypes.BASIC_RUN_TYPES.E],
-            blockNames.Colnames.paceM : self.basic_pace[runTypes.BASIC_RUN_TYPES.M],
-            blockNames.Colnames.paceT : self.basic_pace[runTypes.BASIC_RUN_TYPES.T],
-            blockNames.Colnames.paceI : self.basic_pace[runTypes.BASIC_RUN_TYPES.I],
-            blockNames.Colnames.paceR : self.basic_pace[runTypes.BASIC_RUN_TYPES.R],
-            blockNames.Colnames.paceX : self.basic_pace[runTypes.BASIC_RUN_TYPES.X],
-            blockNames.Colnames.paceXB : self.basic_pace[runTypes.BASIC_RUN_TYPES.XB]
+            blockNames.Colnames.distE : self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E],
+            blockNames.Colnames.distM : self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M],
+            blockNames.Colnames.distT : self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T],
+            blockNames.Colnames.distI : self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.I],
+            blockNames.Colnames.distR : self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.R],
+            blockNames.Colnames.distX : self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.X],
+            blockNames.Colnames.distXB : self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.XB],
+            blockNames.Colnames.timeE : self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E],
+            blockNames.Colnames.timeM : self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M],
+            blockNames.Colnames.timeT : self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T],
+            blockNames.Colnames.timeI : self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I],
+            blockNames.Colnames.timeR : self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R],
+            blockNames.Colnames.timeX : self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.X],
+            blockNames.Colnames.timeXB : self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.XB],
+            blockNames.Colnames.paceE : self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E],
+            blockNames.Colnames.paceM : self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M],
+            blockNames.Colnames.paceT : self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T],
+            blockNames.Colnames.paceI : self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I],
+            blockNames.Colnames.paceR : self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.R],
+            blockNames.Colnames.paceX : self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.X],
+            blockNames.Colnames.paceXB : self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.XB]
         }
         return rdict
 
@@ -311,7 +311,7 @@ class SingleRun(segment.Segment):
                 if type_val==v1: 
                     dictkey = k1
         else:
-            dictkey = runTypes.BASIC_RUN_TYPES.E
+            dictkey = runTypes.BASIC_RUN_TYPES_ENUM.E
 
         self.basic_dist[dictkey] = self.total_distance
         self.basic_time[dictkey] = self.total_time * 60
@@ -324,22 +324,15 @@ class SingleRun(segment.Segment):
             return None
 
     def redistribute_distances_and_times(self):
-        #grouping into basic run types 
-        self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.basic_dist[runTypes.BASIC_RUN_TYPES.WU]
-        self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.basic_dist[runTypes.BASIC_RUN_TYPES.CD]
-
-        self.basic_dist[runTypes.BASIC_RUN_TYPES.WU] = 0
-        self.basic_dist[runTypes.BASIC_RUN_TYPES.CD] = 0
-
-        #to account for innacuracies, e.g due to jogging in between intervals
-        self.basic_dist[runTypes.BASIC_RUN_TYPES.E] += self.total_distance - sum(self.basic_dist.values())
+        #Assign non-assigned distances to 'E'
+        self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] += self.total_distance - sum(self.basic_dist.values())
 
         assigned_time = 0
         for tm in self.basic_time.itervalues():
             assigned_time += tm
 
         unassigned_time = self.total_time*60 - assigned_time
-        self.basic_time[runTypes.BASIC_RUN_TYPES.E] += unassigned_time
+        self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] += unassigned_time
 
     def compute_basic_types_avg_paces(self):
         for i in range(len(self.basic_pace)):

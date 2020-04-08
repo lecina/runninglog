@@ -95,7 +95,7 @@ class TestSegment(unittest.TestCase):
         sgmnt = segment.Segment()
         sgmnt.create_segment(dictionary,repetition_number=1)
 
-        self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES.R)
+        self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES_ENUM.R)
         self.assertEqual(sgmnt.distance, 0.5)
         self.assertEqual(sgmnt.time, 97.5)
         self.assertEqual(sgmnt.pace, 195)
@@ -109,7 +109,7 @@ class TestSegment(unittest.TestCase):
         sgmnt = segment.Segment()
         sgmnt.create_segment(dictionary,repetition_number=2)
 
-        self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES.I)
+        self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES_ENUM.I)
         self.assertEqual(sgmnt.distance, 1)
         self.assertEqual(sgmnt.time, 195)
         self.assertEqual(sgmnt.pace, 195)
@@ -123,7 +123,7 @@ class TestSegment(unittest.TestCase):
         sgmnt = segment.Segment()
         sgmnt.create_segment(dictionary,repetition_number=2)
 
-        self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES.T)
+        self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES_ENUM.T)
         self.assertEqual(sgmnt.distance, 2.99)
         self.assertEqual(sgmnt.time, 2215.59)
         self.assertEqual(sgmnt.pace, 741)

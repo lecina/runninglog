@@ -8,8 +8,8 @@
     "where":"Park",
     "route":"Lap 1",
     "structure":[
-        {"type":"WU", "distance" : 2.36},
+        {"type":"E", "distance" : 2.36},
         {"type":"T", "distance": 5.84, "pace":"3:56"},
-        {"type":"CD", "distance" : 2.2}
+        {"type":"E", "distance" : 2.2}
     ]
 }

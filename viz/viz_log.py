@@ -12,6 +12,8 @@ import pandas as pd
 import numpy as np
 
 from constants import blockNames
+from single_run import runTypes
+
 try:
     from viz.viz_constants import viz_constants
 except:
@@ -30,16 +32,6 @@ def get_year_marks(df):
 
     return year_marks
 
-
-def get_basic_runTypes_order():
-    runType_order = [blockNames.RunTypes.E, 
-                     blockNames.RunTypes.M,
-                     blockNames.RunTypes.T,
-                     blockNames.RunTypes.I,
-                     blockNames.RunTypes.R,
-                     blockNames.RunTypes.X,
-                     blockNames.RunTypes.XB]
-    return runType_order
 
 def get_ordered_runType_long_name(runType_order):
     return [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
@@ -81,8 +73,6 @@ def record_table_columns():
 def main():
     df_empty = pd.DataFrame()
 
-    basic_runType_order = get_basic_runTypes_order()
-
     runType_order = viz_constants.get_runType_order()
     runTypesToColors = viz_constants.get_runType_colors()
     runTypes_long_name = get_ordered_runType_long_name(runType_order)
@@ -118,7 +108,7 @@ def main():
                 dcc.Dropdown(
                     id='type-dropdown',
                     options=runTypes_long_name,
-                    value=[blockNames.RunTypes.C, blockNames.RunTypes.R, blockNames.RunTypes.I, blockNames.RunTypes.T, blockNames.RunTypes.M, blockNames.RunTypes.E],
+                    value=runTypes.RUNNING_ACTIVITIES,
                     multi = True
                 )
             ], style={
@@ -639,7 +629,7 @@ def main():
         df_agg.vspeed.astype('int')
 
         #running avg pace
-        df_agg_notX = filt_df[~filt_df.type.isin([blockNames.RunTypes.X, blockNames.RunTypes.XB])][needed_cols].resample(agg_option, on='date').sum()
+        df_agg_notX = filt_df[filt_df.type.isin(runTypes.RUNNING_ACTIVITIES)][needed_cols].resample(agg_option, on='date').sum()
         df_agg_notX['run_avg_pace'] = df_agg_notX['time']*60/df_agg_notX['distance']
 
         df_agg = pd.concat([df_agg, df_agg_notX['run_avg_pace']], axis=1)
@@ -787,14 +777,7 @@ def main():
                 str_template = 'time%s'
             elif yaxis_colname == '%types':
                 str_template = '%%%s'
-                chosen_basic_runTypes = [
-                                         blockNames.RunTypes.E, 
-                                         blockNames.RunTypes.M,
-                                         blockNames.RunTypes.T,
-                                         blockNames.RunTypes.I,
-                                         blockNames.RunTypes.R,
-                                         blockNames.RunTypes.C
-                                        ]
+                chosen_basic_runTypes = runTypes.RUNNING_ACTIVITIES
 
             traces = [
                 go.Bar(
@@ -804,7 +787,7 @@ def main():
                     hovertext = df_agg[:][yaxis_colname],
                     marker={ 'color': runTypesToColors[i] },
                     name=i
-                ) for i in basic_runType_order if i in chosen_basic_runTypes
+                ) for i in runTypes.BASIC_RUN_TYPES if i in chosen_basic_runTypes
             ]
         else:
             traces = [

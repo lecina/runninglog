@@ -105,19 +105,22 @@ def main():
                 )
             ], style={'width': '30%', 'display': 'inline-block', 'padding': '0px 0px 0px 0px'}),
             html.Div([
-                dcc.Dropdown(
-                    id='type-dropdown',
-                    options=runTypes_long_name,
-                    value=runTypes.RUNNING_ACTIVITIES,
-                    multi = True
+                dcc.Checklist(
+                    id='chosen_types',
+                    options=[
+                        #{'label': 'Running', 'value': 'Running'},
+                        {'label': 'E', 'value': 'E'},
+                        {'label': 'M', 'value': 'M'},
+                        {'label': 'T', 'value': 'T'},
+                        {'label': 'I', 'value': 'I'},
+                        {'label': 'R', 'value': 'R'},
+                        {'label': 'Mountaineering', 'value': 'X'},
+                        {'label': 'Biking', 'value': 'XB'},
+                    ],
+                    value=['E', 'M', 'T', 'I', 'R'],
+                    labelStyle={'display': 'inline-block'}
                 )
-            ], style={
-                            'width': '70%',
-                            'float': 'right',
-                            'display': 'inline-block',
-                            'align-items': 'center',
-                            'padding': '0px 0px 0px 0px'
-                        })
+            ], style={'width': '30%', 'display':'inline-block', 'padding': '0px 0px 0px 0px', 'vertical-align': 'top'})
         ]),
         html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
         html.Div(id='last4weeks_agg', style={'display': 'none'}), #hidden, in order to share data
@@ -473,9 +476,9 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('total_runs', 'children'),
-        [dash.dependencies.Input('type-dropdown', 'value'),
+        [dash.dependencies.Input('chosen_types', 'value'),
         dash.dependencies.Input('year-slider', 'value')])
-    def selected_runs(chosen_basic_runTypes, chosen_year):
+    def selected_runs(chosen_activities, chosen_year):
         if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
         elif chosen_year == df.date.dt.year.max()+1:
@@ -571,7 +574,7 @@ def main():
 
         return filt_df.to_json(date_format='iso', orient='split')
 
-    def time_aggregate(df, chosen_basic_runTypes, time_option=''):
+    def time_aggregate(df, chosen_activities, time_option=''):
         if time_option == 'week':
             agg_option = 'W'
         elif time_option == 'month':
@@ -583,7 +586,7 @@ def main():
         else:
             agg_option = 'W'
 
-        filt_df = df[df.type.isin(chosen_basic_runTypes)]
+        filt_df = df[df.type.isin(chosen_activities)]
         #END apply filters
 
 
@@ -651,10 +654,10 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('weekly_agg', 'children'),
-        [dash.dependencies.Input('type-dropdown', 'value')]
+        [dash.dependencies.Input('chosen_types', 'value')]
     )
-    def weekly_summary(chosen_basic_runTypes):
-        return time_aggregate(df, chosen_basic_runTypes, 'week')
+    def weekly_summary(chosen_activities):
+        return time_aggregate(df, chosen_activities, 'week')
 
     @app.callback(
         dash.dependencies.Output('weekly_agg_table', 'data'),
@@ -686,10 +689,10 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('monthly_agg', 'children'),
-        [dash.dependencies.Input('type-dropdown', 'value')]
+        [dash.dependencies.Input('chosen_types', 'value')]
     )
-    def weekly_summary(chosen_basic_runTypes):
-        return time_aggregate(df, chosen_basic_runTypes, 'month')
+    def weekly_summary(chosen_activities):
+        return time_aggregate(df, chosen_activities, 'month')
 
     @app.callback(
         dash.dependencies.Output('monthly_agg_table', 'data'),
@@ -721,10 +724,10 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('yearly_agg', 'children'),
-        [dash.dependencies.Input('type-dropdown', 'value')]
+        [dash.dependencies.Input('chosen_types', 'value')]
     )
-    def weekly_summary(chosen_basic_runTypes):
-        return time_aggregate(df, chosen_basic_runTypes,'year')
+    def weekly_summary(chosen_activities):
+        return time_aggregate(df, chosen_activities,'year')
 
     @app.callback(
         dash.dependencies.Output('yearly_agg_table', 'data'),
@@ -758,9 +761,9 @@ def main():
         dash.dependencies.Output('agg_graph', 'figure'),
         [dash.dependencies.Input('xaxis-column2', 'value'),
          dash.dependencies.Input('yaxis-column2', 'value'),
-         dash.dependencies.Input('type-dropdown', 'value'),
+         dash.dependencies.Input('chosen_types', 'value'),
          dash.dependencies.Input('agg_df', 'children')])
-    def update_figure(xaxis_colname, yaxis_colname, chosen_basic_runTypes, df_agg_json):
+    def update_figure(xaxis_colname, yaxis_colname, chosen_activities, df_agg_json):
         df_agg = pd.read_json(df_agg_json, orient='split')
 
         xaxis_dict = {'title':xaxis_colname}
@@ -777,7 +780,6 @@ def main():
                 str_template = 'time%s'
             elif yaxis_colname == '%types':
                 str_template = '%%%s'
-                chosen_basic_runTypes = runTypes.RUNNING_ACTIVITIES
 
             traces = [
                 go.Bar(
@@ -787,7 +789,7 @@ def main():
                     hovertext = df_agg[:][yaxis_colname],
                     marker={ 'color': runTypesToColors[i] },
                     name=i
-                ) for i in runTypes.BASIC_RUN_TYPES if i in chosen_basic_runTypes
+                ) for i in runTypes.BASIC_RUN_TYPES
             ]
         else:
             traces = [
@@ -817,10 +819,10 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('freq_graph', 'figure'),
-        [dash.dependencies.Input('type-dropdown', 'value'),
+        [dash.dependencies.Input('chosen_types', 'value'),
         dash.dependencies.Input('year-slider', 'value')]
     )
-    def update_figure(chosen_basic_runTypes, chosen_year):
+    def update_figure(chosen_activities, chosen_year):
         #Apply filters
         if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
@@ -831,7 +833,7 @@ def main():
         else:
             filt_df = df[df.date.dt.year == chosen_year]
 
-        filt_df = filt_df[filt_df.type.isin(chosen_basic_runTypes)]
+        filt_df = filt_df[filt_df.type.isin(chosen_activities)]
 
         counts = get_running_location_count(filt_df)
         counts = counts.loc[counts.counts >1]
@@ -864,12 +866,12 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('last4weeks_agg', 'children'),
-        [dash.dependencies.Input('type-dropdown', 'value')])
-    def update_last4weeks_df(chosen_basic_runTypes):
+        [dash.dependencies.Input('chosen_types', 'value')])
+    def update_last4weeks_df(chosen_activities):
         #consider last 28 days (starting today)
         first_date = pd.Timestamp((pd.Timestamp.now() - datetime.timedelta(days=28)).date())
         df_slice = df[df['date'] > first_date]
-        return time_aggregate(df_slice, chosen_basic_runTypes, 'all')
+        return time_aggregate(df_slice, chosen_activities, 'all')
 
     @app.callback(
         dash.dependencies.Output(component_id='last_4weeks', component_property='children'),
@@ -891,12 +893,12 @@ def main():
                                                                                     agg['%types'])
     #@app.callback(
     #    dash.dependencies.Output(component_id='last_4weeks', component_property='children'),
-    #    [dash.dependencies.Input('type-dropdown', 'value')])
-    #def update_output_div(chosen_basic_runTypes):
+    #    [dash.dependencies.Input('chosen_types', 'value')])
+    #def update_output_div(chosen_activities):
     #    #consider last 28 days (starting today)
     #    first_date = pd.Timestamp((pd.Timestamp.now() - datetime.timedelta(days=28)).date())
     #    df_slice = df[df['date'] > first_date]
-    #    df_agg_json = time_aggregate(df_slice, chosen_basic_runTypes, 'all')
+    #    df_agg_json = time_aggregate(df_slice, chosen_activities, 'all')
     #    agg = pd.read_json(df_agg_json, orient='split').iloc[0]
 
     #    avg_time = '{:d}h {:0>2d}m'.format(int(agg.time/4.//60),int(agg.time/4.%60))
@@ -974,11 +976,11 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_long_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('type-dropdown', 'value')])
-    def record_table(df_json, chosen_basic_runTypes):
+        dash.dependencies.Input('chosen_types', 'value')])
+    def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_basic_runTypes)]
+        df = df[df.type.isin(chosen_activities)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -988,11 +990,11 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_time_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('type-dropdown', 'value')])
-    def record_table(df_json, chosen_basic_runTypes):
+        dash.dependencies.Input('chosen_types', 'value')])
+    def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_basic_runTypes)]
+        df = df[df.type.isin(chosen_activities)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1002,11 +1004,11 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_vspeed_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('type-dropdown', 'value')])
-    def record_table(df_json, chosen_basic_runTypes):
+        dash.dependencies.Input('chosen_types', 'value')])
+    def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_basic_runTypes)]
+        df = df[df.type.isin(chosen_activities)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['vspeed'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1016,11 +1018,11 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_climb_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('type-dropdown', 'value')])
-    def record_table(df_json, chosen_basic_runTypes):
+        dash.dependencies.Input('chosen_types', 'value')])
+    def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_basic_runTypes)]
+        df = df[df.type.isin(chosen_activities)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['vspeed'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1030,11 +1032,11 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_pace_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('type-dropdown', 'value')])
-    def record_table(df_json, chosen_basic_runTypes):
+        dash.dependencies.Input('chosen_types', 'value')])
+    def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_basic_runTypes)]
+        df = df[df.type.isin(chosen_activities)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR', 'feel'])

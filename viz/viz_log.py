@@ -70,6 +70,20 @@ def record_table_columns():
     ]
     return columns
 
+def get_activities_from_checklist(chosen_activity_types):
+    chosen_types = []
+    if 'Running' in chosen_activity_types:
+        chosen_types = runTypes.RUNNING_ACTIVITIES[:]
+    if 'X' in chosen_activity_types:
+        chosen_types.extend([blockNames.RunTypes.X])
+    if 'XB' in chosen_activity_types:
+        chosen_types.extend([blockNames.RunTypes.XB])
+
+    if chosen_types == []:
+        chosen_types = runTypes.RUNNING_ACTIVITIES[:]
+
+    return chosen_types
+
 def main():
     df_empty = pd.DataFrame()
 
@@ -108,16 +122,11 @@ def main():
                 dcc.Checklist(
                     id='chosen_types',
                     options=[
-                        #{'label': 'Running', 'value': 'Running'},
-                        {'label': 'E', 'value': 'E'},
-                        {'label': 'M', 'value': 'M'},
-                        {'label': 'T', 'value': 'T'},
-                        {'label': 'I', 'value': 'I'},
-                        {'label': 'R', 'value': 'R'},
+                        {'label': 'Running', 'value': 'Running'},
                         {'label': 'Mountaineering', 'value': 'X'},
                         {'label': 'Biking', 'value': 'XB'},
                     ],
-                    value=['E', 'M', 'T', 'I', 'R'],
+                    value=['Running'],
                     labelStyle={'display': 'inline-block'}
                 )
             ], style={'width': '30%', 'display':'inline-block', 'padding': '0px 0px 0px 0px', 'vertical-align': 'top'})
@@ -586,7 +595,8 @@ def main():
         else:
             agg_option = 'W'
 
-        filt_df = df[df.type.isin(chosen_activities)]
+        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        filt_df = df[df.type.isin(chosen_activity_types)]
         #END apply filters
 
 
@@ -833,7 +843,8 @@ def main():
         else:
             filt_df = df[df.date.dt.year == chosen_year]
 
-        filt_df = filt_df[filt_df.type.isin(chosen_activities)]
+        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        filt_df = filt_df[filt_df.type.isin(chosen_activity_types)]
 
         counts = get_running_location_count(filt_df)
         counts = counts.loc[counts.counts >1]
@@ -980,7 +991,8 @@ def main():
     def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_activities)]
+        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        df = df[df.type.isin(chosen_activity_types)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -994,7 +1006,8 @@ def main():
     def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_activities)]
+        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        df = df[df.type.isin(chosen_activity_types)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1008,7 +1021,8 @@ def main():
     def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_activities)]
+        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        df = df[df.type.isin(chosen_activity_types)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['vspeed'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1022,7 +1036,8 @@ def main():
     def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_activities)]
+        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        df = df[df.type.isin(chosen_activity_types)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['vspeed'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1036,7 +1051,8 @@ def main():
     def record_table(df_json, chosen_activities):
         df = pd.read_json(df_json, orient='split')
 
-        df = df[df.type.isin(chosen_activities)]
+        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        df = df[df.type.isin(chosen_activity_types)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR', 'feel'])

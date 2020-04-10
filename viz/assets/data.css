@@ -133,7 +133,9 @@ body {
   line-height: 1.6;
   font-weight: 400;
   font-family: "Garamond", "Georgia", serif, "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: rgb(50, 50, 50); }
+  color: rgb(50, 50, 50); 
+  margin-top: 0px;
+  margin-left: 0px;}
 
 
 /* Typography

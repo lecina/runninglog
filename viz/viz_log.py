@@ -84,6 +84,14 @@ def get_activities_from_checklist(chosen_activity_types):
 
     return chosen_types
 
+def get_trail_road_activities(trail_road_selector):
+    if trail_road_selector == 'Trail':
+        return [1]
+    elif trail_road_selector == 'Road':
+        return [0]
+    elif trail_road_selector == 'All':
+        return [0, 1]
+
 def main():
     df_empty = pd.DataFrame()
 
@@ -111,7 +119,7 @@ def main():
     app.layout = html.Div([
         html.Div([
             html.Img(src='data:image/png;base64,{}'.format(encoded_image), style={'height':'40px', 'display':'inline-block', 'margin':'5px 0px 0px 10px'}),
-           html.H2("Running log - Activities", style={'display':'inline-block', 'vertical-align': 'center', 'padding':'3px 0px 5px 20px'}) 
+           html.H2("Running log - Activities", style={'display':'inline-block', 'vertical-align': 'center', 'margin':'0px', 'padding':'3px 0px 5px 20px'}) 
         ], style={'background-color':'#A4C1D9', 'height':'50px', 'vertical-align': 'center', 'padding':'0px', 'margin':'0px', 'margin-block-start':'0px', 'display':'flex'}),
         html.Div([
             html.Div([
@@ -138,6 +146,18 @@ def main():
                         labelStyle={'display': 'inline-block'}
                     )
                 ], style={'display':'inline-block', 'vertical-align': 'top'}),
+                html.Div([
+                    dcc.RadioItems(
+                        id='trail_road_selector',
+                        options=[
+                            {'label': 'All', 'value': 'All'},
+                            {'label': 'Road', 'value': 'Road'},
+                            {'label': 'Trail', 'value': 'Trail'},
+                        ],
+                        value='All',
+                        labelStyle={'display': 'inline-block'}
+                    )
+                ], style={'display':'inline-block', 'vertical-align': 'top'})
             ], style={'width':'100%', 'display':'flex','justify-content':'space-around','padding-top':'5px'}),
 
             html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
@@ -496,8 +516,9 @@ def main():
     @app.callback(
         dash.dependencies.Output('total_runs', 'children'),
         [dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value'),
         dash.dependencies.Input('year-slider', 'value')])
-    def selected_runs(chosen_activities, chosen_year):
+    def selected_runs(chosen_activities, trail_road_selector, chosen_year):
         if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
         elif chosen_year == df.date.dt.year.max()+1:
@@ -593,7 +614,7 @@ def main():
 
         return filt_df.to_json(date_format='iso', orient='split')
 
-    def time_aggregate(df, chosen_activities, time_option=''):
+    def time_aggregate(df, chosen_activities, trail_road_selector, time_option=''):
         if time_option == 'week':
             agg_option = 'W'
         elif time_option == 'month':
@@ -607,6 +628,15 @@ def main():
 
         chosen_activity_types = get_activities_from_checklist(chosen_activities)
         filt_df = df[df.type.isin(chosen_activity_types)]
+
+        trail_road = get_trail_road_activities(trail_road_selector)
+        filt_df = filt_df[filt_df.trail.isin(trail_road)]
+
+        if filt_df.shape[0] == 0:
+            cols = list(filt_df.columns)
+            cols.extend(['N_run', 'N_trail', 'N_all', 'Nrun_Ntrail_Nall', 'run_avg_pace', '%E','%M','%T','%I','%R', '%types'])
+            data = [0]*len(cols)
+            return pd.DataFrame(columns = cols, data = [data]).to_json(date_format='iso', orient='split')
         #END apply filters
 
 
@@ -674,10 +704,11 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('weekly_agg', 'children'),
-        [dash.dependencies.Input('chosen_types', 'value')]
+        [dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')]
     )
-    def weekly_summary(chosen_activities):
-        return time_aggregate(df, chosen_activities, 'week')
+    def weekly_summary(chosen_activities, trail_road_selector):
+        return time_aggregate(df, chosen_activities, trail_road_selector, 'week')
 
     @app.callback(
         dash.dependencies.Output('weekly_agg_table', 'data'),
@@ -709,10 +740,11 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('monthly_agg', 'children'),
-        [dash.dependencies.Input('chosen_types', 'value')]
+        [dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')]
     )
-    def weekly_summary(chosen_activities):
-        return time_aggregate(df, chosen_activities, 'month')
+    def monthly_summary(chosen_activities, trail_road_selector):
+        return time_aggregate(df, chosen_activities, trail_road_selector, 'month')
 
     @app.callback(
         dash.dependencies.Output('monthly_agg_table', 'data'),
@@ -744,10 +776,11 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('yearly_agg', 'children'),
-        [dash.dependencies.Input('chosen_types', 'value')]
+        [dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')]
     )
-    def weekly_summary(chosen_activities):
-        return time_aggregate(df, chosen_activities,'year')
+    def yearly_summary(chosen_activities, trail_road_selector):
+        return time_aggregate(df, chosen_activities, trail_road_selector, 'year')
 
     @app.callback(
         dash.dependencies.Output('yearly_agg_table', 'data'),
@@ -782,8 +815,9 @@ def main():
         [dash.dependencies.Input('xaxis-column2', 'value'),
          dash.dependencies.Input('yaxis-column2', 'value'),
          dash.dependencies.Input('chosen_types', 'value'),
+         dash.dependencies.Input('trail_road_selector', 'value'),
          dash.dependencies.Input('agg_df', 'children')])
-    def update_figure(xaxis_colname, yaxis_colname, chosen_activities, df_agg_json):
+    def update_figure(xaxis_colname, yaxis_colname, chosen_activities, trail_road_selector, df_agg_json):
         df_agg = pd.read_json(df_agg_json, orient='split')
 
         xaxis_dict = {'title':xaxis_colname}
@@ -840,9 +874,10 @@ def main():
     @app.callback(
         dash.dependencies.Output('freq_graph', 'figure'),
         [dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value'),
         dash.dependencies.Input('year-slider', 'value')]
     )
-    def update_figure(chosen_activities, chosen_year):
+    def update_figure(chosen_activities, trail_road_selector, chosen_year):
         #Apply filters
         if chosen_year == df.date.dt.year.max()+2:
             filt_df = df
@@ -855,6 +890,9 @@ def main():
 
         chosen_activity_types = get_activities_from_checklist(chosen_activities)
         filt_df = filt_df[filt_df.type.isin(chosen_activity_types)]
+
+        trail_road = get_trail_road_activities(trail_road_selector)
+        filt_df = filt_df[filt_df.trail.isin(trail_road)]
 
         counts = get_running_location_count(filt_df)
         counts = counts.loc[counts.counts >1]
@@ -887,12 +925,13 @@ def main():
 
     @app.callback(
         dash.dependencies.Output('last4weeks_agg', 'children'),
-        [dash.dependencies.Input('chosen_types', 'value')])
-    def update_last4weeks_df(chosen_activities):
+        [dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')])
+    def update_last4weeks_df(chosen_activities, trail_road_selector):
         #consider last 28 days (starting today)
         first_date = pd.Timestamp((pd.Timestamp.now() - datetime.timedelta(days=28)).date())
         df_slice = df[df['date'] > first_date]
-        return time_aggregate(df_slice, chosen_activities, 'all')
+        return time_aggregate(df_slice, chosen_activities, trail_road_selector, 'all')
 
     @app.callback(
         dash.dependencies.Output(component_id='last_4weeks', component_property='children'),
@@ -997,12 +1036,16 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_long_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('chosen_types', 'value')])
-    def record_table(df_json, chosen_activities):
+        dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')])
+    def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
         chosen_activity_types = get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
+
+        trail_road = get_trail_road_activities(trail_road_selector)
+        df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1012,12 +1055,16 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_time_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('chosen_types', 'value')])
-    def record_table(df_json, chosen_activities):
+        dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')])
+    def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
         chosen_activity_types = get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
+
+        trail_road = get_trail_road_activities(trail_road_selector)
+        df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['avg_pace'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1027,12 +1074,16 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_vspeed_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('chosen_types', 'value')])
-    def record_table(df_json, chosen_activities):
+        dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')])
+    def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
         chosen_activity_types = get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
+
+        trail_road = get_trail_road_activities(trail_road_selector)
+        df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['vspeed'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1042,12 +1093,16 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_climb_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('chosen_types', 'value')])
-    def record_table(df_json, chosen_activities):
+        dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')])
+    def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
         chosen_activity_types = get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
+
+        trail_road = get_trail_road_activities(trail_road_selector)
+        df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         df['avg_pace'] = df['vspeed'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
@@ -1057,12 +1112,16 @@ def main():
     @app.callback(
         dash.dependencies.Output('top_pace_activity_table', 'data'),
         [dash.dependencies.Input('total_runs', 'children'),
-        dash.dependencies.Input('chosen_types', 'value')])
-    def record_table(df_json, chosen_activities):
+        dash.dependencies.Input('chosen_types', 'value'),
+        dash.dependencies.Input('trail_road_selector', 'value')])
+    def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
         chosen_activity_types = get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
+
+        trail_road = get_trail_road_activities(trail_road_selector)
+        df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
         decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR', 'feel'])

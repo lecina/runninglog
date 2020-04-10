@@ -101,136 +101,81 @@ def main():
 
     filt_df = df.copy()
 
+    import base64
+    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read())
+
     #external_stylesheets = ['viz/data.css']
     #app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
     app = dash.Dash(__name__)
 
     app.layout = html.Div([
         html.Div([
-            html.Div([
-                dcc.Slider(
-                    id='year-slider',
-                    min=min(year_marks.keys()),
-                    max=max(year_marks.keys()),
-                    value=max(year_marks.keys())-1,
-                    step=1,
-                    marks=year_marks,
-                    included=False
-                )
-            ], style={'width': '30%', 'display': 'inline-block', 'padding': '0px 0px 0px 0px'}),
-            html.Div([
-                dcc.Checklist(
-                    id='chosen_types',
-                    options=[
-                        {'label': 'Running', 'value': 'Running'},
-                        {'label': 'Mountaineering', 'value': 'X'},
-                        {'label': 'Biking', 'value': 'XB'},
-                    ],
-                    value=['Running'],
-                    labelStyle={'display': 'inline-block'}
-                )
-            ], style={'width': '30%', 'display':'inline-block', 'padding': '0px 0px 0px 0px', 'vertical-align': 'top'})
-        ]),
-        html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
-        html.Div(id='last4weeks_agg', style={'display': 'none'}), #hidden, in order to share data
-        html.Div(id='weekly_agg', style={'display': 'none'}), #hidden, in order to share data
-        html.Div(id='monthly_agg', style={'display': 'none'}), #hidden, in order to share data
-        html.Div(id='yearly_agg', style={'display': 'none'}), #hidden, in order to share data
-        html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data
-
+            html.Img(src='data:image/png;base64,{}'.format(encoded_image), style={'height':'40px', 'display':'inline-block', 'margin':'5px 0px 0px 10px'}),
+           html.H2("Running log - Activities", style={'display':'inline-block', 'vertical-align': 'center', 'padding':'3px 0px 5px 20px'}) 
+        ], style={'background-color':'#A4C1D9', 'height':'50px', 'vertical-align': 'center', 'padding':'0px', 'margin':'0px', 'margin-block-start':'0px', 'display':'flex'}),
         html.Div([
             html.Div([
                 html.Div([
-                    dcc.Dropdown(
-                        id='yaxis-column2',
-                        options=[{'label': i, 'value': i} for i in available_cols],
-                        value='distance'
+                    dcc.Slider(
+                        id='year-slider',
+                        min=min(year_marks.keys()),
+                        max=max(year_marks.keys()),
+                        value=max(year_marks.keys())-1,
+                        step=1,
+                        marks=year_marks,
+                        included=False
                     )
-                ], style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
+                ], style={'width': '30%', 'display': 'inline-block'}),
                 html.Div([
-                    dcc.Dropdown(
-                        id='xaxis-column2',
-                        options=[{'label': i, 'value': i} for i in time_agg_options],
-                        value='week'
-                    ),
-                ],style={'width':'50%', 'display': 'inline-block', 'height':'30px'}),
-                dcc.Graph(id='agg_graph') #graph!
-            ],style={'display':'inline-block', 'width':'50%', 'float':'left', 'height':'380px'}),
+                    dcc.Checklist(
+                        id='chosen_types',
+                        options=[
+                            {'label': 'Running', 'value': 'Running'},
+                            {'label': 'Mountaineering', 'value': 'X'},
+                            {'label': 'Biking', 'value': 'XB'},
+                        ],
+                        value=['Running'],
+                        labelStyle={'display': 'inline-block'}
+                    )
+                ], style={'display':'inline-block', 'vertical-align': 'top'}),
+            ], style={'width':'100%', 'display':'flex','justify-content':'space-around','padding-top':'5px'}),
+
+            html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
+            html.Div(id='last4weeks_agg', style={'display': 'none'}), #hidden, in order to share data
+            html.Div(id='weekly_agg', style={'display': 'none'}), #hidden, in order to share data
+            html.Div(id='monthly_agg', style={'display': 'none'}), #hidden, in order to share data
+            html.Div(id='yearly_agg', style={'display': 'none'}), #hidden, in order to share data
+            html.Div(id='agg_df', style={'display': 'none'}), #hidden, in order to share data
 
             html.Div([
-                html.Div([html.H5("Last 4 weeks:"),],style={'height':'30px', 'textAlign':'center'}),
                 html.Div([
-                    html.Div(
-                        [dcc.Markdown(id='last_4weeks')], 
-                    style={'white-space': 'pre', 'width':'400px', 'text-justify':'inter-word', 'display': 'inline-block', 'padding':'10px', 'border':'3px solid'}),
-                 ], style={'text-align':'center'}),
-                html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
-                dash_table.DataTable(
-                    id='weekly_agg_table',
-                    data=df_empty.to_dict('rows'),
-                    columns=[{'id': c, 'name': c} for c in df_empty.columns],
-                    style_table={
-                        'overflowX': 'scroll', 
-                        'maxHeight': '150px',
-                        'overflowY': 'scroll'},
-                    css=[{
-                            'selector': '.dash-cell div.dash-cell-value',
-                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                        }],
-                    style_cell={
-                        'whiteSpace': 'no-wrap',
-                        'overflow': 'hidden',
-                        'textOverflow': 'ellipsis',
-                        #'textOverflow': 'clip',
-                        'minWidth': '40px', 'maxWidth': '100px'
-                    },
-                    style_as_list_view=True,
-                    merge_duplicate_headers=True,
-                    style_header={
-                            'backgroundColor': 'white',
-                            'fontWeight': 'bold'
-                        },
-                    sort_action = 'native',
-                    fixed_rows = { 'headers': True, 'data': 0 }
-                ),
-            ], style={'width':'50%', 'display':'inline-block', 'height':'380px'}),
-        ], style={'width':'100%', 'display':'block', 'height':'400px'}),
-        html.Div([
-                html.Div([html.H5("All activities:"),],style={'height':'30px', 'textAlign':'center'}),
-                dash_table.DataTable(
-                        id='total_runs_table',
-                        data=df_empty.to_dict('rows'),
-                        columns=[{'id': c, 'name': c} for c in df_empty.columns],
-                        style_table={
-                            'overflowX': 'scroll', 
-                            'maxHeight': '250px',
-                            'overflowY': 'scroll'},
-                        css=[{
-                                'selector': '.dash-cell div.dash-cell-value',
-                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                            }],
-                        style_cell={
-                            'whiteSpace': 'no-wrap',
-                            'overflow': 'hidden',
-                            #'textOverflow': 'ellipsis',
-                            'textOverflow': 'clip',
-                            'minWidth': '40px', 'maxWidth': '90px'
-                        },
-                        style_as_list_view=True,
-                        merge_duplicate_headers=True,
-                        style_header={
-                                'backgroundColor': 'white',
-                                'fontWeight': 'bold'
-                            },
-                        sort_action = 'native',
-                        fixed_rows = { 'headers': True, 'data': 0 }
-                    ),
-        ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'border':'3px solid'}),
-        html.Div([
-            html.Div([
-                html.Div([html.H5("Monthly summary:"),],style={'height':'30px', 'textAlign':'center'}),
-                dash_table.DataTable(
-                        id='monthly_agg_table',
+                    html.Div([
+                        dcc.Dropdown(
+                            id='yaxis-column2',
+                            options=[{'label': i, 'value': i} for i in available_cols],
+                            value='distance'
+                        )
+                    ], style={'width':'49%', 'display': 'inline-block', 'height':'30px'}),
+                    html.Div([
+                        dcc.Dropdown(
+                            id='xaxis-column2',
+                            options=[{'label': i, 'value': i} for i in time_agg_options],
+                            value='week'
+                        ),
+                    ],style={'width':'50%', 'display': 'inline-block', 'height':'30px'}),
+                    dcc.Graph(id='agg_graph') #graph!
+                ],style={'display':'inline-block', 'width':'50%', 'float':'left', 'height':'380px'}),
+
+                html.Div([
+                    html.Div([html.H5("Last 4 weeks:"),],style={'height':'30px', 'textAlign':'center'}),
+                    html.Div([
+                        html.Div(
+                            [dcc.Markdown(id='last_4weeks')], 
+                        style={'white-space': 'pre', 'width':'400px', 'text-justify':'inter-word', 'display': 'inline-block', 'padding':'10px', 'border':'3px solid'}),
+                     ], style={'text-align':'center'}),
+                    html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
+                    dash_table.DataTable(
+                        id='weekly_agg_table',
                         data=df_empty.to_dict('rows'),
                         columns=[{'id': c, 'name': c} for c in df_empty.columns],
                         style_table={
@@ -245,7 +190,8 @@ def main():
                             'whiteSpace': 'no-wrap',
                             'overflow': 'hidden',
                             'textOverflow': 'ellipsis',
-                            'minWidth': '20px', 'maxWidth': '80px'
+                            #'textOverflow': 'clip',
+                            'minWidth': '40px', 'maxWidth': '100px'
                         },
                         style_as_list_view=True,
                         merge_duplicate_headers=True,
@@ -256,231 +202,295 @@ def main():
                         sort_action = 'native',
                         fixed_rows = { 'headers': True, 'data': 0 }
                     ),
-            ], style={'width':'45%', 'display':'inline-block'}),
+                ], style={'width':'50%', 'display':'inline-block', 'height':'380px'}),
+            ], style={'width':'100%', 'display':'block', 'height':'400px'}),
             html.Div([
-                html.Div([html.H5("Yearly summary:"),],style={'height':'30px', 'textAlign':'center'}),
-                dash_table.DataTable(
-                        id='yearly_agg_table',
-                        data=df_empty.to_dict('rows'),
-                        columns=[{'id': c, 'name': c} for c in df_empty.columns],
-                        style_table={
-                            'overflowX': 'scroll', 
-                            'maxHeight': '150px',
-                            'overflowY': 'scroll'},
-                        css=[{
-                                'selector': '.dash-cell div.dash-cell-value',
-                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                            }],
-                        style_cell={
-                            'whiteSpace': 'no-wrap',
-                            'overflow': 'hidden',
-                            'textOverflow': 'ellipsis',
-                            'minWidth': '20px', 'maxWidth': '80px'
-                        },
-                        style_as_list_view=True,
-                        merge_duplicate_headers=True,
-                        style_header={
-                                'backgroundColor': 'white',
-                                'fontWeight': 'bold'
+                    html.Div([html.H5("All activities:"),],style={'height':'30px', 'textAlign':'center'}),
+                    dash_table.DataTable(
+                            id='total_runs_table',
+                            data=df_empty.to_dict('rows'),
+                            columns=[{'id': c, 'name': c} for c in df_empty.columns],
+                            style_table={
+                                'overflowX': 'scroll', 
+                                'maxHeight': '250px',
+                                'overflowY': 'scroll'},
+                            css=[{
+                                    'selector': '.dash-cell div.dash-cell-value',
+                                    'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                }],
+                            style_cell={
+                                'whiteSpace': 'no-wrap',
+                                'overflow': 'hidden',
+                                #'textOverflow': 'ellipsis',
+                                'textOverflow': 'clip',
+                                'minWidth': '40px', 'maxWidth': '90px'
                             },
-                        sort_action = 'native',
-                        fixed_rows = { 'headers': True, 'data': 0 }
-                    ),
-            ], style={'width':'45%', 'display':'inline-block'}),
-        ], style={'width':'100%', 'display':'flex','justify-content':'space-around', 'height':'200px'}),
-        html.Div([html.H4("Top activities:"),],style={'height':'40px', 'textAlign':'Left'}),
-        html.Div([
+                            style_as_list_view=True,
+                            merge_duplicate_headers=True,
+                            style_header={
+                                    'backgroundColor': 'white',
+                                    'fontWeight': 'bold'
+                                },
+                            sort_action = 'native',
+                            fixed_rows = { 'headers': True, 'data': 0 }
+                        ),
+            ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'border':'3px solid'}),
             html.Div([
-                    html.Div([
-                        html.Div([html.H6("Top distance:"),],style={'height':'30px', 'textAlign':'center'}),
-                        dash_table.DataTable(
-                                id='top_long_activity_table',
-                                data=df_empty.to_dict('rows'),
-                                columns=record_table_columns(),
-                                style_table={
-                                    'overflowX': 'scroll', 
-                                    'maxHeight': '150px',
-                                    'overflowY': 'scroll'},
-                                css=[{
-                                        'selector': '.dash-cell div.dash-cell-value',
-                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                                    }],
-                                style_cell={
-                                    'whiteSpace': 'no-wrap',
-                                    'overflow': 'hidden',
-                                    'textOverflow': 'ellipsis',
-                                    'minWidth': '60px', 'maxWidth': '100px'
+                html.Div([
+                    html.Div([html.H5("Monthly summary:"),],style={'height':'30px', 'textAlign':'center'}),
+                    dash_table.DataTable(
+                            id='monthly_agg_table',
+                            data=df_empty.to_dict('rows'),
+                            columns=[{'id': c, 'name': c} for c in df_empty.columns],
+                            style_table={
+                                'overflowX': 'scroll', 
+                                'maxHeight': '150px',
+                                'overflowY': 'scroll'},
+                            css=[{
+                                    'selector': '.dash-cell div.dash-cell-value',
+                                    'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                }],
+                            style_cell={
+                                'whiteSpace': 'no-wrap',
+                                'overflow': 'hidden',
+                                'textOverflow': 'ellipsis',
+                                'minWidth': '20px', 'maxWidth': '80px'
+                            },
+                            style_as_list_view=True,
+                            merge_duplicate_headers=True,
+                            style_header={
+                                    'backgroundColor': 'white',
+                                    'fontWeight': 'bold'
                                 },
-                                style_as_list_view=True,
-                                merge_duplicate_headers=True,
-                                style_header={
-                                        'backgroundColor': 'white',
-                                        'fontWeight': 'bold'
-                                    },
-                                sort_action = 'native',
-                                fixed_rows = { 'headers': True, 'data': 0 }
-                            ),
-                        ],style={'display':'inline-block', 'width':'30%'}),
-                    html.Div([
-                        html.Div([html.H6("Top time:"),],style={'height':'30px', 'textAlign':'center'}),
-                        dash_table.DataTable(
-                                id='top_time_activity_table',
-                                data=df_empty.to_dict('rows'),
-                                columns=record_table_columns(),
-                                style_table={
-                                    'overflowX': 'scroll', 
-                                    'maxHeight': '150px',
-                                    'overflowY': 'scroll'},
-                                css=[{
-                                        'selector': '.dash-cell div.dash-cell-value',
-                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                                    }],
-                                style_cell={
-                                    'whiteSpace': 'no-wrap',
-                                    'overflow': 'hidden',
-                                    'textOverflow': 'ellipsis',
-                                    'minWidth': '60px', 'maxWidth': '100px'
+                            sort_action = 'native',
+                            fixed_rows = { 'headers': True, 'data': 0 }
+                        ),
+                ], style={'width':'45%', 'display':'inline-block'}),
+                html.Div([
+                    html.Div([html.H5("Yearly summary:"),],style={'height':'30px', 'textAlign':'center'}),
+                    dash_table.DataTable(
+                            id='yearly_agg_table',
+                            data=df_empty.to_dict('rows'),
+                            columns=[{'id': c, 'name': c} for c in df_empty.columns],
+                            style_table={
+                                'overflowX': 'scroll', 
+                                'maxHeight': '150px',
+                                'overflowY': 'scroll'},
+                            css=[{
+                                    'selector': '.dash-cell div.dash-cell-value',
+                                    'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                }],
+                            style_cell={
+                                'whiteSpace': 'no-wrap',
+                                'overflow': 'hidden',
+                                'textOverflow': 'ellipsis',
+                                'minWidth': '20px', 'maxWidth': '80px'
+                            },
+                            style_as_list_view=True,
+                            merge_duplicate_headers=True,
+                            style_header={
+                                    'backgroundColor': 'white',
+                                    'fontWeight': 'bold'
                                 },
-                                style_as_list_view=True,
-                                merge_duplicate_headers=True,
-                                style_header={
-                                        'backgroundColor': 'white',
-                                        'fontWeight': 'bold'
-                                    },
-                                sort_action = 'native',
-                                fixed_rows = { 'headers': True, 'data': 0 }
-                            ),
-                        ],style={'display':'inline-block', 'width':'30%'}),
-                    html.Div([
-                        html.Div([html.H6("Top climb:"),],style={'height':'30px', 'textAlign':'center'}),
-                        dash_table.DataTable(
-                                id='top_climb_activity_table',
-                                data=df_empty.to_dict('rows'),
-                                columns=record_table_columns(),
-                                style_table={
-                                    'overflowX': 'scroll', 
-                                    'maxHeight': '150px',
-                                    'overflowY': 'scroll'},
-                                css=[{
-                                        'selector': '.dash-cell div.dash-cell-value',
-                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                                    }],
-                                style_cell={
-                                    'whiteSpace': 'no-wrap',
-                                    'overflow': 'hidden',
-                                    'textOverflow': 'ellipsis',
-                                    'minWidth': '60px', 'maxWidth': '100px'
-                                },
-                                style_as_list_view=True,
-                                merge_duplicate_headers=True,
-                                style_header={
-                                        'backgroundColor': 'white',
-                                        'fontWeight': 'bold'
-                                    },
-                                sort_action = 'native',
-                                fixed_rows = { 'headers': True, 'data': 0 }
-                            ),
-                        ],style={'display':'inline-block', 'width':'30%'}),
+                            sort_action = 'native',
+                            fixed_rows = { 'headers': True, 'data': 0 }
+                        ),
+                ], style={'width':'45%', 'display':'inline-block'}),
             ], style={'width':'100%', 'display':'flex','justify-content':'space-around', 'height':'200px'}),
+            html.Div([html.H4("Top activities:"),],style={'height':'40px', 'textAlign':'Left'}),
             html.Div([
-                    html.Div([
-                        html.Div([html.H6("Top Vert. speed:"),],style={'height':'30px', 'textAlign':'center'}),
-                        dash_table.DataTable(
-                                id='top_vspeed_activity_table',
-                                data=df_empty.to_dict('rows'),
-                                columns=record_table_columns(),
-                                style_table={
-                                    'overflowX': 'scroll', 
-                                    'maxHeight': '150px',
-                                    'overflowY': 'scroll'},
-                                css=[{
-                                        'selector': '.dash-cell div.dash-cell-value',
-                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                                    }],
-                                style_cell={
-                                    'whiteSpace': 'no-wrap',
-                                    'overflow': 'hidden',
-                                    'textOverflow': 'ellipsis',
-                                    'minWidth': '60px', 'maxWidth': '100px'
-                                },
-                                style_as_list_view=True,
-                                merge_duplicate_headers=True,
-                                style_header={
-                                        'backgroundColor': 'white',
-                                        'fontWeight': 'bold'
+                html.Div([
+                        html.Div([
+                            html.Div([html.H6("Top distance:"),],style={'height':'30px', 'textAlign':'center'}),
+                            dash_table.DataTable(
+                                    id='top_long_activity_table',
+                                    data=df_empty.to_dict('rows'),
+                                    columns=record_table_columns(),
+                                    style_table={
+                                        'overflowX': 'scroll', 
+                                        'maxHeight': '150px',
+                                        'overflowY': 'scroll'},
+                                    css=[{
+                                            'selector': '.dash-cell div.dash-cell-value',
+                                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                        }],
+                                    style_cell={
+                                        'whiteSpace': 'no-wrap',
+                                        'overflow': 'hidden',
+                                        'textOverflow': 'ellipsis',
+                                        'minWidth': '60px', 'maxWidth': '100px'
                                     },
-                                sort_action = 'native',
-                                fixed_rows = { 'headers': True, 'data': 0 }
-                            ),
-                        ],style={'display':'inline-block', 'width':'30%'}),
-                    html.Div([
-                        html.Div([html.H6("Top speed:"),],style={'height':'30px', 'textAlign':'center'}),
-                        dash_table.DataTable(
-                                id='top_pace_activity_table',
-                                data=df_empty.to_dict('rows'),
-                                columns=record_table_columns(),
-                                style_table={
-                                    'overflowX': 'scroll', 
-                                    'maxHeight': '150px',
-                                    'overflowY': 'scroll'},
-                                css=[{
-                                        'selector': '.dash-cell div.dash-cell-value',
-                                        'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                                    }],
-                                style_cell={
-                                    'whiteSpace': 'no-wrap',
-                                    'overflow': 'hidden',
-                                    'textOverflow': 'ellipsis',
-                                    'minWidth': '60px', 'maxWidth': '100px'
-                                },
-                                style_as_list_view=True,
-                                merge_duplicate_headers=True,
-                                style_header={
-                                        'backgroundColor': 'white',
-                                        'fontWeight': 'bold'
+                                    style_as_list_view=True,
+                                    merge_duplicate_headers=True,
+                                    style_header={
+                                            'backgroundColor': 'white',
+                                            'fontWeight': 'bold'
+                                        },
+                                    sort_action = 'native',
+                                    fixed_rows = { 'headers': True, 'data': 0 }
+                                ),
+                            ],style={'display':'inline-block', 'width':'30%'}),
+                        html.Div([
+                            html.Div([html.H6("Top time:"),],style={'height':'30px', 'textAlign':'center'}),
+                            dash_table.DataTable(
+                                    id='top_time_activity_table',
+                                    data=df_empty.to_dict('rows'),
+                                    columns=record_table_columns(),
+                                    style_table={
+                                        'overflowX': 'scroll', 
+                                        'maxHeight': '150px',
+                                        'overflowY': 'scroll'},
+                                    css=[{
+                                            'selector': '.dash-cell div.dash-cell-value',
+                                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                        }],
+                                    style_cell={
+                                        'whiteSpace': 'no-wrap',
+                                        'overflow': 'hidden',
+                                        'textOverflow': 'ellipsis',
+                                        'minWidth': '60px', 'maxWidth': '100px'
                                     },
-                                sort_action = 'native',
-                                fixed_rows = { 'headers': True, 'data': 0 }
-                            ),
-                        ],style={'display':'inline-block', 'width':'30%'}),
-            ], style={'width':'100%', 'display':'flex','justify-content':'space-around', 'height':'200px'}),
-        ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'5px', 'margin':'auto', 'height':'400px'}),
-        html.Div([html.H4("Location:"),],style={'height':'40px', 'textAlign':'Left'}),
-        html.Div([
+                                    style_as_list_view=True,
+                                    merge_duplicate_headers=True,
+                                    style_header={
+                                            'backgroundColor': 'white',
+                                            'fontWeight': 'bold'
+                                        },
+                                    sort_action = 'native',
+                                    fixed_rows = { 'headers': True, 'data': 0 }
+                                ),
+                            ],style={'display':'inline-block', 'width':'30%'}),
+                        html.Div([
+                            html.Div([html.H6("Top climb:"),],style={'height':'30px', 'textAlign':'center'}),
+                            dash_table.DataTable(
+                                    id='top_climb_activity_table',
+                                    data=df_empty.to_dict('rows'),
+                                    columns=record_table_columns(),
+                                    style_table={
+                                        'overflowX': 'scroll', 
+                                        'maxHeight': '150px',
+                                        'overflowY': 'scroll'},
+                                    css=[{
+                                            'selector': '.dash-cell div.dash-cell-value',
+                                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                        }],
+                                    style_cell={
+                                        'whiteSpace': 'no-wrap',
+                                        'overflow': 'hidden',
+                                        'textOverflow': 'ellipsis',
+                                        'minWidth': '60px', 'maxWidth': '100px'
+                                    },
+                                    style_as_list_view=True,
+                                    merge_duplicate_headers=True,
+                                    style_header={
+                                            'backgroundColor': 'white',
+                                            'fontWeight': 'bold'
+                                        },
+                                    sort_action = 'native',
+                                    fixed_rows = { 'headers': True, 'data': 0 }
+                                ),
+                            ],style={'display':'inline-block', 'width':'30%'}),
+                ], style={'width':'100%', 'display':'flex','justify-content':'space-around', 'height':'200px'}),
+                html.Div([
+                        html.Div([
+                            html.Div([html.H6("Top Vert. speed:"),],style={'height':'30px', 'textAlign':'center'}),
+                            dash_table.DataTable(
+                                    id='top_vspeed_activity_table',
+                                    data=df_empty.to_dict('rows'),
+                                    columns=record_table_columns(),
+                                    style_table={
+                                        'overflowX': 'scroll', 
+                                        'maxHeight': '150px',
+                                        'overflowY': 'scroll'},
+                                    css=[{
+                                            'selector': '.dash-cell div.dash-cell-value',
+                                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                        }],
+                                    style_cell={
+                                        'whiteSpace': 'no-wrap',
+                                        'overflow': 'hidden',
+                                        'textOverflow': 'ellipsis',
+                                        'minWidth': '60px', 'maxWidth': '100px'
+                                    },
+                                    style_as_list_view=True,
+                                    merge_duplicate_headers=True,
+                                    style_header={
+                                            'backgroundColor': 'white',
+                                            'fontWeight': 'bold'
+                                        },
+                                    sort_action = 'native',
+                                    fixed_rows = { 'headers': True, 'data': 0 }
+                                ),
+                            ],style={'display':'inline-block', 'width':'30%'}),
+                        html.Div([
+                            html.Div([html.H6("Top speed:"),],style={'height':'30px', 'textAlign':'center'}),
+                            dash_table.DataTable(
+                                    id='top_pace_activity_table',
+                                    data=df_empty.to_dict('rows'),
+                                    columns=record_table_columns(),
+                                    style_table={
+                                        'overflowX': 'scroll', 
+                                        'maxHeight': '150px',
+                                        'overflowY': 'scroll'},
+                                    css=[{
+                                            'selector': '.dash-cell div.dash-cell-value',
+                                            'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                        }],
+                                    style_cell={
+                                        'whiteSpace': 'no-wrap',
+                                        'overflow': 'hidden',
+                                        'textOverflow': 'ellipsis',
+                                        'minWidth': '60px', 'maxWidth': '100px'
+                                    },
+                                    style_as_list_view=True,
+                                    merge_duplicate_headers=True,
+                                    style_header={
+                                            'backgroundColor': 'white',
+                                            'fontWeight': 'bold'
+                                        },
+                                    sort_action = 'native',
+                                    fixed_rows = { 'headers': True, 'data': 0 }
+                                ),
+                            ],style={'display':'inline-block', 'width':'30%'}),
+                ], style={'width':'100%', 'display':'flex','justify-content':'space-around', 'height':'200px'}),
+            ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'5px', 'margin':'auto', 'height':'400px'}),
+            html.Div([html.H4("Location:"),],style={'height':'40px', 'textAlign':'Left'}),
             html.Div([
-                dcc.Graph(id='freq_graph') #graph!
-            ],style={'display':'inline-block', 'width':'49%', 'float':'left'}),
-            html.Div([
-                html.Div([html.H5("Summary Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
-                dash_table.DataTable(
-                        id='summary_table',
-                        data=df_empty.to_dict('rows'),
-                        columns=[{'id': c, 'name': c} for c in df.columns],
-                        style_table={
-                            'overflowX': 'scroll', 
-                            'maxHeight': '150px',
-                            'overflowY': 'scroll'},
-                        css=[{
-                                'selector': '.dash-cell div.dash-cell-value',
-                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                            }],
-                        style_cell={
-                            'whiteSpace': 'no-wrap',
-                            'overflow': 'hidden',
-                            'textOverflow': 'ellipsis',
-                            'minWidth': '60px', 'maxWidth': '100px'
-                        },
-                        style_as_list_view=True,
-                        merge_duplicate_headers=True,
-                        style_header={
-                                'backgroundColor': 'white',
-                                'fontWeight': 'bold'
+                html.Div([
+                    dcc.Graph(id='freq_graph') #graph!
+                ],style={'display':'inline-block', 'width':'49%', 'float':'left'}),
+                html.Div([
+                    html.Div([html.H5("Summary Statistics:"),],style={'height':'30px', 'textAlign':'center'}),
+                    dash_table.DataTable(
+                            id='summary_table',
+                            data=df_empty.to_dict('rows'),
+                            columns=[{'id': c, 'name': c} for c in df.columns],
+                            style_table={
+                                'overflowX': 'scroll', 
+                                'maxHeight': '150px',
+                                'overflowY': 'scroll'},
+                            css=[{
+                                    'selector': '.dash-cell div.dash-cell-value',
+                                    'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                }],
+                            style_cell={
+                                'whiteSpace': 'no-wrap',
+                                'overflow': 'hidden',
+                                'textOverflow': 'ellipsis',
+                                'minWidth': '60px', 'maxWidth': '100px'
                             },
-                        sort_action = 'native',
-                        fixed_rows = { 'headers': True, 'data': 0 }
-                    ),
-            ],style={'display':'inline-block', 'width':'49%', 'float':'right'}),
-        ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'height':'300px'}),
+                            style_as_list_view=True,
+                            merge_duplicate_headers=True,
+                            style_header={
+                                    'backgroundColor': 'white',
+                                    'fontWeight': 'bold'
+                                },
+                            sort_action = 'native',
+                            fixed_rows = { 'headers': True, 'data': 0 }
+                        ),
+                ],style={'display':'inline-block', 'width':'49%', 'float':'right'}),
+            ], style={'width':'90%', 'display':'block','float':'center', 'padding-top':'10px', 'margin':'auto', 'height':'300px'}),
+        ], style={'margin-left':'8px'})
     ])
 
     @app.callback(

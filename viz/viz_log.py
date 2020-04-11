@@ -41,7 +41,7 @@ def get_available_columns():
     return available_cols
 
 def get_time_options():
-    time_agg_options = ['', 'day', 'week', 'month', 'year']
+    time_agg_options = ['week', 'month', 'year']
     return time_agg_options
 
 def get_running_location_count(df):

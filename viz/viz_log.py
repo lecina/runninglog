@@ -75,9 +75,9 @@ def get_activities_from_checklist(chosen_activity_types):
     if 'Running' in chosen_activity_types:
         chosen_types = runTypes.RUNNING_ACTIVITIES[:]
     if 'X' in chosen_activity_types:
-        chosen_types.extend([blockNames.RunTypes.X])
+        chosen_types.append(blockNames.RunTypes.X)
     if 'XB' in chosen_activity_types:
-        chosen_types.extend([blockNames.RunTypes.XB])
+        chosen_types.append(blockNames.RunTypes.XB)
 
     if chosen_types == []:
         chosen_types = runTypes.RUNNING_ACTIVITIES[:]
@@ -159,6 +159,7 @@ def main():
                     )
                 ], style={'display':'inline-block', 'vertical-align': 'top'})
             ], style={'width':'100%', 'display':'flex','justify-content':'space-around','padding-top':'5px'}),
+            html.Hr(style={'margin':'0px 0px 10px 0px'}),
 
             html.Div(id='total_runs', style={'display': 'none'}), #hidden, in order to share data
             html.Div(id='last4weeks_agg', style={'display': 'none'}), #hidden, in order to share data
@@ -194,34 +195,36 @@ def main():
                         style={'white-space': 'pre', 'width':'400px', 'text-justify':'inter-word', 'display': 'inline-block', 'padding':'10px', 'border':'3px solid'}),
                      ], style={'text-align':'center'}),
                     html.Div([html.H5("Weekly summary:"),],style={'height':'30px', 'textAlign':'center'}),
-                    dash_table.DataTable(
-                        id='weekly_agg_table',
-                        data=df_empty.to_dict('rows'),
-                        columns=[{'id': c, 'name': c} for c in df_empty.columns],
-                        style_table={
-                            'overflowX': 'scroll', 
-                            'maxHeight': '150px',
-                            'overflowY': 'scroll'},
-                        css=[{
-                                'selector': '.dash-cell div.dash-cell-value',
-                                'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
-                            }],
-                        style_cell={
-                            'whiteSpace': 'no-wrap',
-                            'overflow': 'hidden',
-                            'textOverflow': 'ellipsis',
-                            #'textOverflow': 'clip',
-                            'minWidth': '40px', 'maxWidth': '100px'
-                        },
-                        style_as_list_view=True,
-                        merge_duplicate_headers=True,
-                        style_header={
-                                'backgroundColor': 'white',
-                                'fontWeight': 'bold'
+                    html.Div([
+                        dash_table.DataTable(
+                            id='weekly_agg_table',
+                            data=df_empty.to_dict('rows'),
+                            columns=[{'id': c, 'name': c} for c in df_empty.columns],
+                            style_table={
+                                'overflowX': 'scroll', 
+                                'maxHeight': '150px',
+                                'overflowY': 'scroll'},
+                            css=[{
+                                    'selector': '.dash-cell div.dash-cell-value',
+                                    'rule': 'display: inline; white-space: inherit; overflow: inherit; text-overflow: inherit;'
+                                }],
+                            style_cell={
+                                'whiteSpace': 'no-wrap',
+                                'overflow': 'hidden',
+                                'textOverflow': 'ellipsis',
+                                #'textOverflow': 'clip',
+                                'minWidth': '40px', 'maxWidth': '100px'
                             },
-                        sort_action = 'native',
-                        fixed_rows = { 'headers': True, 'data': 0 }
-                    ),
+                            style_as_list_view=True,
+                            merge_duplicate_headers=True,
+                            style_header={
+                                    'backgroundColor': 'white',
+                                    'fontWeight': 'bold'
+                                },
+                            sort_action = 'native',
+                            fixed_rows = { 'headers': True, 'data': 0 }
+                        ),
+                    ], style={'margin-right':'20px'})
                 ], style={'width':'50%', 'display':'inline-block', 'height':'380px'}),
             ], style={'width':'100%', 'display':'block', 'height':'400px'}),
             html.Div([
@@ -843,7 +846,7 @@ def main():
                     hovertext = df_agg[:][yaxis_colname],
                     marker={ 'color': runTypesToColors[i] },
                     name=i
-                ) for i in runTypes.BASIC_RUN_TYPES
+                ) for i in runTypes.BASIC_RUN_TYPES + runTypes.NON_RUNNING_ACTIVITIES
             ]
         else:
             traces = [

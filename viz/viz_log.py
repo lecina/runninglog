@@ -695,6 +695,7 @@ def main():
         df_agg['%T'] = 100*df_agg['distT'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
         df_agg['%I'] = 100*df_agg['distI'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
         df_agg['%R'] = 100*df_agg['distR'] / (df_agg['distE'] + df_agg['distI'] + df_agg['distM'] + df_agg['distR'] + df_agg['distT'])
+        df_agg['%X'] = df_agg['%XB'] = 0
 
         df_agg.fillna(value={'%E':0, '%M':0, '%T':0, '%I':0, '%R':0}, inplace=True)
 

@@ -18,6 +18,10 @@ try:
     from viz.viz_constants import viz_constants
 except:
     from viz_constants import viz_constants
+try:
+    from viz.viz_exploration import update_distr_plot_figure
+except:
+    from viz_exploration import update_distr_plot_figure
 
 def read_pandas_pickle(fname = "data/processed/df.pkl"):
     df = pd.read_pickle(fname)
@@ -320,6 +324,18 @@ def main():
                         ),
                 ], style={'width':'45%', 'display':'inline-block'}),
             ], style={'width':'100%', 'display':'flex','justify-content':'space-around', 'height':'200px'}),
+            html.Div([
+                html.Div([html.H4("Evolution:")],style={'height':'40px', 'textAlign':'Left'}),
+                html.Div([
+                    dcc.Graph(id='graph_distr_dist', figure=update_distr_plot_figure(df,'distance', 'Dist. density', agg_all=True))
+                ], style={'width':'33%', 'display':'inline-block', 'float':'left', 'margin':'auto'}),
+                html.Div([
+                    dcc.Graph(id='graph_distr_time', figure=update_distr_plot_figure(df,'time', 'Time density', agg_all=True))
+                ], style={'width':'33%', 'display':'inline-block', 'margin':'auto'}),
+                html.Div([
+                    dcc.Graph(id='graph_distr_climb', figure=update_distr_plot_figure(df,'climb', 'Climb density', agg_all=True))
+                ], style={'width':'33%', 'display':'inline-block', 'margin':'auto'}),
+            ]),
             html.Div([html.H4("Top activities:"),],style={'height':'40px', 'textAlign':'Left'}),
             html.Div([
                 html.Div([

@@ -11,7 +11,12 @@ import matplotlib.pyplot as plt
 
 from utilities import utilities
 from constants import blockNames
-from viz.viz_constants import viz_constants
+from single_run import runTypes
+
+try:
+    from viz.viz_constants import viz_constants
+except:
+    from viz_constants import viz_constants
 
 
 
@@ -85,7 +90,7 @@ def update_distr_plot_figure(df, col, title=None, agg_all=False):
         x = [df[df.type == type][col] for type in groups]
     else:
         colors = ['#4682b4', '#00BB00', '#BB0000', '#0000BB']
-        df_notX = df[~df.type.isin([blockNames.RunTypes.X, blockNames.RunTypes.XB])]
+        df_notX = df[df.type.isin(runTypes.RUNNING_ACTIVITIES)]
 
         x = [df_notX[col]]
         groups = ['All']
@@ -96,13 +101,16 @@ def update_distr_plot_figure(df, col, title=None, agg_all=False):
 
     #rug_text #TODO...
     fig = ff.create_distplot(x, groups, show_hist=False, colors=colors, curve_type='normal')
+    fig.update_traces(line=dict(width=5, dash='dash'),selector=dict(mode='lines', legendgroup='All'))
     layout = go.Layout(
         xaxis={ 'title': col},
         yaxis={ 'title': 'Density'},
         title=title,
         height=400,
         margin={'l': 30, 'b': 30, 't': 30, 'r': 30},
-        hovermode='closest'
+        hovermode='closest',
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
         )
     fig.update_layout(layout)
     return fig

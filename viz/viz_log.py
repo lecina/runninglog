@@ -37,7 +37,7 @@ def get_ordered_runType_long_name(runType_order):
     return [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
 
 def get_available_columns():
-    available_cols = ['distance', 'time', 'climb', 'avg_pace', 'run_avg_pace', '%types']
+    available_cols = ['distance', 'distance road vs trail', 'time', 'climb', 'avg_pace', '%types']
     return available_cols
 
 def get_time_options():
@@ -643,6 +643,8 @@ def main():
         #END apply filters
 
 
+
+
         needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB', 'timeE', 'timeI', 'timeM', 'timeR', 'timeT', 'timeX', 'timeXB']
         df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').agg(pd.Series.sum, skipna=True)
 
@@ -653,15 +655,24 @@ def main():
         df_count_all = filt_df[:][['date']].resample(agg_option, on='date').agg({'date':'size'}).rename(columns={'date':'N_all'})
         df_agg = pd.concat([df_agg, df_count_all], axis=1, sort=False)
 
-        #Only count running activities
-        running_types = [blockNames.RunTypes.E, blockNames.RunTypes.M, blockNames.RunTypes.T, blockNames.RunTypes.I, blockNames.RunTypes.R]
-        df_running = filt_df[filt_df.type.isin(running_types)][['date', 'type', 'trail']]
-        df_count_running = df_running.resample(agg_option, on='date').agg({'type':'size', 'trail':'sum'}).rename(index=str, columns={'type': 'N_run', 'trail': 'N_trail'})
 
-        df_agg = pd.concat([df_agg, df_count_running], axis=1, sort=False)
+        #count road/trail #runs and distance
+        df_running = filt_df[filt_df.type.isin(runTypes.RUNNING_ACTIVITIES)][['date', 'distance', 'trail']]
+        df_running.trail = df_running.trail.astype('int')
+        df_running.reset_index(drop=True, inplace=True)
+        df_running = df_running.groupby('trail').resample(agg_option, on='date').agg({'distance':'sum', 'trail':'size'})
+        df_running.rename(index={0:'road',1:'trail'}, columns={'trail':'n'},inplace=True)
+        df_running = df_running.unstack('trail', fill_value=0)
+        df_running.columns = ['_'.join(col).strip() for col in df_running.columns.values]
+        for col in ['distance_road', 'distance_trail', 'n_road', 'n_trail']:
+            if col not in df_running.columns:
+                df_running[col] = 0
 
-        cols = ['N_run', 'N_trail', 'N_all']
-        df_agg['Nrun_Ntrail_Nall'] = df_agg[cols].apply(lambda row: "%d(%d)/%d"%(row.values[0],row.values[1],row.values[2]), axis=1)
+        df_agg = pd.concat([df_agg, df_running], axis=1, sort=False)
+
+        cols = ['n_road', 'n_trail', 'N_all']
+        df_agg['Nrun_Ntrail_Nall'] = df_agg[cols].apply(lambda row: "%.0f(%.0f)/%d"%(row.values[0]+row.values[1],row.values[1],row.values[2]), axis=1)
+
 
 
         df_agg[time_option] = df_agg.index
@@ -849,6 +860,20 @@ def main():
                     name=i
                 ) for i in runTypes.BASIC_RUN_TYPES + runTypes.NON_RUNNING_ACTIVITIES
             ]
+        elif yaxis_colname in ('distance road vs trail'):
+            str_template = 'distance_%s'
+            types = ['road', 'trail']
+            colors = {'road':'#267dd7', 'trail':'#10931c'}
+            traces = [
+                go.Bar(
+                    x=df_agg[:][xaxis_colname],
+                    y=df_agg[:][str_template%i],
+                    opacity=0.5,
+                    hovertext = df_agg[:]['distance'],
+                    marker={ 'color': colors[i] },
+                    name=i
+                ) for i in types
+            ]
         else:
             traces = [
                 go.Bar(
@@ -995,7 +1020,7 @@ def main():
         summary_df = pd.DataFrame(index=index, columns=columns)
 
         aggs = [w_agg.iloc[-5:-1], w_agg[:-1], m_agg.iloc[:-1], y_agg]
-        variables = ['distance', 'time', 'climb', 'N_run', 'N_trail', 'N_all']
+        variables = ['distance', 'time', 'climb', 'n_road', 'n_trail', 'N_all']
         for i in range(4):
             df_agg = aggs[i]
             metrics = []

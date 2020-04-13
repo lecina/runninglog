@@ -29,14 +29,6 @@ def read_pandas_pickle(fname = "data/processed/df.pkl"):
     df.date = pd.to_datetime(df.date)
     return df
 
-def get_year_marks(df):
-    years = df.date.dt.year
-    year_marks={year: str(year) for year in np.hstack([years.unique(), [years.max()+1], [years.max()+2]])}
-    year_marks[years.max()+1] = 'Last year'
-    year_marks[years.max()+2] = 'All'
-
-    return year_marks
-
 
 def get_ordered_runType_long_name(runType_order):
     return [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
@@ -75,27 +67,6 @@ def record_table_columns():
     ]
     return columns
 
-def get_activities_from_checklist(chosen_activity_types):
-    chosen_types = []
-    if 'Running' in chosen_activity_types:
-        chosen_types = runTypes.RUNNING_ACTIVITIES[:]
-    if 'X' in chosen_activity_types:
-        chosen_types.append(blockNames.RunTypes.X)
-    if 'XB' in chosen_activity_types:
-        chosen_types.append(blockNames.RunTypes.XB)
-
-    if chosen_types == []:
-        chosen_types = runTypes.RUNNING_ACTIVITIES[:]
-
-    return chosen_types
-
-def get_trail_road_activities(trail_road_selector):
-    if trail_road_selector == 'Trail':
-        return [1]
-    elif trail_road_selector == 'Road':
-        return [0]
-    elif trail_road_selector == 'All':
-        return [0, 1]
 
 def main():
     df_empty = pd.DataFrame()
@@ -109,7 +80,7 @@ def main():
     #reading data
     df = read_pandas_pickle()
 
-    year_marks = get_year_marks(df)
+    year_marks = viz_constants.get_year_marks(df)
     available_cols = get_available_columns()
 
     filt_df = df.copy()
@@ -645,10 +616,10 @@ def main():
         else:
             agg_option = 'W'
 
-        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        chosen_activity_types = viz_constants.get_activities_from_checklist(chosen_activities)
         filt_df = df[df.type.isin(chosen_activity_types)]
 
-        trail_road = get_trail_road_activities(trail_road_selector)
+        trail_road = viz_constants.get_trail_road_activities(trail_road_selector)
         filt_df = filt_df[filt_df.trail.isin(trail_road)]
 
         if filt_df.shape[0] == 0:
@@ -933,10 +904,10 @@ def main():
         else:
             filt_df = df[df.date.dt.year == chosen_year]
 
-        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        chosen_activity_types = viz_constants.get_activities_from_checklist(chosen_activities)
         filt_df = filt_df[filt_df.type.isin(chosen_activity_types)]
 
-        trail_road = get_trail_road_activities(trail_road_selector)
+        trail_road = viz_constants.get_trail_road_activities(trail_road_selector)
         filt_df = filt_df[filt_df.trail.isin(trail_road)]
 
         column='where'
@@ -1086,10 +1057,10 @@ def main():
     def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
-        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        chosen_activity_types = viz_constants.get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
 
-        trail_road = get_trail_road_activities(trail_road_selector)
+        trail_road = viz_constants.get_trail_road_activities(trail_road_selector)
         df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
@@ -1105,10 +1076,10 @@ def main():
     def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
-        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        chosen_activity_types = viz_constants.get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
 
-        trail_road = get_trail_road_activities(trail_road_selector)
+        trail_road = viz_constants.get_trail_road_activities(trail_road_selector)
         df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
@@ -1124,10 +1095,10 @@ def main():
     def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
-        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        chosen_activity_types = viz_constants.get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
 
-        trail_road = get_trail_road_activities(trail_road_selector)
+        trail_road = viz_constants.get_trail_road_activities(trail_road_selector)
         df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
@@ -1143,10 +1114,10 @@ def main():
     def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
-        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        chosen_activity_types = viz_constants.get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
 
-        trail_road = get_trail_road_activities(trail_road_selector)
+        trail_road = viz_constants.get_trail_road_activities(trail_road_selector)
         df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))
@@ -1162,10 +1133,10 @@ def main():
     def record_table(df_json, chosen_activities, trail_road_selector):
         df = pd.read_json(df_json, orient='split')
 
-        chosen_activity_types = get_activities_from_checklist(chosen_activities)
+        chosen_activity_types = viz_constants.get_activities_from_checklist(chosen_activities)
         df = df[df.type.isin(chosen_activity_types)]
 
-        trail_road = get_trail_road_activities(trail_road_selector)
+        trail_road = viz_constants.get_trail_road_activities(trail_road_selector)
         df = df[df.trail.isin(trail_road)]
 
         df.date = df.date.apply(lambda x: x.strftime("%y/%m/%d"))

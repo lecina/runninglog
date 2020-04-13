@@ -3,6 +3,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
+import plotly.express as px
 
 import umap
 import pandas as pd
@@ -89,19 +90,19 @@ def update_distr_plot_figure(df, col, title=None, agg_all=False):
         colors = [runTypesToColors[type] for type in groups]
         x = [df[df.type == type][col] for type in groups]
     else:
-        colors = ['#4682b4', '#00BB00', '#BB0000', '#0000BB']
         df_notX = df[df.type.isin(runTypes.RUNNING_ACTIVITIES)]
 
-        x = [df_notX[col]]
-        groups = ['All']
-
         years = set(df_notX.date.dt.year)
+
+        x = [df_notX[col]]
         x.extend([df_notX[df_notX.date.dt.year == year][col] for year in years])
+
+        groups = ['All']
         groups.extend([str(year) for year in years])
 
-    #rug_text #TODO...
-    fig = ff.create_distplot(x, groups, show_hist=False, colors=colors, curve_type='normal')
-    fig.update_traces(line=dict(width=5, dash='dash'),selector=dict(mode='lines', legendgroup='All'))
+    #TODO rug_text
+    fig = ff.create_distplot(x, groups, show_hist=False, colors=px.colors.sequential.Burg, curve_type='normal')
+    fig.update_traces(line=dict(width=5, dash='dash', color='#4682b4'),selector=dict(mode='lines', legendgroup='All'))
     layout = go.Layout(
         xaxis={ 'title': col},
         yaxis={ 'title': 'Density'},

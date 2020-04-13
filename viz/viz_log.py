@@ -48,8 +48,8 @@ def get_time_options():
     time_agg_options = ['week', 'month', 'year']
     return time_agg_options
 
-def get_running_location_count(df):
-    counts = pd.crosstab(index=df['where'], columns="count") 
+def get_running_location_count(df,column):
+    counts = pd.crosstab(index=df[column], columns="count") 
     rel_counts = counts/counts.sum()*100
     counts = pd.concat([counts, rel_counts], axis=1)
     counts.columns = ['counts','rel_counts']
@@ -879,7 +879,7 @@ def main():
         elif yaxis_colname in ('distance road vs trail'):
             str_template = 'distance_%s'
             types = ['road', 'trail']
-            colors = {'road':'#267dd7', 'trail':'#10931c'}
+            colors = {'road':'#5557a6', 'trail':'#10931c'}
             traces = [
                 go.Bar(
                     x=df_agg[:][xaxis_colname],
@@ -939,15 +939,16 @@ def main():
         trail_road = get_trail_road_activities(trail_road_selector)
         filt_df = filt_df[filt_df.trail.isin(trail_road)]
 
-        counts = get_running_location_count(filt_df)
-        counts = counts.loc[counts.counts >1]
+        column='where'
+        counts = get_running_location_count(filt_df, column)
+        counts = counts.nlargest(10, 'counts')[::-1]
 
         traces = [
             go.Bar(
                 y=counts.index,
                 x=counts.counts,
-                opacity=0.5,
-                marker={ 'color': '#1f77b4' },
+                opacity=0.90,
+                marker={ 'color': '#A4C1D9' },
                 name='All',
                 orientation='h'
             ) 
@@ -957,7 +958,6 @@ def main():
             'data': traces,
             'layout': go.Layout(
                 height=300,
-                #width=600,
                 barmode='stack',
                 yaxis={'title':'location'},
                 xaxis={'title': 'counts'},

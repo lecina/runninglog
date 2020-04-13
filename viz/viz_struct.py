@@ -2,11 +2,11 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+import base64
 
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
-#import matplotlib.pyplot as plt
 
 from utilities import utilities
 from viz.viz_constants import viz_constants
@@ -161,7 +161,13 @@ def main():
 
     runType_colors = viz_constants.get_runType_colors()
 
+    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read())
+
     app.layout = html.Div([
+        html.Div([
+            html.Img(src='data:image/png;base64,{}'.format(encoded_image), style={'height':'40px', 'display':'inline-block', 'margin':'5px 0px 0px 10px'}),
+           html.H2("Running log - Structure analysis", style={'display':'inline-block', 'vertical-align': 'center', 'margin':'0px', 'padding':'3px 0px 5px 20px'}) 
+        ], style={'background-color':'#E57E7E', 'height':'50px', 'vertical-align': 'center', 'padding':'0px', 'margin':'0px', 'margin-block-start':'0px', 'display':'flex'}),
         html.Div([
             html.Div([html.H3("Pace in structured workouts"),]),
             html.Div([

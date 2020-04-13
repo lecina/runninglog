@@ -4,6 +4,7 @@ import dash_html_components as html
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
 import plotly.express as px
+import base64
 
 import umap
 import pandas as pd
@@ -100,9 +101,14 @@ def update_distr_plot_figure(df, col, title=None, agg_all=False):
         groups = ['All']
         groups.extend([str(year) for year in years])
 
+        colors = px.colors.sequential.Burg
+
     #TODO rug_text
-    fig = ff.create_distplot(x, groups, show_hist=False, colors=px.colors.sequential.Burg, curve_type='normal')
-    fig.update_traces(line=dict(width=5, dash='dash', color='#4682b4'),selector=dict(mode='lines', legendgroup='All'))
+    fig = ff.create_distplot(x, groups, show_hist=False, colors=colors, curve_type='normal')
+
+    if agg_all:
+        fig.update_traces(line=dict(width=5, dash='dash', color='#4682b4'),selector=dict(mode='lines', legendgroup='All'))
+
     layout = go.Layout(
         xaxis={ 'title': col},
         yaxis={ 'title': 'Density'},
@@ -128,9 +134,15 @@ def main():
 
     cols = ['climb', u'distance', 'time', 'date', 'type', 'where', u'distE', u'distI', u'distM', u'distR', u'distT', u'distX', u'distXB', 'trail']
 
+    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read())
+
     app.layout = html.Div([
         html.Div([
-            html.H1("UMAP projection"),
+            html.Img(src='data:image/png;base64,{}'.format(encoded_image), style={'height':'40px', 'display':'inline-block', 'margin':'5px 0px 0px 10px'}),
+           html.H2("Running log - Exploration", style={'display':'inline-block', 'vertical-align': 'center', 'margin':'0px', 'padding':'3px 0px 5px 20px'}) 
+        ], style={'background-color':'#6BC06D', 'height':'50px', 'vertical-align': 'center', 'padding':'0px', 'margin':'0px', 'margin-block-start':'0px', 'display':'flex'}),
+        html.Div([
+            html.H3("UMAP projection"),
             html.Div([
                 dcc.Graph(id='umap_graph', figure=update_umap_figure(df, cols, title='Runs - UMAP projection'))
             ], style={'width':'60%', 'display':'inline-block', 'float':'left'}),
@@ -144,7 +156,7 @@ def main():
             ], style={'width':'20%', 'display':'inline-block'})
         ], style={'width':'100%', 'display':'block', 'margin':'auto'}),
         html.Div([
-            html.H1("Variable relation"),
+            html.H3("Variable relation"),
             html.Div([
                 dcc.Dropdown(
                     id='yaxis-column',

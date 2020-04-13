@@ -3,10 +3,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 from plotly.tools import FigureFactory as ff
-import seaborn as sns
+#import seaborn as sns
 import matplotlib.pyplot as plt
 import dash_table
 import datetime
+import base64
 
 import pandas as pd
 import numpy as np
@@ -113,7 +114,6 @@ def main():
 
     filt_df = df.copy()
 
-    import base64
     encoded_image = base64.b64encode(open('img/logo.png', 'rb').read())
 
     #external_stylesheets = ['viz/data.css']

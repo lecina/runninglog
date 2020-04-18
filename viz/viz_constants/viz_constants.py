@@ -28,9 +28,9 @@ def get_runType_order():
 
 def get_year_marks(df):
     years = df.date.dt.year
-    year_marks={year: str(year) for year in np.hstack([years.unique(), [years.max()+1], [years.max()+2]])}
-    year_marks[years.max()+1] = 'Last year'
-    year_marks[years.max()+2] = 'All'
+    year_marks={year: {'label':str(year), 'style':{'font-size':'1.2em'}} for year in np.hstack([years.unique(), [years.max()+1], [years.max()+2]])}
+    year_marks[years.max()+1] = {'label':'Last year', 'style':{'font-size':'1.2em'}}
+    year_marks[years.max()+2] = {'label':'All', 'style':{'font-size':'1.2em'}}
 
     return year_marks
 

@@ -34,7 +34,7 @@ def get_ordered_runType_long_name(runType_order):
     return [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
 
 def get_available_columns():
-    available_cols = ['distance', 'distance road vs trail', 'time', 'climb', 'avg_pace', '%types']
+    available_cols = ['distance', 'distance road vs trail', 'time', 'climb', 'avg_pace', '%types', 'feeling']
     return available_cols
 
 def get_time_options():
@@ -185,10 +185,12 @@ def main():
                                 }],
                             style_cell={
                                 'whiteSpace': 'no-wrap',
+                                #'whiteSpace': 'normal',
                                 'overflow': 'hidden',
                                 'textOverflow': 'ellipsis',
                                 #'textOverflow': 'clip',
-                                'minWidth': '40px', 'maxWidth': '100px'
+                                'minWidth': '50px', 'maxWidth': '80px',
+                                'font-size':'0.9em', 'font-family':'garamond',#georgia
                             },
                             style_as_list_view=True,
                             merge_duplicate_headers=True,
@@ -196,6 +198,9 @@ def main():
                                     'backgroundColor': 'white',
                                     'fontWeight': 'bold'
                                 },
+                            #style_cell_conditional=[
+                            #        {'if': {'column_id': 'week'}, 'width': '50px'},
+                            #    ],
                             sort_action = 'native',
                             fixed_rows = { 'headers': True, 'data': 0 }
                         ),
@@ -221,6 +226,7 @@ def main():
                                 'overflow': 'hidden',
                                 #'textOverflow': 'ellipsis',
                                 'textOverflow': 'clip',
+                                'font-size':'0.9em', 'font-family':'garamond',#georgia
                                 'minWidth': '40px', 'maxWidth': '90px'
                             },
                             style_as_list_view=True,
@@ -252,6 +258,7 @@ def main():
                                 'whiteSpace': 'no-wrap',
                                 'overflow': 'hidden',
                                 'textOverflow': 'ellipsis',
+                                'font-size':'0.9em', 'font-family':'garamond',#georgia
                                 'minWidth': '20px', 'maxWidth': '80px'
                             },
                             style_as_list_view=True,
@@ -282,6 +289,7 @@ def main():
                                 'whiteSpace': 'no-wrap',
                                 'overflow': 'hidden',
                                 'textOverflow': 'ellipsis',
+                                'font-size':'0.9em', 'font-family':'garamond',#georgia
                                 'minWidth': '20px', 'maxWidth': '80px'
                             },
                             style_as_list_view=True,
@@ -328,6 +336,7 @@ def main():
                                         'whiteSpace': 'no-wrap',
                                         'overflow': 'hidden',
                                         'textOverflow': 'ellipsis',
+                                        'font-size':'0.9em', 'font-family':'garamond',#georgia
                                         'minWidth': '60px', 'maxWidth': '100px'
                                     },
                                     style_as_list_view=True,
@@ -358,6 +367,7 @@ def main():
                                         'whiteSpace': 'no-wrap',
                                         'overflow': 'hidden',
                                         'textOverflow': 'ellipsis',
+                                        'font-size':'0.9em', 'font-family':'garamond',#georgia
                                         'minWidth': '60px', 'maxWidth': '100px'
                                     },
                                     style_as_list_view=True,
@@ -388,6 +398,7 @@ def main():
                                         'whiteSpace': 'no-wrap',
                                         'overflow': 'hidden',
                                         'textOverflow': 'ellipsis',
+                                        'font-size':'0.9em', 'font-family':'garamond',#georgia
                                         'minWidth': '60px', 'maxWidth': '100px'
                                     },
                                     style_as_list_view=True,
@@ -420,6 +431,7 @@ def main():
                                         'whiteSpace': 'no-wrap',
                                         'overflow': 'hidden',
                                         'textOverflow': 'ellipsis',
+                                        'font-size':'0.9em', 'font-family':'garamond',#georgia
                                         'minWidth': '60px', 'maxWidth': '100px'
                                     },
                                     style_as_list_view=True,
@@ -450,6 +462,7 @@ def main():
                                         'whiteSpace': 'no-wrap',
                                         'overflow': 'hidden',
                                         'textOverflow': 'ellipsis',
+                                        'font-size':'0.9em', 'font-family':'garamond',#georgia
                                         'minWidth': '60px', 'maxWidth': '100px'
                                     },
                                     style_as_list_view=True,
@@ -487,6 +500,7 @@ def main():
                                 'whiteSpace': 'no-wrap',
                                 'overflow': 'hidden',
                                 'textOverflow': 'ellipsis',
+                                'font-size':'0.9em', 'font-family':'garamond',#georgia
                                 'minWidth': '60px', 'maxWidth': '100px'
                             },
                             style_as_list_view=True,
@@ -535,7 +549,7 @@ def main():
         df_total_runs['paceR'] = df_total_runs['paceR'].apply(lambda x: "-" if np.isnan(x) else "{:d}:{:0>2d}".format(int(x//60),int(x%60)))
 
         #df_total_runs.date = df_total_runs.date.dt.strftime("%d-%m-%y")
-        df_total_runs.date = df_total_runs.date.apply(lambda x: x.strftime("%y/%m/%d"))
+        df_total_runs.date = df_total_runs.date.apply(lambda x: x.strftime("%y-%m-%d"))
 
         decimals = pd.Series([1, 1, 0, 1, 1, 1, 1, 1], index=['distance', 'time', 'climb', 'distE', 'distM', 'distT', 'distI', 'distR'])
         return df_total_runs.round(decimals).sort_values(by=['date'], ascending=False).to_dict('rows')
@@ -624,7 +638,7 @@ def main():
 
         if filt_df.shape[0] == 0:
             cols = list(filt_df.columns)
-            cols.extend(['N_run', 'N_trail', 'N_all', 'Nrun_Ntrail_Nall', 'run_avg_pace', '%E','%M','%T','%I','%R', '%types'])
+            cols.extend(['N_run', 'N_trail', 'N_all', 'Nall_Nroad_Ntrail', 'run_avg_pace', '%E','%M','%T','%I','%R', '%types'])
             data = [0]*len(cols)
             return pd.DataFrame(columns = cols, data = [data]).to_json(date_format='iso', orient='split')
         #END apply filters
@@ -658,7 +672,7 @@ def main():
         df_agg = pd.concat([df_agg, df_running], axis=1, sort=False)
 
         cols = ['n_road', 'n_trail', 'N_all']
-        df_agg['Nrun_Ntrail_Nall'] = df_agg[cols].apply(lambda row: "%.0f(%.0f)/%d"%(row.values[0]+row.values[1],row.values[1],row.values[2]), axis=1)
+        df_agg['Nall_Nroad_Ntrail'] = df_agg[cols].apply(lambda row: "%d/%.0f/%.0f"%(row.values[2],row.values[0],row.values[1]), axis=1)
 
 
 
@@ -733,10 +747,10 @@ def main():
                 {"name": "Time", "id": "time"},
                 {"name": "Climb", "id": "climb"},
                 {"name": "V.Speed", "id": "vspeed"},
-                {"name": "Run Avg.Pace", "id": "run_avg_pace"},
+                {"name": "Pace", "id": "run_avg_pace"},
                 {"name": "E(M)%/T%/I%/R%", "id": "%types"},
                 {"name": "Feel", "id": "feeling"},
-                {"name": "#R(#T)/#A", "id": "Nrun_Ntrail_Nall"},
+                {"name": "#A/#R/#T", "id": "Nall_Nroad_Ntrail"},
             ]
         return columns
 
@@ -772,7 +786,7 @@ def main():
                 {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
                 {"name": "E(M)%/T%/I%/R%", "id": "%types"},
                 {"name": "Feel", "id": "feeling"},
-                {"name": "#R(#T)/#A", "id": "Nrun_Ntrail_Nall"},
+                {"name": "#A/#R/#T", "id": "Nall_Nroad_Ntrail"},
             ]
         return columns
 
@@ -808,7 +822,7 @@ def main():
                 {"name": "Run.Avg.Pace", "id": "run_avg_pace"},
                 {"name": "E(M)%/T%/I%/R%", "id": "%types"},
                 {"name": "Feel", "id": "feeling"},
-                {"name": "#R(#T)/#A", "id": "Nrun_Ntrail_Nall"},
+                {"name": "#A/#R/#T", "id": "Nall_Nroad_Ntrail"},
             ]
         return columns
 
@@ -959,12 +973,12 @@ def main():
         avg_pace = "{:d}:{:0>2d}".format(int(agg.avg_pace//60),int(agg.avg_pace%60))
         return '**Avg. distance:** {:.1f} km    **Avg. time:** {};\n'\
                 '**Avg.pace:** {} min/km    **Avg. vert. speed:** {} m/h\n'\
-                '**#Activities _Run(Trail)/All_:**{}    **Avg. feel:** {} \n'\
+                '**#Activities _All/Road/Trail_:**{}    **Avg. feel:** {} \n'\
                 '**Distance _E(M)%/T%/I%/R%_:** {}'.format(agg.distance/4, 
                                                                                     avg_time, 
                                                                                     avg_pace, 
                                                                                     agg.vspeed, 
-                                                                                    agg.Nrun_Ntrail_Nall, 
+                                                                                    agg.Nall_Nroad_Ntrail, 
                                                                                     agg.feeling, 
                                                                                     agg['%types'])
     #@app.callback(
@@ -986,7 +1000,7 @@ def main():
     #                                                                                avg_time, 
     #                                                                                avg_pace, 
     #                                                                                agg.vspeed, 
-    #                                                                                agg.Nrun_Ntrail_Nall, 
+    #                                                                                agg.Nall_Nroad_Ntrail, 
     #                                                                                agg.feeling, 
     #                                                                                agg['%types'])
 

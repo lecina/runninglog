@@ -3,8 +3,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 from plotly.tools import FigureFactory as ff
-#import seaborn as sns
-import matplotlib.pyplot as plt
 import dash_table
 import datetime
 import base64
@@ -12,8 +10,8 @@ import base64
 import pandas as pd
 import numpy as np
 
-from constants import blockNames
-from single_run import runTypes
+from src.constants import blockNames
+from src.single_run import runTypes
 
 try:
     from viz.viz_constants import viz_constants
@@ -85,7 +83,7 @@ def main():
 
     filt_df = df.copy()
 
-    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read())
+    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read()).decode('ascii')
 
     #external_stylesheets = ['viz/data.css']
     #app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -603,18 +601,15 @@ def main():
         elif xaxis_colname == 'year':
             filt_df = pd.read_json(df_y_agg, orient='split')
 
-        filt_df['date'] = filt_df.index
-
-
         if chosen_year == df.date.dt.year.max()+2:
             pass #do nothing
         elif chosen_year == df.date.dt.year.max()+1:
             today = datetime.datetime.now()
             last_year = subtract_weeks(today, 52)
+            filt_df.date = filt_df.date.dt.tz_localize(None)
             filt_df = filt_df[np.logical_and(filt_df.date >= last_year, filt_df.date <= today)]
         else:
             filt_df = filt_df[filt_df.date.dt.year == chosen_year]
-
 
         return filt_df.to_json(date_format='iso', orient='split')
 
@@ -630,11 +625,13 @@ def main():
         else:
             agg_option = 'W'
 
+
         chosen_activity_types = viz_constants.get_activities_from_checklist(chosen_activities)
         filt_df = df[df.type.isin(chosen_activity_types)]
 
         trail_road = viz_constants.get_trail_road_activities(trail_road_selector)
         filt_df = filt_df[filt_df.trail.isin(trail_road)]
+
 
         if filt_df.shape[0] == 0:
             cols = list(filt_df.columns)
@@ -647,7 +644,7 @@ def main():
 
 
         needed_cols = ['date', 'distance', 'time', 'climb', 'distE', 'distI', 'distM', 'distR', 'distT', 'distX', 'distXB', 'timeE', 'timeI', 'timeM', 'timeR', 'timeT', 'timeX', 'timeXB']
-        df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').agg(pd.Series.sum, skipna=True)
+        df_agg = filt_df[:][needed_cols].resample(agg_option, on='date').sum()
 
         agg_feeling = filt_df[:][['date', 'feeling']].resample(agg_option, on='date').agg(pd.Series.mean, skipna=True)
         df_agg = pd.concat([df_agg, agg_feeling], axis=1, sort=False)

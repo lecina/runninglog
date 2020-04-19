@@ -1,7 +1,7 @@
-from constants import blockNames
-from utilities import utilities
-import runTypes
-import segment
+from src.constants import blockNames
+from src.utilities import utilities
+from src.single_run import runTypes
+from src.single_run import segment
 
 import datetime
 import re
@@ -39,7 +39,7 @@ class SingleRun(segment.Segment):
         self.basic_dist = {}
         self.basic_pace = {}
         self.basic_time = {}
-        for k in runTypes.BASIC_RUN_TYPES_DICTIONARY.iterkeys():
+        for k in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.basic_dist[k] = 0 
             self.basic_time[k] = 0 
             self.basic_pace[k] = None
@@ -107,21 +107,21 @@ class SingleRun(segment.Segment):
         str_to_return += "\n=========================\n"
 
         print_dist = {}
-        for (t, d) in self.basic_dist.iteritems():
+        for (t, d) in self.basic_dist.items():
             if d != 0:
                 blockname_type = runTypes.BASIC_RUN_TYPES_DICTIONARY[t]
                 print_dist[blockname_type] = d
         str_to_return += "Distances (km): %s\n"%print_dist
 
         print_time = {}
-        for (t, d) in self.basic_time.iteritems():
+        for (t, d) in self.basic_time.items():
             if d != 0:
                 blockname_type = runTypes.BASIC_RUN_TYPES_DICTIONARY[t]
                 print_time[blockname_type] = d
         str_to_return += "Times (sec): %s\n"%print_time
 
         print_pace = {}
-        for (t, p) in self.basic_pace.iteritems():
+        for (t, p) in self.basic_pace.items():
             if p is not None: 
                 blockname_type = runTypes.BASIC_RUN_TYPES_DICTIONARY[t]
                 print_pace[blockname_type] = p
@@ -176,7 +176,7 @@ class SingleRun(segment.Segment):
 
     def load_json(self, parsed_json):
         self.orig_json_string = parsed_json
-        parsed_json = dict((k.lower(), v) for k, v in parsed_json.iteritems())
+        parsed_json = dict((k.lower(), v) for k, v in parsed_json.items())
 
         #Compulsory
         self.total_time = self.parse_time(parsed_json[blockNames.FileParams.time])
@@ -269,7 +269,7 @@ class SingleRun(segment.Segment):
         """
             Parses run type. If not found, set it to E.
         """
-        for (runType, runTypeBlockname) in runTypes.RUN_TYPES_DICTIONARY.iteritems():
+        for (runType, runTypeBlockname) in runTypes.RUN_TYPES_DICTIONARY.items():
             if type_str == runTypeBlockname:
                 return runType
 
@@ -307,7 +307,7 @@ class SingleRun(segment.Segment):
 
         type_val = runTypes.RUN_TYPES_DICTIONARY[self.type]
         if type_val in runTypes.BASIC_RUN_TYPES_DICTIONARY.values():
-            for (k1,v1) in runTypes.BASIC_RUN_TYPES_DICTIONARY.iteritems():
+            for (k1,v1) in runTypes.BASIC_RUN_TYPES_DICTIONARY.items():
                 if type_val==v1: 
                     dictkey = k1
         else:
@@ -328,7 +328,7 @@ class SingleRun(segment.Segment):
         self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] += self.total_distance - sum(self.basic_dist.values())
 
         assigned_time = 0
-        for tm in self.basic_time.itervalues():
+        for tm in self.basic_time.values():
             assigned_time += tm
 
         unassigned_time = self.total_time*60 - assigned_time

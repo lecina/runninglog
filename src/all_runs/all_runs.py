@@ -1,7 +1,7 @@
-from reader import reader
-from single_run import single_run
-from constants import constants, blockNames
-from utilities import utilities
+from src.reader import reader
+from src.single_run import single_run
+from src.constants import constants, blockNames
+from src.utilities import utilities
 
 import os
 import fnmatch
@@ -17,7 +17,7 @@ class AllRuns():
         self.structures = pd.DataFrame() #TODO: append structures
 
     def read_single_run(self, filename, verbose=True):
-        if verbose: print "Reading", filename
+        if verbose: print ("Reading", filename)
         #TODO: raise/catch exception
         parsed_json = reader.read_file(filename)
 
@@ -39,7 +39,9 @@ class AllRuns():
         if self.df.size == 0:
             already_added = False
         else:
-            already_added = sum((self.df.values==sr_ds.values).all(axis=1))
+            sr_df = pd.DataFrame()
+            sr_df = sr_df.append(sr_ds, ignore_index=True)
+            already_added = sum((self.df.values==sr_df.values).all(axis=1))
 
         if not already_added:
             self.df = self.df.append(sr_ds, ignore_index=True)
@@ -60,7 +62,7 @@ class AllRuns():
 
         if len(file_list) == 0:
             if verbose: 
-                print "No files to read!"
+                print ("No files to read!")
             return []
 
         parsed_single_runs = []
@@ -68,7 +70,7 @@ class AllRuns():
             jsonFile = open(f, 'r').read()
             if jsonFile == constants.EMPTY_JSON or jsonFile == "":
                 if verbose: 
-                    print "Empty json file: \"%s\"!\nCleaning it up!!"%f
+                    print ("Empty json file: \"%s\"!\nCleaning it up!!"%f)
                 utilities.rm_file(f)
             else:
                 #TODO: add json validator
@@ -82,8 +84,8 @@ class AllRuns():
                     if added_sr:
                         parsed_single_runs.append(sr)
                     elif verbose==True:
-                        print "Not adding already added move:", sr.as_dict()
-                        print "in %s"%f
+                        print ("Not adding already added move:", sr.as_dict())
+                        print ("in %s"%f)
 
         return parsed_single_runs
 

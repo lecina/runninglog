@@ -1,5 +1,6 @@
-from constants import blockNames
-from single_run import runTypes
+from src.constants import blockNames
+from src.single_run import runTypes
+
 import numpy as np
 
 def get_runType_colors():
@@ -27,10 +28,17 @@ def get_runType_order():
 
 
 def get_year_marks(df):
-    years = df.date.dt.year
-    year_marks={year: {'label':str(year), 'style':{'font-size':'1.2em'}} for year in np.hstack([years.unique(), [years.max()+1], [years.max()+2]])}
-    year_marks[years.max()+1] = {'label':'Last year', 'style':{'font-size':'1.2em'}}
-    year_marks[years.max()+2] = {'label':'All', 'style':{'font-size':'1.2em'}}
+    #years = df.date.dt.year
+    #year_marks={year: {'label':str(year), 'style':{'font-size':'1.2em'}} for year in np.hstack([years.unique(), [years.max()+1], [years.max()+2]])}
+    #year_marks[years.max()+1] = {'label':'Last year', 'style':{'font-size':'1.2em'}}
+    #year_marks[years.max()+2] = {'label':'All', 'style':{'font-size':'1.2em'}}
+
+    years = list(set(df.date.dt.year.tolist()))
+    max_year = max(years)
+
+    year_marks={year: {'label':str(year), 'style':{'font-size':'1.2em'}} for year in years + [max_year+1, max_year+2]}
+    year_marks[max_year+1] = {'label':'Last year', 'style':{'font-size':'1.2em'}}
+    year_marks[max_year+2] = {'label':'All', 'style':{'font-size':'1.2em'}}
 
     return year_marks
 

@@ -2,18 +2,22 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+import datetime
 import base64
 
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from utilities import utilities
+from src.utilities import utilities
 try:
     from viz.viz_constants import viz_constants
 except:
     from viz_constants import viz_constants
 
+#TODO:move to common functions
+def subtract_weeks(d, weeks=52):
+    return d - datetime.timedelta(days=d.weekday() + 7*weeks)
 
 def find_coefficient(df, xcol, ycol):
     #import statsmodels.formula.api as sm
@@ -172,7 +176,7 @@ def main():
 
     runType_colors = viz_constants.get_runType_colors()
 
-    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read())
+    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read()).decode('ascii')
 
     app.layout = html.Div([
         html.Div([

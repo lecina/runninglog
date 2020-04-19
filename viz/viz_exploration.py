@@ -9,11 +9,10 @@ import base64
 import umap
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
-from utilities import utilities
-from constants import blockNames
-from single_run import runTypes
+from src.utilities import utilities
+from src.constants import blockNames
+from src.single_run import runTypes
 
 try:
     from viz.viz_constants import viz_constants
@@ -22,7 +21,8 @@ except:
 
 
 
-def create_scatter(df, cols, colors=None, colortitle=None, symbols=None):
+def create_scatter(df, cols, colors=None, colortitle=None, symbols=None, scale=True):
+        #return px.scatter(df, x='umap_X1', y='umap_X2', color='type', symbol='trail')#, text=[df.loc[i,cols].to_string().replace("\n", "<br>") for i in range(len(df.index))])
         runTypesToColors = viz_constants.get_runType_colors()
         if colors is None:
             colors = [runTypesToColors[x] for x in df.type]
@@ -43,15 +43,16 @@ def create_scatter(df, cols, colors=None, colortitle=None, symbols=None):
                 'color' : colors,
                 #'colorscale': runTypesToColors.values(),
                 'colorbar' : { 'title':colortitle},
-                'showscale' : True
+                'showscale' : scale
             }
         )
         return scatter
 
 def update_umap_figure(df, cols, title=None, colors=None, symbols=None):
+    #return create_scatter(df,cols, colors=colors, symbols=symbols, scale=False)
     runTypesToColors = viz_constants.get_runType_colors()
     figure= {
-        'data': [create_scatter(df,cols, colors=colors, symbols=symbols)],
+        'data': [create_scatter(df,cols, colors=colors, symbols=symbols, scale=False)],
         'layout': go.Layout(
             xaxis={ 'title': 'X1'},
             yaxis={ 'title': 'X2'},
@@ -87,7 +88,7 @@ def update_umap_explain_figure(df, cols, title, logColors=False):
 def update_distr_plot_figure(df, col, title=None, agg_all=False):
     if not agg_all:
         runTypesToColors = viz_constants.get_runType_colors()
-        groups = viz_constants.get_runType_order()
+        groups = runTypes.RUNNING_ACTIVITIES
         colors = [runTypesToColors[type] for type in groups]
         x = [df[df.type == type][col] for type in groups]
     else:
@@ -104,7 +105,7 @@ def update_distr_plot_figure(df, col, title=None, agg_all=False):
         colors = px.colors.sequential.Burg
 
     #TODO rug_text
-    fig = ff.create_distplot(x, groups, show_hist=False, colors=colors, curve_type='normal')
+    fig = ff.create_distplot(x, groups, show_hist=False, colors=colors, curve_type='kde')
 
     if agg_all:
         fig.update_traces(line=dict(width=5, dash='dash', color='#4682b4'),selector=dict(mode='lines', legendgroup='All'))
@@ -123,9 +124,6 @@ def update_distr_plot_figure(df, col, title=None, agg_all=False):
     return fig
 
 def main():
-    #external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
-    #app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
     app = dash.Dash(__name__)
 
     df = utilities.read_pandas_pickle("data/processed/df.pkl")
@@ -134,7 +132,8 @@ def main():
 
     cols = ['climb', u'distance', 'time', 'date', 'type', 'where', u'distE', u'distI', u'distM', u'distR', u'distT', u'distX', u'distXB', 'trail']
 
-    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read())
+    encoded_image = base64.b64encode(open('img/logo.png', 'rb').read()).decode('ascii')
+
 
     app.layout = html.Div([
         html.Div([
@@ -155,6 +154,7 @@ def main():
                 dcc.Graph(id='umap_graph_pace', figure=update_umap_explain_figure(df, cols, 'avg_pace', logColors=True))
             ], style={'width':'20%', 'display':'inline-block'})
         ], style={'width':'100%', 'display':'block', 'margin':'auto'}),
+        ], style={'width':'20%'}),
         html.Div([
             html.H3("Variable relation"),
             html.Div([

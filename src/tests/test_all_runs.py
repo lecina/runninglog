@@ -1,6 +1,6 @@
-from all_runs import all_runs
-from single_run import single_run, runTypes
-from reader import reader
+from src.all_runs import all_runs
+from src.single_run import single_run, runTypes
+from src.reader import reader
 
 import unittest
 import datetime

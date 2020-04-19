@@ -1,7 +1,7 @@
-from all_runs import all_runs
-from utilities import utilities
-from constants import constants
-from reader import reader
+from src.all_runs import all_runs
+from src.utilities import utilities
+from src.constants import constants
+from src.reader import reader
 
 import os.path
 import json
@@ -73,7 +73,7 @@ class RunningLog():
         with open(fname, "w") as json_file:
             json_file.write(constants.EMPTY_JSON)
 
-        print "Generated: %s"%fname
+        print ("Generated: %s"%fname)
 
     def load_files_to_load(self):
         directory = constants.TO_LOAD_FOLDER
@@ -95,7 +95,7 @@ class RunningLog():
                 outputJsonFile = reader.read_file(oname)
                 outputJsonFileList = outputJsonFile[constants.blockNames.FileParams.list]
                 if jsonFile in outputJsonFileList:
-                    print "Json has already been inserted!"
+                    print ("Json has already been inserted!")
                 else:
                     outputJsonFileList.append(jsonFile)
                     #Better write and if correct, replace
@@ -109,7 +109,7 @@ class RunningLog():
                 newdict[constants.blockNames.FileParams.list] = [jsonFile]
                 with open(oname, "w") as json_file:
                     json_file.write(json.dumps(newdict, indent=4, separators=(',', ' : ')))
-                print "Wrote new file:", oname
+                print ("Wrote new file:", oname)
 
     def compute_embedding(self):
         self.allRuns.compute_umap_projection()
@@ -120,26 +120,26 @@ def main():
     rl = RunningLog()
 
     if args.template:
-        print "Generating template\n"
+        print ("Generating template\n")
         rl.generate_empty_json()
 
     rl.load_all_runs()
 
     if args.load_json==[]:
-        print "Loading files to load\n"
+        print ("Loading files to load\n")
         rl.load_files_to_load()
-        print "End loading files to load\n"
+        print ("End loading files to load\n")
     elif type(args.load_json) == list:
         for directory in args.load:
-            print "Loading files in ", directory
+            print ("Loading files in ", directory)
             rl.load_files_in_directory(directory)
-        print ""
+        print ("")
 
-    print "Computing embedding"
+    print ("Computing embedding")
     rl.compute_embedding()
-    print "End computing embedding"
+    print ("End computing embedding")
 
-    print "Saving all runs"
+    print ("Saving all runs")
     rl.save_all_runs("pkl")
     rl.save_all_runs("csv")
 

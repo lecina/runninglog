@@ -1,8 +1,8 @@
 import unittest
 
-import tests.test_all_runs as tAllRuns
-import tests.test_single_run as tSingleRun
-import tests.test_segment as tSegment
+import src.tests.test_all_runs as tAllRuns
+import src.tests.test_single_run as tSingleRun
+import src.tests.test_segment as tSegment
 #import tests.single_test as tSing
 
 def main():

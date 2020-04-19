@@ -1,5 +1,5 @@
-from constants import blockNames
-import runTypes
+from src.constants import blockNames
+from src.single_run import runTypes
 
 import datetime
 import re
@@ -77,7 +77,7 @@ class Segment:
     def create_segment(self, segment_dict, repetition_number=0):
         #Type and distance are compulsory
         #the rest are optional
-        item_dict = dict((k.lower(), v) for k, v in segment_dict.iteritems())
+        item_dict = dict((k.lower(), v) for k, v in segment_dict.items())
 
         parsed_type = self.parse_type(item_dict[blockNames.FileParams.type])
         if parsed_type is not None:
@@ -137,7 +137,7 @@ class Segment:
         """
             Parses run type. If not found, return None
         """
-        for (runType, runTypeBlockname) in runTypes.BASIC_RUN_TYPES_DICTIONARY.iteritems():
+        for (runType, runTypeBlockname) in runTypes.BASIC_RUN_TYPES_DICTIONARY.items():
             if type_str == runTypeBlockname:
                 return runType
 

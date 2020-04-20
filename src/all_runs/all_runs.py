@@ -34,18 +34,24 @@ class AllRuns():
             return singleRun
 
     def append_single_run_if_not_present(self, sr):
-        sr_ds = pd.Series(sr.as_dict())
+        sr_df = pd.DataFrame()
+        sr_df = sr_df.append(pd.Series(sr.as_dict()), ignore_index=True)
+
+        columns = ['avg_pace', 'vspeed', 
+            'distE', 'distM', 'distT', 'distI', 'distR', 'distX', 'distXB', 
+            'timeE', 'timeM', 'timeT', 'timeI', 'timeR', 'timeX', 'timeXB', 
+            'paceE', 'paceM', 'paceT', 'paceI', 'paceR', 'paceX', 'paceXB']
+        decimals = pd.Series([2] * len(columns), index=columns)
+        sr_df = sr_df.round(decimals)
     
         if self.df.size == 0:
             already_added = False
         else:
-            sr_df = pd.DataFrame()
-            sr_df = sr_df.append(sr_ds, ignore_index=True)
             already_added = sum((self.df.values==sr_df.values).all(axis=1))
 
         if not already_added:
-            self.df = self.df.append(sr_ds, ignore_index=True)
-            self.structures = pd.concat([self.structures, sr.get_structure_as_df()], axis=0)
+            self.df = pd.concat([self.df, sr_df], axis=0, ignore_index=True)
+            self.structures = pd.concat([self.structures, sr.get_structure_as_df()], axis=0, ignore_index=True)
 
         added_sr = not already_added
         return added_sr

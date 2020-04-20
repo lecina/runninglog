@@ -218,7 +218,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.total_distance = 13.80
         goldenSingleRun.climb = 110
         goldenSingleRun.vspeed = 88
-        goldenSingleRun.avg_pace = 326.086957
+        goldenSingleRun.avg_pace = 326.09
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = ""
         goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
@@ -232,7 +232,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 1378.24
         goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
         goldenSingleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
-        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 392.1809
+        goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 392.18
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = None
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = 236
         goldenSingleRun.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I] = None
@@ -244,7 +244,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.total_distance = 12.2
         goldenSingleRun2.climb = 100
         goldenSingleRun2.vspeed = 100
-        goldenSingleRun2.avg_pace = 295.081967213
+        goldenSingleRun2.avg_pace = 295.08
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
         goldenSingleRun2.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y").date()
@@ -258,7 +258,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 0
         goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I] = 0
         goldenSingleRun2.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R] = 0
-        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 295.081967213
+        goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 295.08
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = None
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = None
         goldenSingleRun2.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I] = None

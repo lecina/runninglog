@@ -1,15 +1,19 @@
-from src.all_runs import all_runs
-from src.single_run import single_run, runTypes
-from src.reader import reader
+from context import src
+
+from all_runs import all_runs
+from single_run import single_run, runTypes
+from reader import reader
 
 import unittest
 import datetime
+import os
 import pandas as pd
 
 class TestAllRuns(unittest.TestCase):
     def test_read_single_run1(self):
         allRuns = all_runs.AllRuns()
-        singleRun = allRuns.read_single_run("src/tests/data/test_2.json", verbose=False)
+        datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_2.json')
+        singleRun = allRuns.read_single_run(datafile, verbose=False)
 
         goldenSingleRun = single_run.SingleRun()
         goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T
@@ -42,7 +46,8 @@ class TestAllRuns(unittest.TestCase):
 
     def test_read_single_run2(self):
         allRuns = all_runs.AllRuns()
-        singleRun = allRuns.read_single_run("src/tests/data/test_3.json", verbose=False)
+        datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_3.json')
+        singleRun = allRuns.read_single_run(datafile, verbose=False)
 
         goldenSingleRun = single_run.SingleRun()
         goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.E
@@ -75,7 +80,8 @@ class TestAllRuns(unittest.TestCase):
 
     def test_read_single_run3(self):
         allRuns = all_runs.AllRuns()
-        singleRuns = allRuns.read_single_run("src/tests/data/test_1.json", verbose=False)
+        datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_1.json')
+        singleRuns = allRuns.read_single_run(datafile, verbose=False)
 
         goldenSingleRun = single_run.SingleRun()
         goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T
@@ -134,10 +140,18 @@ class TestAllRuns(unittest.TestCase):
 
     def test_get_json_files_in_subdirs(self):
         allRuns = all_runs.AllRuns()
-        files = allRuns.get_json_files_in_subdirs("src/tests/data/test_get_json_files")
+        datafolder = os.path.join(os.path.split(__file__)[0], 'data', 'test_get_json_files')
+        files = allRuns.get_json_files_in_subdirs(datafolder)
         files.sort()
 
-        goldenData = ['src/tests/data/test_get_json_files/1/2/a2.json', 'src/tests/data/test_get_json_files/1/2/b2.json', 'src/tests/data/test_get_json_files/1/a1.json', 'src/tests/data/test_get_json_files/a.json', 'src/tests/data/test_get_json_files/b.json']
+        goldenData = [
+                        os.path.join('1','2','a2.json'), 
+                        os.path.join('1','2','b2.json'), 
+                        os.path.join('1','a1.json'), 
+                        'a.json', 
+                        'b.json',
+                    ]
+        goldenData = [os.path.join(datafolder, f) for f in goldenData]
 
         self.assertEqual(files, goldenData)
 
@@ -145,7 +159,8 @@ class TestAllRuns(unittest.TestCase):
         allRuns = all_runs.AllRuns()
 
         singleRun = single_run.SingleRun()
-        parsed_json = reader.read_file('src/tests/data/test_2.json')
+        datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_2.json')
+        parsed_json = reader.read_file(datafile)
         singleRun.load_json(parsed_json)
 
         added1 = allRuns.append_single_run_if_not_present(singleRun)
@@ -164,13 +179,15 @@ class TestAllRuns(unittest.TestCase):
         allRuns = all_runs.AllRuns()
 
         singleRun = single_run.SingleRun()
-        parsed_json = reader.read_file('src/tests/data/test_2.json')
+        datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_2.json')
+        parsed_json = reader.read_file(datafile)
         singleRun.load_json(parsed_json)
         added1 = allRuns.append_single_run_if_not_present(singleRun)
         df1 = allRuns.df.copy()
 
         singleRun = single_run.SingleRun()
-        parsed_json = reader.read_file('src/tests/data/test_3.json')
+        datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_3.json')
+        parsed_json = reader.read_file(datafile)
         singleRun.load_json(parsed_json)
         added2 = allRuns.append_single_run_if_not_present(singleRun)
         df2 = allRuns.df.copy()
@@ -188,13 +205,15 @@ class TestAllRuns(unittest.TestCase):
         allRuns = all_runs.AllRuns()
 
         singleRun = single_run.SingleRun()
-        parsed_json = reader.read_file('src/tests/data/test_3.json')
+        datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_3.json')
+        parsed_json = reader.read_file(datafile)
         singleRun.load_json(parsed_json)
         added1 = allRuns.append_single_run_if_not_present(singleRun)
         df1 = allRuns.df.copy()
 
         singleRun = single_run.SingleRun()
-        parsed_json = reader.read_file('src/tests/data/test_4.json')
+        datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_4.json')
+        parsed_json = reader.read_file(datafile)
         singleRun.load_json(parsed_json)
         added2 = allRuns.append_single_run_if_not_present(singleRun)
         df2 = allRuns.df.copy()
@@ -210,7 +229,8 @@ class TestAllRuns(unittest.TestCase):
 
     def test_load_files_in_dir(self):
         allRuns = all_runs.AllRuns()
-        added_single_runs = allRuns.load_files_in_dir("src/tests/data/test_load_files_in_dir", verbose=False)
+        datafolder = os.path.join(os.path.split(__file__)[0], 'data', 'test_load_files_in_dir')
+        added_single_runs = allRuns.load_files_in_dir(datafolder, verbose=False)
 
         goldenSingleRun = single_run.SingleRun()
         goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T

@@ -1,10 +1,10 @@
-from src.constants import blockNames
-from src.single_run import runTypes
-
 import datetime
 import re
 import numbers
 import sys
+
+from runninglog.constants import blockNames
+from runninglog.single_run import runTypes
 
 class Segment:
     def __init__(self):

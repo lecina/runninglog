@@ -1,13 +1,14 @@
-from src.constants import blockNames
-from src.utilities import utilities
-from src.single_run import runTypes
-from src.single_run import segment
-
 import datetime
 import re
 import numbers
 import sys
+
 import pandas as pd
+
+from runninglog.constants import blockNames
+from runninglog.utilities import utilities
+from runninglog.single_run import runTypes
+from runninglog.single_run import segment
 
 class SingleRun(segment.Segment):
     #Single run contains all info from single run

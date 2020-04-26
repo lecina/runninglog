@@ -1,4 +1,4 @@
-from src.constants import blockNames
+from runninglog.constants import blockNames
 
 TO_LOAD_FOLDER = "to_load"
 JSON_TEMPLATE_OUTPUT_NAME = "template%s.json"

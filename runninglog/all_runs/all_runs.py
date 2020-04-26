@@ -1,15 +1,16 @@
-from src.reader import reader
-from src.single_run import single_run
-from src.constants import constants, blockNames
-from src.utilities import utilities
-
 import os
 import fnmatch
+import pickle
+
 import pandas as pd
 import numpy as np
-import pickle
 import umap
 from sklearn.preprocessing import MinMaxScaler
+
+from runninglog.reader import reader
+from runninglog.single_run import single_run
+from runninglog.constants import constants, blockNames
+from runninglog.utilities import utilities
 
 class AllRuns():
     def __init__(self):
@@ -76,8 +77,7 @@ class AllRuns():
             jsonFile = open(f, 'r').read()
             if jsonFile == constants.EMPTY_JSON or jsonFile == "":
                 if verbose: 
-                    print ("Empty json file: \"%s\"!\nCleaning it up!!"%f)
-                utilities.rm_file(f)
+                    print ("Empty json file: \"%s\"!\nClean it up!!"%f)
             else:
                 #TODO: add json validator
                 srs = self.read_single_run(f, verbose) 

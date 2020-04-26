@@ -1,4 +1,4 @@
-from context import src
+import context
 
 from all_runs import all_runs
 from single_run import single_run, runTypes

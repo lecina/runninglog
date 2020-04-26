@@ -1,4 +1,4 @@
-from src.constants import blockNames
+from runninglog.constants import blockNames
 
 """
     RunTypes can be divided in 5 running types + cross training 

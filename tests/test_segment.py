@@ -1,5 +1,7 @@
-from src.single_run import segment
-from src.single_run import runTypes
+import context
+
+from single_run import segment
+from single_run import runTypes
 
 import unittest
 import datetime

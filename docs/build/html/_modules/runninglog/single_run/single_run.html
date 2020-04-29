@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>runninglog.single_run.single_run &#8212; runninglog 0.8 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for runninglog.single_run.single_run</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">runninglog.constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
+<span class="kn">from</span> <span class="nn">runninglog.utilities</span> <span class="kn">import</span> <span class="n">utilities</span>
+<span class="kn">from</span> <span class="nn">runninglog.single_run</span> <span class="kn">import</span> <span class="n">runTypes</span>
+<span class="kn">from</span> <span class="nn">runninglog.single_run</span> <span class="kn">import</span> <span class="n">segment</span>
+
+<div class="viewcode-block" id="SingleRun"><a class="viewcode-back" href="../../../single_run.html#runninglog.single_run.single_run.SingleRun">[docs]</a><span class="k">class</span> <span class="nc">SingleRun</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">Segment</span><span class="p">):</span>
+    <span class="c1">#Single run contains all info from single run</span>
+    <span class="c1">#Segment contains basic info such as parsers</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#km</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#m</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_pace</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1">#sec/km</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#m/h</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">trail_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">where</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">route</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notes</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orig_json_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+
+        <span class="c1">#distances split over basic running types</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_structure</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">basic_dist</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">utilities</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">basic_time</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">utilities</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">other</span><span class="o">.</span><span class="n">basic_pace</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">utilities</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">type</span> <span class="ow">and</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">total_time</span> <span class="ow">and</span>\
+                <span class="n">utilities</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">total_distance</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="ow">and</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">climb</span> <span class="ow">and</span>\
+                <span class="n">utilities</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">avg_pace</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">avg_pace</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="ow">and</span>\
+                <span class="n">utilities</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">vspeed</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span> <span class="ow">and</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">date</span> <span class="ow">and</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">trail_running</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">trail_running</span> <span class="ow">and</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">where</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">where</span> <span class="ow">and</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">route</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">route</span> <span class="ow">and</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">feeling</span> <span class="ow">and</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">notes</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">notes</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">str_to_return</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Date: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">where</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Location: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">where</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">route</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Route: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">route</span>
+
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Type: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">runTypes</span><span class="o">.</span><span class="n">RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trail_running</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Trail run&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Feeling: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">feeling</span>
+
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Total time: </span><span class="si">%d</span><span class="s2">min</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">total_time</span>
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Total distance: </span><span class="si">%.2f</span><span class="s2">km</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span>
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Total climb: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">climb</span>
+
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Avg pace: </span><span class="si">%d</span><span class="s2"> (in sec/km)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">avg_pace</span>
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Avg vert. speed: </span><span class="si">%d</span><span class="s2"> (in m/h)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span>
+
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">With basic types:&quot;</span>
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Stats by training speeds:&quot;</span>
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=========================</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="n">print_dist</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">blockname_type</span> <span class="o">=</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+                <span class="n">print_dist</span><span class="p">[</span><span class="n">blockname_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Distances (km): </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">print_dist</span>
+
+        <span class="n">print_time</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">blockname_type</span> <span class="o">=</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+                <span class="n">print_time</span><span class="p">[</span><span class="n">blockname_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Times (sec): </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">print_time</span>
+
+        <span class="n">print_pace</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+                <span class="n">blockname_type</span> <span class="o">=</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+                <span class="n">print_pace</span><span class="p">[</span><span class="n">blockname_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="n">str_to_return</span> <span class="o">+=</span> <span class="s2">&quot;Paces (sec/km): </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">print_pace</span>
+
+        <span class="k">return</span> <span class="n">str_to_return</span>
+
+<div class="viewcode-block" id="SingleRun.as_dict"><a class="viewcode-back" href="../../../single_run.html#runninglog.single_run.single_run.SingleRun.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rdict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">type</span> <span class="p">:</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">time</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distance</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">climb</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">climb</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">avg_pace</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">avg_pace</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">vspeed</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">date</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">trail</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">trail_running</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">where</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">where</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">route</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">route</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">notes</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">notes</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">feeling</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distE</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">E</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distM</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">M</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distT</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">T</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distI</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">I</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distR</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">R</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distX</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">X</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distXB</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">XB</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">timeE</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">E</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">timeM</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">M</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">timeT</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">T</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">timeI</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">I</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">timeR</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">R</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">timeX</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">X</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">timeXB</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">XB</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">paceE</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">E</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">paceM</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">M</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">paceT</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">T</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">paceI</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">I</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">paceR</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">R</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">paceX</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">X</span><span class="p">],</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">paceXB</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">XB</span><span class="p">]</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">rdict</span></div>
+
+    <span class="k">def</span> <span class="nf">get_structure_as_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">sgmnt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_structure</span><span class="p">:</span>
+            <span class="n">ds_sgmnt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">sgmnt</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ds_sgmnt</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_json</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orig_json_string</span> <span class="o">=</span> <span class="n">parsed_json</span>
+        <span class="n">parsed_json</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">parsed_json</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+        <span class="c1">#Compulsory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_time</span><span class="p">(</span><span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">time</span><span class="p">])</span>
+        <span class="c1">#Compulsory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_distance</span><span class="p">(</span><span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">distance</span><span class="p">])</span>
+        <span class="c1">#Compulsory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_date</span><span class="p">(</span><span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">date</span><span class="p">])</span>
+
+
+        <span class="c1">#type</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">type_str</span> <span class="o">=</span> <span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">type_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">type_str</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_type</span><span class="p">(</span><span class="n">type_str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">RUN_TYPES</span><span class="o">.</span><span class="n">E</span>
+
+        <span class="c1">#climb</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">climb_str</span> <span class="o">=</span> <span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">climb</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">climb_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">climb_str</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">climb_str</span><span class="p">)</span>  
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">=</span> <span class="mi">0</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">*</span> <span class="mf">60.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span><span class="p">)</span>
+
+        <span class="c1">#where</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">where_str</span> <span class="o">=</span> <span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">where</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">where_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">where</span> <span class="o">=</span> <span class="n">where_str</span>
+
+        <span class="c1">#route</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">route_str</span> <span class="o">=</span> <span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">route</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">route_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">route</span> <span class="o">=</span> <span class="n">route_str</span>
+
+        <span class="c1">#trail: if exists, it is a trail running activity except</span>
+        <span class="c1"># if 0 or false are stated</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">trail_str</span> <span class="o">=</span> <span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">trail</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">trail_str</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trail_running</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">trail_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trail_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1">#feeling</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">feeling</span> <span class="o">=</span> <span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">feeling</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">feeling</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span> <span class="o">=</span> <span class="n">feeling</span>
+
+        <span class="c1">#struct</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">struct_str</span> <span class="o">=</span> <span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">structure</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">struct_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">struct_str</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill_basic_runtype_info_with_dict</span><span class="p">(</span><span class="n">struct_str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fill_basic_runtype_info_with_global_type</span><span class="p">()</span>
+
+        <span class="c1">#notes</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notes</span> <span class="o">=</span> <span class="n">parsed_json</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">notes</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1">#compute other measures</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avg_pace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_avg_pace</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redistribute_distances_and_times</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_basic_types_avg_paces</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SingleRun.parse_type"><a class="viewcode-back" href="../../../single_run.html#runninglog.single_run.single_run.SingleRun.parse_type">[docs]</a>    <span class="k">def</span> <span class="nf">parse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Parses run type. If not found, set it to E.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">runType</span><span class="p">,</span> <span class="n">runTypeBlockname</span><span class="p">)</span> <span class="ow">in</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">RUN_TYPES_DICTIONARY</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="n">runTypeBlockname</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">runType</span>
+
+        <span class="c1">#If run_type is not found, set it to E</span>
+        <span class="k">return</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">RUN_TYPES</span><span class="o">.</span><span class="n">E</span></div>
+
+    <span class="c1">#TODO:change this. split in two functions. Create segments. then fill into with dict</span>
+    <span class="k">def</span> <span class="nf">fill_basic_runtype_info_with_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">struct_list_dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">rep_num</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct_list_dict</span><span class="p">):</span>
+            <span class="n">sgmnt</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">Segment</span><span class="p">()</span>
+            <span class="n">sgmnt</span><span class="o">.</span><span class="n">fill_segment</span><span class="p">(</span><span class="n">item</span><span class="p">,</span><span class="n">rep_num</span><span class="p">)</span>
+
+            <span class="c1">#empty segment if type is invalid for example</span>
+            <span class="k">if</span> <span class="n">sgmnt</span><span class="o">.</span><span class="n">is_empty</span><span class="p">():</span> <span class="k">return</span>
+
+            <span class="n">sgmnt</span><span class="o">.</span><span class="n">trail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trail_running</span>
+
+            <span class="n">dictkey</span><span class="o">=</span><span class="n">sgmnt</span><span class="o">.</span><span class="n">type</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">dictkey</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sgmnt</span><span class="o">.</span><span class="n">distance</span>
+
+            <span class="k">if</span> <span class="n">sgmnt</span><span class="o">.</span><span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">dictkey</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sgmnt</span><span class="o">.</span><span class="n">time</span>
+
+            <span class="n">sgmnt</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_structure</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sgmnt</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SingleRun.fill_basic_runtype_info_with_global_type"><a class="viewcode-back" href="../../../single_run.html#runninglog.single_run.single_run.SingleRun.fill_basic_runtype_info_with_global_type">[docs]</a>    <span class="k">def</span> <span class="nf">fill_basic_runtype_info_with_global_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Only applied when no structure was found</span>
+
+<span class="sd">            It requires self.type, self.total_distance and self.total_time</span>
+<span class="sd">            to be set beforehand</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dictkey</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">type_val</span> <span class="o">=</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">type_val</span> <span class="ow">in</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k1</span><span class="p">,</span><span class="n">v1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">type_val</span><span class="o">==</span><span class="n">v1</span><span class="p">:</span> 
+                    <span class="n">dictkey</span> <span class="o">=</span> <span class="n">k1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dictkey</span> <span class="o">=</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">E</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">dictkey</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">dictkey</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="o">*</span> <span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">dictkey</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span></div>
+
+    <span class="k">def</span> <span class="nf">compute_avg_pace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">redistribute_distances_and_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#Assign non-assigned distances to &#39;E&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">E</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_distance</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="n">assigned_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">tm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">assigned_time</span> <span class="o">+=</span> <span class="n">tm</span>
+
+        <span class="n">unassigned_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time</span><span class="o">*</span><span class="mi">60</span> <span class="o">-</span> <span class="n">assigned_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_ENUM</span><span class="o">.</span><span class="n">E</span><span class="p">]</span> <span class="o">+=</span> <span class="n">unassigned_time</span>
+
+    <span class="k">def</span> <span class="nf">compute_basic_types_avg_paces</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">basic_pace</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_time</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">basic_dist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+                <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">runninglog</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../all_runs.html">All_runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../single_run.html">Single_run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../segment.html">Segment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../runTypes.html">runTypes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, D.Lecina.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

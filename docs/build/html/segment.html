@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Segment &#8212; runninglog 0.8 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="runTypes" href="runTypes.html" />
+    <link rel="prev" title="Single_run" href="single_run.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <span class="target" id="module-runninglog.single_run.segment"></span><dl class="py class">
+<dt id="runninglog.single_run.segment.Segment">
+<em class="property">class </em><code class="sig-prename descclassname">runninglog.single_run.segment.</code><code class="sig-name descname">Segment</code><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic run element of a given type.
+It must have a type and a distance. The rest of parameters are optional
+A single run may contain from none to an indefinite number of them.</p>
+<dl class="py method">
+<dt id="runninglog.single_run.segment.Segment.as_dict">
+<code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts segment into dictionary.
+This is later used to build a panda’s DataFrame representation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.segment.Segment.fill_segment">
+<code class="sig-name descname">fill_segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">segment_dict</span></em>, <em class="sig-param"><span class="n">repetition_number</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.fill_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.fill_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills the segment with the data in the dictionary</p>
+<p>Fills the segment with the data in the input dictionary.
+A segment type and a distance must be provided. The rest of
+parameters are optional but further analysis can be performed
+when provided (e.g. pace analysis or vspeed analysis).</p>
+<p>When one of pace or time are given, the other one is computed
+When both are given, pace is used to compute the time in order
+to enseure consistency. As expected, if none are given, they
+are left unfilled</p>
+<dl class="simple">
+<dt>Units:</dt><dd><p>distance: km
+time:
+pace: seconds/km
+vspeed: m/h</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>segment_dict</strong> (<em>dict</em>) – Dictionary containing segment information</p></li>
+<li><p><strong>repetition_number</strong> (<em>int</em>) – Repetition number within a workout</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Dictionary keys are defined in constants.blockNames</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.segment.Segment.is_empty">
+<code class="sig-name descname">is_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if segment is empty</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.segment.Segment.parse_distance">
+<code class="sig-name descname">parse_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dist</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.parse_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.parse_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses distance</p>
+<p>It parses the segment distance from the input argument in dist
+Distance must be given in km</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dist</strong> (<em>int</em><em> or </em><em>str</em>) – distance in int or str format</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pace in seconds/km</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only the numerical part is extracted
+Hence 10km is interpreted in the same way as 10m</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.segment.Segment.parse_pace">
+<code class="sig-name descname">parse_pace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pace</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.parse_pace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.parse_pace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses pace</p>
+<p>It parses the segment pace from the input argument pace</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pace</strong> (<em>int</em><em> or </em><em>str</em>) – If pace is an integer, it is supposed
+to be in seconds/km. If it is a string it is supposed
+to be in minutes:seconds/km</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pace in seconds/km</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.segment.Segment.parse_time">
+<code class="sig-name descname">parse_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.parse_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.parse_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses time</p>
+<p>It parses the segment time from the input argument pace and
+returns it in minutes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>time_str</strong> (<em>str</em>) – string with XXh XXmin XXsec format</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>time in minutes</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The hour can be written as: ‘h’ or ‘hr’
+The minutes can be written as: ‘min’, ‘mi’, ‘mn’ or ‘m’
+Seconds can be written as: ‘s’</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.segment.Segment.parse_type">
+<code class="sig-name descname">parse_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.parse_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.parse_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses type</p>
+<p>It parses the segment type from the input argument</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>type_str</strong> (<em>str</em>) – string type</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>run type in BASIC_RUN_TYPES_DICTIONARY.
+If not found, returns None</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="segment">
+<h1>Segment<a class="headerlink" href="#segment" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">runninglog</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="all_runs.html">All_runs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="single_run.html">Single_run</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Segment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runTypes.html">runTypes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="single_run.html" title="previous chapter">Single_run</a></li>
+      <li>Next: <a href="runTypes.html" title="next chapter">runTypes</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, D.Lecina.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/segment.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

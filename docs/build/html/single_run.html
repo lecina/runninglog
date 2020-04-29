@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Single_run &#8212; runninglog 0.8 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Segment" href="segment.html" />
+    <link rel="prev" title="All_runs" href="all_runs.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <span class="target" id="module-runninglog.single_run.single_run"></span><dl class="py class">
+<dt id="runninglog.single_run.single_run.SingleRun">
+<em class="property">class </em><code class="sig-prename descclassname">runninglog.single_run.single_run.</code><code class="sig-name descname">SingleRun</code><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.as_dict">
+<code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.as_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts segment into dictionary.
+This is later used to build a panda’s DataFrame representation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_basic_runtype_info_with_global_type">
+<code class="sig-name descname">fill_basic_runtype_info_with_global_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_basic_runtype_info_with_global_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_basic_runtype_info_with_global_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only applied when no structure was found</p>
+<p>It requires self.type, self.total_distance and self.total_time
+to be set beforehand</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.parse_type">
+<code class="sig-name descname">parse_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.parse_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.parse_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parses run type. If not found, set it to E.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="single-run">
+<h1>Single_run<a class="headerlink" href="#single-run" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">runninglog</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="all_runs.html">All_runs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Single_run</a></li>
+<li class="toctree-l1"><a class="reference internal" href="segment.html">Segment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="runTypes.html">runTypes</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="all_runs.html" title="previous chapter">All_runs</a></li>
+      <li>Next: <a href="segment.html" title="next chapter">Segment</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, D.Lecina.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/single_run.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -92,10 +92,10 @@ class TestSegment(unittest.TestCase):
         parsed_time = sgmnt.parse_pace(240)
         self.assertEqual(parsed_time, 240)
 
-    def test_create_segment(self):
+    def test_fill_segment(self):
         dictionary = {"type":"R", "distance":0.5, "pace":"3:15"}
         sgmnt = segment.Segment()
-        sgmnt.create_segment(dictionary,repetition_number=1)
+        sgmnt.fill_segment(dictionary,repetition_number=1)
 
         self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES_ENUM.R)
         self.assertEqual(sgmnt.distance, 0.5)
@@ -106,10 +106,10 @@ class TestSegment(unittest.TestCase):
         self.assertEqual(sgmnt.date, None)
         self.assertEqual(sgmnt.repetition, 1)
 
-    def test_create_segment2(self):
+    def test_fill_segment2(self):
         dictionary = {"type":"I", "distance":1, "time":"3min15sec", "climb":10, "bpm":160, "date":"31-01-2020"}
         sgmnt = segment.Segment()
-        sgmnt.create_segment(dictionary,repetition_number=2)
+        sgmnt.fill_segment(dictionary,repetition_number=2)
 
         self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES_ENUM.I)
         self.assertEqual(sgmnt.distance, 1)
@@ -120,10 +120,10 @@ class TestSegment(unittest.TestCase):
         self.assertEqual(sgmnt.date, datetime.datetime.strptime("31-01-2020", "%d-%m-%Y").date())
         self.assertEqual(sgmnt.repetition, 2)
 
-    def test_create_segment3(self):
+    def test_fill_segment3(self):
         dictionary = {"type":"T", "distance" : 2.99, "pace":"12:21", "bpm":172, "time":"37min05sec"}
         sgmnt = segment.Segment()
-        sgmnt.create_segment(dictionary,repetition_number=2)
+        sgmnt.fill_segment(dictionary,repetition_number=2)
 
         self.assertEqual(sgmnt.type, runTypes.BASIC_RUN_TYPES_ENUM.T)
         self.assertEqual(sgmnt.distance, 2.99)

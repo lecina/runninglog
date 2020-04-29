@@ -277,10 +277,11 @@ class SingleRun(segment.Segment):
         #If run_type is not found, set it to E
         return runTypes.RUN_TYPES.E
 
+    #TODO:change this. split in two functions. Create segments. then fill into with dict
     def fill_basic_runtype_info_with_dict(self, struct_list_dict):
         for rep_num,item in enumerate(struct_list_dict):
             sgmnt = segment.Segment()
-            sgmnt.create_segment(item,rep_num)
+            sgmnt.fill_segment(item,rep_num)
 
             #empty segment if type is invalid for example
             if sgmnt.is_empty(): return

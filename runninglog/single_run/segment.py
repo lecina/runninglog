@@ -6,11 +6,16 @@ import sys
 from runninglog.constants import blockNames
 from runninglog.single_run import runTypes
 
+
 class Segment:
+    """ Basic run element of a given type.
+    It must have a type and a distance. The rest of parameters are optional
+    A single run may contain from none to an indefinite number of them.
+    """
     def __init__(self):
         self.type = None
         self.trail = False
-        self.distance = None
+        self.distance = 0
         self.time = None
         self.pace = None
         self.climb = 0
@@ -21,51 +26,63 @@ class Segment:
         self.feeling = 0
 
     def __str__(self):
-        str_to_return = ""
+        str_ = []
         if self.date is not None:
-            str_to_return += "Date: %s\n"%self.date
+            str_.append(f"Date: self.date")
 
-        str_to_return += "Repetition: %s\n"%self.repetition
-        str_to_return += "Type: %s\n"%runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type]
+        str_.append(f"Repetition: {self.repetition}")
 
-        if self.trail == True:
-            str_to_return += "Trail running segment\n"
+        if self.type is None:
+            str_.append("Type: not yet defined")
+        else:
+            type_ = runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type]
+            str_.append(f"Type: {type_}")
 
-        str_to_return += "Feeling: %d\n"%self.feeling
+        if self.trail:
+            str_.append("Trail running segment")
+
+        str_.append(f"Feeling: {self.feeling}")
 
         try:
-            str_to_return += "Time: %dmin\n"%self.time
-        except:
+            str_.append("Time: {:.0f}min".format(self.time))
+        except TypeError:
             pass
-        str_to_return += "Distance: %.2fkm\n"%self.distance
-        str_to_return += "\nClimb: %d\n"%self.climb
+        str_.append("Distance: {:0.2f}km".format(self.distance))
+        str_.append("Climb: {:d}".format(self.climb))
         try:
-            str_to_return += "Pace: %d (in sec/km)\n"%self.avg_pace
-        except:
+            str_.append("Pace: {:d} (in sec/km)".format(self.pace))
+        except TypeError:
             pass
-        str_to_return += "\nVert. speed:: %.0f\n"%self.vspeed
+        str_.append("Vert. speed:: {:.0f}".format(self.vspeed))
 
-        return str_to_return
+        return "\n".join(str_)
 
     def as_dict(self):
+        """ Converts segment into dictionary.
+        This is later used to build a panda's DataFrame representation
+        """
+        type_ = runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type]
         rdict = {
-            blockNames.Colnames.type :  runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type],
-            blockNames.Colnames.trail : self.trail,
-            blockNames.Colnames.feeling : self.feeling,
-            blockNames.Colnames.time : self.time,
-            blockNames.Colnames.distance : self.distance,
-            blockNames.Colnames.avg_pace : self.pace,
-            blockNames.Colnames.climb : self.climb,
-            blockNames.Colnames.bpm : self.bpm,
-            blockNames.Colnames.date : self.date,
-            blockNames.Colnames.repetition : self.repetition
+            blockNames.Colnames.type: type_,
+            blockNames.Colnames.trail: self.trail,
+            blockNames.Colnames.feeling: self.feeling,
+            blockNames.Colnames.time: self.time,
+            blockNames.Colnames.distance: self.distance,
+            blockNames.Colnames.avg_pace: self.pace,
+            blockNames.Colnames.climb: self.climb,
+            blockNames.Colnames.bpm: self.bpm,
+            blockNames.Colnames.date: self.date,
+            blockNames.Colnames.repetition: self.repetition
         }
         return rdict
 
     def is_empty(self):
+        """
+        Checks if segment is empty
+        """
         return (self.type is None and
                 self.trail is False and
-                self.distance is None and
+                self.distance == 0 and
                 self.time is None and
                 self.pace is None and
                 self.climb == 0 and
@@ -74,42 +91,75 @@ class Segment:
                 self.feeling == 0 and
                 self.repetition == 0)
 
-    def create_segment(self, segment_dict, repetition_number=0):
-        #Type and distance are compulsory
-        #the rest are optional
+    def fill_segment(self, segment_dict, repetition_number=0):
+        """Fills the segment with the data in the dictionary
+
+        Fills the segment with the data in the input dictionary.
+        A segment type and a distance must be provided. The rest of
+        parameters are optional but further analysis can be performed
+        when provided (e.g. pace analysis or vspeed analysis).
+
+        When one of pace or time are given, the other one is computed
+        When both are given, pace is used to compute the time in order
+        to enseure consistency. As expected, if none are given, they
+        are left unfilled
+
+
+        Units:
+            distance: km
+            time: seconds
+            pace: seconds/km
+            vspeed: m/h
+
+        Args:
+            segment_dict (dict): Dictionary containing segment information
+            repetition_number (int): Repetition number within a workout
+
+        Note:
+            Dictionary keys are defined in constants.blockNames
+        """
         item_dict = dict((k.lower(), v) for k, v in segment_dict.items())
 
-        parsed_type = self.parse_type(item_dict[blockNames.FileParams.type])
+        # Parsing compulsory elements
+        # Type
+        type_ = item_dict[blockNames.FileParams.type]
+        parsed_type = self.parse_type(type_)
         if parsed_type is not None:
             self.type = parsed_type
         else:
-            sys.exit("Unknown run type in segment: %s"%item_dict[blockNames.FileParams.type])
+            error = "Unknown type in segment: {}, repetition:{}".format(
+                                                            type_,
+                                                            repetition_number
+            )
+            raise ValueError(error)
 
-        #distance is compulsory
-        self.distance = self.parse_distance(item_dict[blockNames.FileParams.distance])
+        # Distance
+        str_distance = item_dict[blockNames.FileParams.distance]
+        self.distance = self.parse_distance(str_distance)
 
         self.repetition = repetition_number
 
-        #date is passed
+        # Date
         try:
             self.date = self.parse_date(item_dict[blockNames.FileParams.date])
         except KeyError:
             pass
 
+        # Climb
         try:
             self.climb = item_dict[blockNames.FileParams.climb]
         except KeyError:
             pass
 
+        # BPM
         try:
             self.bpm = item_dict[blockNames.FileParams.bpm]
         except KeyError:
             pass
 
-        #When only pace or time are given, the other one is guessed
-        #When both are given, pace is used to compute the time in order
-        #to ensure consistency
-        #If none is given, then do nothing
+        # Pace and time.
+        # If one is given, the other is computed.
+        # If both are given, pace is used to compute time for consistency
         try:
             pace_str = item_dict[blockNames.FileParams.pace]
         except KeyError:
@@ -131,32 +181,42 @@ class Segment:
             parsed_pace = None
 
         if self.time is not None:
-            self.vspeed = int(self.climb * 3600./ self.time) #vspeed in m/h
+            self.vspeed = int(self.climb * 3600. / self.time)  # vspeed in m/h
 
     def parse_type(self, type_str):
+        """Parses type
+
+            It parses the segment type from the input argument
+
+            Args:
+                type_str (str): string type
+
+            Returns:
+                int: run type in BASIC_RUN_TYPES_DICTIONARY.
+                If not found, returns None
+
         """
-            Parses run type. If not found, return None
-        """
-        for (runType, runTypeBlockname) in runTypes.BASIC_RUN_TYPES_DICTIONARY.items():
+        for (runType, runTypeBlockname) in\
+                runTypes.BASIC_RUN_TYPES_DICTIONARY.items():
             if type_str == runTypeBlockname:
                 return runType
 
         return None
 
     def parse_date(self, date_str):
-        fmt="%d/%m/%Y"
+        fmt = "%d/%m/%Y"
         try:
             dateObj = datetime.datetime.strptime(date_str, fmt)
         except ValueError:
-            fmt="%d/%m/%y"
+            fmt = "%d/%m/%y"
             try:
                 dateObj = datetime.datetime.strptime(date_str, fmt)
             except ValueError:
-                fmt="%d-%m-%Y"
+                fmt = "%d-%m-%Y"
                 try:
                     dateObj = datetime.datetime.strptime(date_str, fmt)
                 except ValueError:
-                    fmt="%d-%m-%y"
+                    fmt = "%d-%m-%y"
                     try:
                         dateObj = datetime.datetime.strptime(date_str, fmt)
                     except ValueError:
@@ -164,47 +224,85 @@ class Segment:
         return dateObj.date()
 
     def parse_time(self, time_str):
+        """Parses time
+
+            It parses the segment time from the input argument pace and
+            returns it in minutes
+
+            Args:
+                time_str (str): string with XXh XXmin XXsec format
+
+            Returns:
+                int: time in minutes
+
+            Note:
+                The hour can be written as: 'h' or 'hr'
+                The minutes can be written as: 'min', 'mi', 'mn' or 'm'
+                Seconds can be written as: 's'
         """
-            Parses time and returns it in minutes
-        """
-        #solution based on https://stackoverflow.com/questions/4628122/how-to-construct-a-timedelta-object-from-a-simple-string
-        #work out regex a little bit more: only math r if h was matched
-        regex = re.compile(r'((?P<hours>\d+?)h)?([r])?((?P<minutes>\d+?)m)?([i])?([n])?((?P<seconds>\d+?)s)?')
+        regex = re.compile(r'((?P<hours>\d+?)hr?)?'
+                           r'((?P<minutes>\d+?)m)?([i])?([n])?'
+                           r'((?P<seconds>\d+?)s)?')
         time_str = time_str.replace(" ", "")
         time = regex.search(time_str).groupdict()
 
         time_in_minutes = 0
-        if time["hours"] is not None: 
-            time_in_minutes += int(time["hours"]) * 60 
-        if time["minutes"] is not None: 
+        if time["hours"] is not None:
+            time_in_minutes += int(time["hours"]) * 60
+        if time["minutes"] is not None:
             time_in_minutes += int(time["minutes"])
-        if time["seconds"] is not None: 
+        if time["seconds"] is not None:
             time_in_minutes += float(time["seconds"])/60
 
         return time_in_minutes
 
-    def parse_distance(self, dist_str):
-        """
-            Parses distance and returns it in km
-        """
-        if isinstance(dist_str, numbers.Number):
-            return dist_str #not actually a string
+    def parse_distance(self, dist):
+        """Parses distance
 
-        regex = re.compile(r'((?P<km>\d(.\d+)?))?')
-        dist = regex.search(dist_str).groupdict()
+            It parses the segment distance from the input argument in dist
+            Distance must be given in km
 
-        return float(dist["km"])
-    
-    def parse_pace(self, pace_str):
-        if pace_str is None:
+            Args:
+                dist (int or str): distance in int or str format
+
+            Returns:
+                int: pace in seconds/km
+
+            Note:
+                Only the numerical part is extracted
+                Hence 10km is interpreted in the same way as 10m
+        """
+        # If it is a number, do not preprocess
+        if isinstance(dist, numbers.Number):
+            return dist
+
+        regex = re.compile(r'((?P<km>\d+(.\d+)?))?')
+        distance = regex.search(dist).groupdict()
+
+        return float(distance["km"])
+
+    def parse_pace(self, pace):
+        """Parses pace
+
+            It parses the segment pace from the input argument pace
+
+            Args:
+                pace (int or str): If pace is an integer, it is supposed
+                    to be in seconds/km. If it is a string it is supposed
+                    to be in minutes:seconds/km
+            Returns:
+                int: pace in seconds/km
+        """
+        if pace is None:
             return None
 
-        if isinstance(pace_str, numbers.Number):
-            return pace_str #not a string
+        # If it is a number, do not preprocess
+        if isinstance(pace, numbers.Number):
+            return pace
 
         regex = re.compile(r'((?P<min>\d+):(?P<sec>\d+?))$')
-        pace_dict = regex.search(pace_str).groupdict()
+        pace_dict = regex.search(pace).groupdict()
 
-        pace = int(pace_dict["min"])*60 + int(pace_dict["sec"])
+        parsed_pace = int(pace_dict["min"])*60 + int(pace_dict["sec"])
 
-        return pace
+        return parsed_pace

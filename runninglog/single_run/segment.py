@@ -8,7 +8,7 @@ from runninglog.single_run import runTypes
 
 
 class Segment:
-    """ Basic run element of a given type.
+    """Basic run element of a given type.
     It must have a type and a distance. The rest of parameters are optional
     A single run may contain from none to an indefinite number of them.
     """

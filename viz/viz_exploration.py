@@ -10,9 +10,9 @@ import umap
 import pandas as pd
 import numpy as np
 
-from src.utilities import utilities
-from src.constants import blockNames
-from src.single_run import runTypes
+from runninglog.utilities import utilities
+from runninglog.constants import blockNames
+from runninglog.run import types
 
 try:
     from viz.viz_constants import viz_constants
@@ -88,11 +88,11 @@ def update_umap_explain_figure(df, cols, title, logColors=False):
 def update_distr_plot_figure(df, col, title=None, agg_all=False):
     if not agg_all:
         runTypesToColors = viz_constants.get_runType_colors()
-        groups = runTypes.RUNNING_ACTIVITIES
+        groups = types.RUNNING_ACTIVITIES
         colors = [runTypesToColors[type] for type in groups]
         x = [df[df.type == type][col] for type in groups]
     else:
-        df_notX = df[df.type.isin(runTypes.RUNNING_ACTIVITIES)]
+        df_notX = df[df.type.isin(types.RUNNING_ACTIVITIES)]
 
         years = set(df_notX.date.dt.year)
 
@@ -154,7 +154,6 @@ def main():
                 dcc.Graph(id='umap_graph_pace', figure=update_umap_explain_figure(df, cols, 'avg_pace', logColors=True))
             ], style={'width':'20%', 'display':'inline-block'})
         ], style={'width':'100%', 'display':'block', 'margin':'auto'}),
-        ], style={'width':'20%'}),
         html.Div([
             html.H3("Variable relation"),
             html.Div([

@@ -1,7 +1,7 @@
-from src.constants import blockNames
-from src.single_run import runTypes
-
 import numpy as np
+
+from runninglog.constants import blockNames
+from runninglog.run import types
 
 def get_runType_colors():
     runType_colors = {  
@@ -45,14 +45,14 @@ def get_year_marks(df):
 def get_activities_from_checklist(chosen_activity_types):
     chosen_types = []
     if 'Running' in chosen_activity_types:
-        chosen_types = runTypes.RUNNING_ACTIVITIES[:]
+        chosen_types = types.RUNNING_ACTIVITIES[:]
     if 'X' in chosen_activity_types:
         chosen_types.append(blockNames.RunTypes.X)
     if 'XB' in chosen_activity_types:
         chosen_types.append(blockNames.RunTypes.XB)
 
     if chosen_types == []:
-        chosen_types = runTypes.RUNNING_ACTIVITIES[:]
+        chosen_types = types.RUNNING_ACTIVITIES[:]
 
     return chosen_types
 

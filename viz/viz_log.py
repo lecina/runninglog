@@ -10,8 +10,8 @@ import base64
 import pandas as pd
 import numpy as np
 
-from src.constants import blockNames
-from src.single_run import runTypes
+from runninglog.constants import blockNames
+from runninglog.run import types
 
 try:
     from viz.viz_constants import viz_constants
@@ -655,7 +655,7 @@ def main():
 
 
         #count road/trail #runs and distance
-        df_running = filt_df[filt_df.type.isin(runTypes.RUNNING_ACTIVITIES)][['date', 'distance', 'trail']]
+        df_running = filt_df[filt_df.type.isin(types.RUNNING_ACTIVITIES)][['date', 'distance', 'trail']]
         df_running.trail = df_running.trail.astype('int')
         df_running.reset_index(drop=True, inplace=True)
         df_running = df_running.groupby('trail').resample(agg_option, on='date').agg({'distance':'sum', 'trail':'size'})
@@ -694,7 +694,7 @@ def main():
         df_agg.vspeed.astype('int')
 
         #running avg pace
-        df_agg_notX = filt_df[filt_df.type.isin(runTypes.RUNNING_ACTIVITIES)][needed_cols].resample(agg_option, on='date').sum()
+        df_agg_notX = filt_df[filt_df.type.isin(types.RUNNING_ACTIVITIES)][needed_cols].resample(agg_option, on='date').sum()
         df_agg_notX['run_avg_pace'] = df_agg_notX['time']*60/df_agg_notX['distance']
 
         df_agg = pd.concat([df_agg, df_agg_notX['run_avg_pace']], axis=1)
@@ -856,11 +856,11 @@ def main():
                     hovertext = df_agg[:][yaxis_colname],
                     marker={ 'color': runTypesToColors[i] },
                     name=i
-                ) for i in runTypes.BASIC_RUN_TYPES + runTypes.NON_RUNNING_ACTIVITIES
+                ) for i in types.BASIC_RUN_TYPES + types.NON_RUNNING_ACTIVITIES
             ]
         elif yaxis_colname in ('distance road vs trail'):
             str_template = 'distance_%s'
-            types = ['road', 'trail']
+            rtypes = ['road', 'trail']
             colors = {'road':'#5557a6', 'trail':'#10931c'}
             traces = [
                 go.Bar(
@@ -870,7 +870,7 @@ def main():
                     hovertext = df_agg[:]['distance'],
                     marker={ 'color': colors[i] },
                     name=i
-                ) for i in types
+                ) for i in rtypes
             ]
         else:
             traces = [

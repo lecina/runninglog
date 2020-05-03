@@ -4,7 +4,7 @@ import numbers
 import sys
 
 from runninglog.constants import blockNames
-from runninglog.single_run import runTypes
+from runninglog.run import types
 
 
 class Segment:
@@ -44,7 +44,7 @@ class Segment:
         if self.type is None:
             str_.append("Type: not yet defined")
         else:
-            type_ = runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type]
+            type_ = types.BASIC_RUN_TYPES_DICTIONARY[self.type]
             str_.append(f"Type: {type_}")
 
         if self.is_trail_running:
@@ -79,7 +79,7 @@ class Segment:
         """ Converts segment into dictionary.
         This is later used to build a panda's DataFrame representation
         """
-        type_ = runTypes.BASIC_RUN_TYPES_DICTIONARY[self.type]
+        type_ = types.BASIC_RUN_TYPES_DICTIONARY[self.type]
         rdict = {
             blockNames.Colnames.type: type_,
             blockNames.Colnames.trail: self.is_trail_running,
@@ -229,7 +229,7 @@ class Segment:
 
         """
         for (runType, runTypeBlockname) in\
-                runTypes.BASIC_RUN_TYPES_DICTIONARY.items():
+                types.BASIC_RUN_TYPES_DICTIONARY.items():
             if type_str == runTypeBlockname:
                 return runType
 

@@ -2,22 +2,22 @@ import unittest
 import datetime
 
 import context
-from runninglog.single_run import single_run
-from runninglog.single_run import segment
-from runninglog.single_run import runTypes
+from runninglog.run import single
+from runninglog.run import segment
+from runninglog.run import types
 from runninglog.constants import blockNames
 
 
 class TestSingleRun(unittest.TestCase):
     def test_compute_avg_pace(self):
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
         singleRun.distance = 10
         singleRun.time = 40
         avg_pace = singleRun.compute_avg_pace()
         self.assertEqual(avg_pace, 240)
 
     def test_fill_segments(self):
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         input_dict = [
             {"type":"E", "distance" : 2.36},
@@ -40,7 +40,7 @@ class TestSingleRun(unittest.TestCase):
 
     def test_fill_segments_empty_segment(self):
         # Goal: assert that empty segments are not added
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         # First segment does not match a known type
         input_dict = [
@@ -66,7 +66,7 @@ class TestSingleRun(unittest.TestCase):
         # tested in the segment's tests, but explicitly added
         # here as a remark
 
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         # First segment has an invalid type
         input_dict = [
@@ -81,7 +81,7 @@ class TestSingleRun(unittest.TestCase):
     def test_fill_dist_and_time_dictionaries(self):
         #Single run type is not passed to the structure
 
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         input_dict = [
             {"type":"E", "distance":2.36},
@@ -96,16 +96,16 @@ class TestSingleRun(unittest.TestCase):
         golden_basic_dist = {}
         golden_basic_time = {}
         golden_basic_pace = {}
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             golden_basic_dist[i] = 0
             golden_basic_time[i] = 0
             golden_basic_pace[i] = None
 
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 4.56
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 5.84
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 1378.24
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.E] = 4.56
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.T] = 5.84
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.T] = 1378.24
 
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.assertAlmostEqual(
                             singleRun.basic_dist[i],
                             golden_basic_dist[i],
@@ -120,18 +120,18 @@ class TestSingleRun(unittest.TestCase):
                             2)
 
     def test_assign_spare_distance_and_time_to_easy_basic_type(self):
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         #Equivalent distance and time distributions to structure:
         #[
         #    {"type":"M", "distance":10.0, "time":"40min"},
         #    {"type":"T", "distance":5.0, "time":"17min"}
         #]
-        singleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 10
-        singleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 5
-        singleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 40*60
-        singleRun.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 17*60
-        singleRun.type = runTypes.BASIC_RUN_TYPES_ENUM.E
+        singleRun.basic_dist[types.BASIC_RUN_TYPES_ENUM.M] = 10
+        singleRun.basic_dist[types.BASIC_RUN_TYPES_ENUM.T] = 5
+        singleRun.basic_time[types.BASIC_RUN_TYPES_ENUM.M] = 40*60
+        singleRun.basic_time[types.BASIC_RUN_TYPES_ENUM.T] = 17*60
+        singleRun.type = types.BASIC_RUN_TYPES_ENUM.E
         singleRun.distance = 20
         singleRun.time = 82
 
@@ -139,20 +139,20 @@ class TestSingleRun(unittest.TestCase):
 
         golden_basic_dist = {}
         golden_basic_time = {}
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             golden_basic_dist[i] = 0
             golden_basic_time[i] = 0
 
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 10
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 5
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 40*60
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 17*60
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.M] = 10
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.T] = 5
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.M] = 40*60
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.T] = 17*60
         #See singleRun distance and time
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 5
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 25*60
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.E] = 5
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.E] = 25*60
 
 
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.assertAlmostEqual(
                             singleRun.basic_dist[i],
                             golden_basic_dist[i],
@@ -163,7 +163,7 @@ class TestSingleRun(unittest.TestCase):
                             2)
 
     def test_load_json1(self):
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         parsed_json = {
                         "type": "T",
@@ -198,19 +198,19 @@ class TestSingleRun(unittest.TestCase):
         golden_basic_dist = {}
         golden_basic_time = {}
         golden_basic_pace = {}
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             golden_basic_dist[i] = 0
             golden_basic_time[i] = 0
             golden_basic_pace[i] = None
 
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 7.96
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 5.84
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 3121.76
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 1378.24
-        golden_basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 392.1809
-        golden_basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = 236
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.E] = 7.96
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.T] = 5.84
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.E] = 3121.76
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.T] = 1378.24
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.E] = 392.1809
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.T] = 236
 
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.assertAlmostEqual(
                             singleRun.basic_dist[i],
                             golden_basic_dist[i],
@@ -227,7 +227,7 @@ class TestSingleRun(unittest.TestCase):
 
 
     def test_load_json2(self):
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         parsed_json = {
                         "type": "E",
@@ -251,16 +251,16 @@ class TestSingleRun(unittest.TestCase):
         golden_basic_dist = {}
         golden_basic_time = {}
         golden_basic_pace = {}
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             golden_basic_dist[i] = 0
             golden_basic_time[i] = 0
             golden_basic_pace[i] = None
 
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 15
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 75*60
-        golden_basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 300
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.E] = 15
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.E] = 75*60
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.E] = 300
 
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.assertAlmostEqual(
                             singleRun.basic_dist[i],
                             golden_basic_dist[i],
@@ -276,7 +276,7 @@ class TestSingleRun(unittest.TestCase):
 
     def test_load_json3(self):
         # All dist/time/pace are assigned to key X in dictionary
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         parsed_json = {
                         "type": "X",
@@ -299,16 +299,16 @@ class TestSingleRun(unittest.TestCase):
         golden_basic_dist = {}
         golden_basic_time = {}
         golden_basic_pace = {}
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             golden_basic_dist[i] = 0
             golden_basic_time[i] = 0
             golden_basic_pace[i] = None
 
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.X] = 15
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.X] = 75*60
-        golden_basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.X] = 300
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.X] = 15
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.X] = 75*60
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.X] = 300
 
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.assertAlmostEqual(
                             singleRun.basic_dist[i],
                             golden_basic_dist[i],
@@ -326,7 +326,7 @@ class TestSingleRun(unittest.TestCase):
         # We can assign data to any basic type with an X activity.
         # In the case of cross training activities, the remaining
         # is assigned to the cross training activity type
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         parsed_json = {
                         "type": "X",
@@ -351,19 +351,19 @@ class TestSingleRun(unittest.TestCase):
         golden_basic_dist = {}
         golden_basic_time = {}
         golden_basic_pace = {}
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             golden_basic_dist[i] = 0
             golden_basic_time[i] = 0
             golden_basic_pace[i] = None
 
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 12
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.X] = 4
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M] = 60*60
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.X] = 15*60
-        golden_basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M] = 300
-        golden_basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.X] = 225
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.M] = 12
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.X] = 4
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.M] = 60*60
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.X] = 15*60
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.M] = 300
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.X] = 225
 
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.assertAlmostEqual(
                             singleRun.basic_dist[i],
                             golden_basic_dist[i],
@@ -380,7 +380,7 @@ class TestSingleRun(unittest.TestCase):
     def test_load_json5(self):
         # Although the single run is of type T, the spare
         # time and distance is assigned to the E type
-        singleRun = single_run.SingleRun()
+        singleRun = single.SingleRun()
 
         parsed_json = {
                         "type": "T",
@@ -406,19 +406,19 @@ class TestSingleRun(unittest.TestCase):
         golden_basic_dist = {}
         golden_basic_time = {}
         golden_basic_pace = {}
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             golden_basic_dist[i] = 0
             golden_basic_time[i] = 0
             golden_basic_pace[i] = None
 
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 4
-        golden_basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T] = 10
-        golden_basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E] = 300
-        golden_basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T] = 240
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E] = 20*60
-        golden_basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T] = 40*60
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.E] = 4
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.T] = 10
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.E] = 300
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.T] = 240
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.E] = 20*60
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.T] = 40*60
 
-        for i in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.assertAlmostEqual(
                             singleRun.basic_dist[i],
                             golden_basic_dist[i],

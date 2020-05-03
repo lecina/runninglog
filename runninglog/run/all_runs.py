@@ -8,7 +8,7 @@ import umap
 from sklearn.preprocessing import MinMaxScaler
 
 from runninglog.reader import reader
-from runninglog.single_run import single_run
+from runninglog.run import single
 from runninglog.constants import constants, blockNames
 from runninglog.utilities import utilities
 
@@ -25,12 +25,12 @@ class AllRuns():
         if blockNames.FileParams.list in parsed_json.keys():
             singleRuns = []
             for json_dir in parsed_json[blockNames.FileParams.list]:
-                singleRun = single_run.SingleRun()
+                singleRun = single.SingleRun()
                 singleRun.load_json(json_dir)
                 singleRuns.append(singleRun)
             return singleRuns
         else:
-            singleRun = single_run.SingleRun()
+            singleRun = single.SingleRun()
             singleRun.load_json(parsed_json)
             return singleRun
 

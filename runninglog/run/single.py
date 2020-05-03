@@ -7,8 +7,8 @@ import pandas as pd
 
 from runninglog.constants import blockNames
 from runninglog.utilities import utilities
-from runninglog.single_run import runTypes
-from runninglog.single_run import segment
+from runninglog.run import types
+from runninglog.run import segment
 
 
 class SingleRun(segment.Segment):
@@ -97,10 +97,10 @@ class SingleRun(segment.Segment):
             str_.append(f"Route: -")
 
         try:
-            str_.append(f"Type: {runTypes.RUN_TYPES_DICTIONARY[self.type]}")
+            str_.append(f"Type: {types.RUN_TYPES_DICTIONARY[self.type]}")
         except KeyError:
-            easy = runTypes.RUN_TYPES_DICTIONARY[
-                                runTypes.BASIC_RUN_TYPES_ENUM.E]
+            easy = types.RUN_TYPES_DICTIONARY[
+                                types.BASIC_RUN_TYPES_ENUM.E]
             str_.append(f"Type: {easy}") 
 
         if self.is_trail_running:
@@ -134,13 +134,13 @@ class SingleRun(segment.Segment):
         str_.append("Stats by training speeds:")
         str_.append("=========================\n")
 
-        print_dist = {runTypes.BASIC_RUN_TYPES_DICTIONARY[t]:d for (t,d) in self.basic_dist.items() if d != 0}
+        print_dist = {types.BASIC_RUN_TYPES_DICTIONARY[t]:d for (t,d) in self.basic_dist.items() if d != 0}
         str_.append(f"Distances (km): {print_dist}")
 
-        print_time = {runTypes.BASIC_RUN_TYPES_DICTIONARY[t]:tm for (t,tm) in self.basic_time.items() if tm != 0}
+        print_time = {types.BASIC_RUN_TYPES_DICTIONARY[t]:tm for (t,tm) in self.basic_time.items() if tm != 0}
         str_.append(f"Times (sec): {print_time}")
 
-        print_pace = {runTypes.BASIC_RUN_TYPES_DICTIONARY[t]:p for (t,p) in self.basic_pace.items() if p != 0}
+        print_pace = {types.BASIC_RUN_TYPES_DICTIONARY[t]:p for (t,p) in self.basic_pace.items() if p != 0}
         str_.append(f"Paces (sec/km): {print_pace}")
 
         return "\n".join(str_)
@@ -150,7 +150,7 @@ class SingleRun(segment.Segment):
         This is later used to build a panda's DataFrame representation
         """
         rdict = {
-            blockNames.Colnames.type:runTypes.RUN_TYPES_DICTIONARY[self.type],
+            blockNames.Colnames.type:types.RUN_TYPES_DICTIONARY[self.type],
             blockNames.Colnames.time:self.time,
             blockNames.Colnames.distance:self.distance,
             blockNames.Colnames.climb:self.climb,
@@ -162,27 +162,27 @@ class SingleRun(segment.Segment):
             blockNames.Colnames.route:self.route,
             blockNames.Colnames.notes:self.notes,
             blockNames.Colnames.feeling:self.feeling,
-            blockNames.Colnames.distE:self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E],
-            blockNames.Colnames.distM:self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M],
-            blockNames.Colnames.distT:self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.T],
-            blockNames.Colnames.distI:self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.I],
-            blockNames.Colnames.distR:self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.R],
-            blockNames.Colnames.distX:self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.X],
-            blockNames.Colnames.distXB:self.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.XB],
-            blockNames.Colnames.timeE:self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.E],
-            blockNames.Colnames.timeM:self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.M],
-            blockNames.Colnames.timeT:self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.T],
-            blockNames.Colnames.timeI:self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.I],
-            blockNames.Colnames.timeR:self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.R],
-            blockNames.Colnames.timeX:self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.X],
-            blockNames.Colnames.timeXB:self.basic_time[runTypes.BASIC_RUN_TYPES_ENUM.XB],
-            blockNames.Colnames.paceE:self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.E],
-            blockNames.Colnames.paceM:self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.M],
-            blockNames.Colnames.paceT:self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.T],
-            blockNames.Colnames.paceI:self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.I],
-            blockNames.Colnames.paceR:self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.R],
-            blockNames.Colnames.paceX:self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.X],
-            blockNames.Colnames.paceXB:self.basic_pace[runTypes.BASIC_RUN_TYPES_ENUM.XB]
+            blockNames.Colnames.distE:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.E],
+            blockNames.Colnames.distM:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.M],
+            blockNames.Colnames.distT:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.T],
+            blockNames.Colnames.distI:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.I],
+            blockNames.Colnames.distR:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.R],
+            blockNames.Colnames.distX:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.X],
+            blockNames.Colnames.distXB:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.XB],
+            blockNames.Colnames.timeE:self.basic_time[types.BASIC_RUN_TYPES_ENUM.E],
+            blockNames.Colnames.timeM:self.basic_time[types.BASIC_RUN_TYPES_ENUM.M],
+            blockNames.Colnames.timeT:self.basic_time[types.BASIC_RUN_TYPES_ENUM.T],
+            blockNames.Colnames.timeI:self.basic_time[types.BASIC_RUN_TYPES_ENUM.I],
+            blockNames.Colnames.timeR:self.basic_time[types.BASIC_RUN_TYPES_ENUM.R],
+            blockNames.Colnames.timeX:self.basic_time[types.BASIC_RUN_TYPES_ENUM.X],
+            blockNames.Colnames.timeXB:self.basic_time[types.BASIC_RUN_TYPES_ENUM.XB],
+            blockNames.Colnames.paceE:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.E],
+            blockNames.Colnames.paceM:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.M],
+            blockNames.Colnames.paceT:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.T],
+            blockNames.Colnames.paceI:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.I],
+            blockNames.Colnames.paceR:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.R],
+            blockNames.Colnames.paceX:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.X],
+            blockNames.Colnames.paceXB:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.XB]
         }
         return rdict
 
@@ -279,7 +279,7 @@ class SingleRun(segment.Segment):
             basic_time, and basic_pace). The first two are set
             to 0 and the latter to None.
         """
-        for k in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for k in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.basic_dist[k] = 0 
             self.basic_time[k] = 0 
             self.basic_pace[k] = None
@@ -349,19 +349,19 @@ class SingleRun(segment.Segment):
             
             Fills type with the configuration dictionary. If the type 
             is either not present in the dictionary, or it is a not supported
-            one, it is set to runTypes.RUN_TYPES_ENUM.E
+            one, it is set to types.RUN_TYPES_ENUM.E
 
             Args:
                 config(dict): Dictionary with type information
 
             Notes:
                 Supported activity types are defined in
-                runTypes.RUN_TYPES_DICTIONARY
+                types.RUN_TYPES_DICTIONARY
         """
         try:
             type_str = config[blockNames.FileParams.type]
         except KeyError:
-            type_str = runTypes.RUN_TYPES_DICTIONARY[runTypes.RUN_TYPES_ENUM.E]
+            type_str = types.RUN_TYPES_DICTIONARY[types.RUN_TYPES_ENUM.E]
 
         self.type = self.parse_type(type_str)
 
@@ -513,19 +513,19 @@ class SingleRun(segment.Segment):
 
             Returns:
                 int: run type in RUN_TYPES_DICTIONARY.
-                If not found, returns runTypes.RUN_TYPES.E
+                If not found, returns types.RUN_TYPES.E
 
         """
-        for (runType, runTypeBlockname) in runTypes.RUN_TYPES_DICTIONARY.items():
+        for (runType, runTypeBlockname) in types.RUN_TYPES_DICTIONARY.items():
             if type_str == runTypeBlockname:
                 return runType
 
         # If run_type is not found, set it to E
         # TODO: Add to log
         # print ("Assigning {} type for run in {}; {} km; {} min".format(
-        #            runTypes.RUN_TYPES_DICTIONARY[runTypes.RUN_TYPES_ENUM.E],
+        #            types.RUN_TYPES_DICTIONARY[types.RUN_TYPES_ENUM.E],
         #                                self.date, self.distance, self.time))
-        return runTypes.RUN_TYPES_ENUM.E
+        return types.RUN_TYPES_ENUM.E
 
     def fill_basic_runtype_info_with_dict(self, struct_list_dict):
         self.fill_segments(struct_list_dict)
@@ -573,13 +573,13 @@ class SingleRun(segment.Segment):
         """
         dictkey = 0
 
-        type_val = runTypes.RUN_TYPES_DICTIONARY[self.type]
-        if type_val in runTypes.BASIC_RUN_TYPES_DICTIONARY.values():
-            for (k1,v1) in runTypes.BASIC_RUN_TYPES_DICTIONARY.items():
+        type_val = types.RUN_TYPES_DICTIONARY[self.type]
+        if type_val in types.BASIC_RUN_TYPES_DICTIONARY.values():
+            for (k1,v1) in types.BASIC_RUN_TYPES_DICTIONARY.items():
                 if type_val==v1: 
                     dictkey = k1
         else:
-            dictkey = runTypes.BASIC_RUN_TYPES_ENUM.E
+            dictkey = types.BASIC_RUN_TYPES_ENUM.E
 
         self.basic_dist[dictkey] = self.distance
         self.basic_time[dictkey] = self.time * 60
@@ -623,13 +623,13 @@ class SingleRun(segment.Segment):
             activities.
         """
 
-        str_type = runTypes.RUN_TYPES_DICTIONARY[self.type]
-        if str_type in runTypes.RUNNING_ACTIVITIES:
-            type_ = runTypes.BASIC_RUN_TYPES_ENUM.E
+        str_type = types.RUN_TYPES_DICTIONARY[self.type]
+        if str_type in types.RUNNING_ACTIVITIES:
+            type_ = types.BASIC_RUN_TYPES_ENUM.E
         else:
             #assign to cross training basic type
             for (runType, runTypeBlockname) in\
-                runTypes.BASIC_RUN_TYPES_DICTIONARY.items():
+                types.BASIC_RUN_TYPES_DICTIONARY.items():
                     if str_type == runTypeBlockname:
                         type_ = runType
 
@@ -647,6 +647,6 @@ class SingleRun(segment.Segment):
             is not computed
         """
 
-        for t in runTypes.BASIC_RUN_TYPES_DICTIONARY.keys():
+        for t in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             if self.basic_time[t] != 0 and self.basic_dist[t] != 0:
                 self.basic_pace[t] = self.basic_time[t] / self.basic_dist[t]

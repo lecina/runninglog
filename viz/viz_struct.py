@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from src.utilities import utilities
+from runninglog.utilities import utilities
 try:
     from viz.viz_constants import viz_constants
 except:

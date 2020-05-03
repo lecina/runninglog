@@ -16,7 +16,7 @@ class TestSingleRun(unittest.TestCase):
         avg_pace = singleRun.compute_avg_pace()
         self.assertEqual(avg_pace, 240)
 
-    def test_fill_segments(self):
+    def test_parse_structure(self):
         singleRun = single.SingleRun()
 
         input_dict = [
@@ -25,11 +25,11 @@ class TestSingleRun(unittest.TestCase):
             {"type":"E", "distance" : 2.2}
         ]
 
-        singleRun.fill_segments(input_dict)
+        singleRun.parse_structure(input_dict)
 
-        self.assertEqual(len(singleRun.run_structure), 3)
+        self.assertEqual(len(singleRun.structure), 3)
 
-        for i, sgmnt in enumerate(singleRun.run_structure):
+        for i, sgmnt in enumerate(singleRun.structure):
             if i == 0:
                 self.assertAlmostEqual(sgmnt.distance, 2.36, 2)
             elif i == 1:
@@ -38,7 +38,7 @@ class TestSingleRun(unittest.TestCase):
             elif i == 2:
                 self.assertAlmostEqual(sgmnt.distance, 2.2, 2)
 
-    def test_fill_segments_empty_segment(self):
+    def test_parse_structure_empty_segment(self):
         # Goal: assert that empty segments are not added
         singleRun = single.SingleRun()
 
@@ -49,18 +49,18 @@ class TestSingleRun(unittest.TestCase):
             {"type":"E", "distance" : 2.2}
         ]
 
-        singleRun.fill_segments(input_dict)
+        singleRun.parse_structure(input_dict)
 
-        self.assertEqual(len(singleRun.run_structure), 2)
+        self.assertEqual(len(singleRun.structure), 2)
 
-        for i, sgmnt in enumerate(singleRun.run_structure):
+        for i, sgmnt in enumerate(singleRun.structure):
             if i == 0:
                 self.assertAlmostEqual(sgmnt.distance, 5.84, 2)
                 self.assertAlmostEqual(sgmnt.pace, 236, 2)
             elif i == 1:
                 self.assertAlmostEqual(sgmnt.distance, 2.2, 2)
 
-    def test_fill_segments_invalid_segment(self):
+    def test_parse_structure_invalid_segment(self):
         # Goal: assert that an exception is raised when an
         # invalid segment type is passed. This is already
         # tested in the segment's tests, but explicitly added
@@ -76,7 +76,7 @@ class TestSingleRun(unittest.TestCase):
         ]
 
         with self.assertRaises(Exception):
-            singleRun.fill_segments(input_dict)
+            singleRun.parse_structure(input_dict)
 
     def test_fill_dist_and_time_dictionaries(self):
         #Single run type is not passed to the structure
@@ -90,7 +90,7 @@ class TestSingleRun(unittest.TestCase):
         ]
 
         #Segments are needed to be set in singleRun
-        singleRun.fill_segments(input_dict)
+        singleRun.parse_structure(input_dict)
         singleRun.fill_basic_volume_dict_with_structure_volume()
 
         golden_basic_dist = {}

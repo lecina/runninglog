@@ -28,7 +28,7 @@ class SingleRun(segment.Segment):
         * Route
         * Trail
         * Feeling
-        * Structure (`run_structure`)
+        * Structure (`structure`)
 
     Units:
         * distance: km
@@ -78,39 +78,42 @@ class SingleRun(segment.Segment):
         self.init_distribution_dictionaries()
 
         # List of segments
-        self.run_structure = []
+        self.structure = []
 
     def __eq__(self, other):
-        for (a,b) in zip(self.basic_dist.values(), other.basic_dist.values()):
-            if (a is not None and b is not None) and not utilities.isclose(a,b,abs_tol=1e-3):
+        for (a, b) in zip(self.basic_dist.values(), other.basic_dist.values()):
+            if (a is not None and b is not None) and
+            not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
             if (a is None and b is not None) or (a is not None and b is None):
                 return False
 
-        for (a,b) in zip(self.basic_time.values(), other.basic_time.values()):
-            if (a is not None and b is not None) and not utilities.isclose(a,b,abs_tol=1e-3):
+        for (a, b) in zip(self.basic_time.values(), other.basic_time.values()):
+            if (a is not None and b is not None) and
+            not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
             if (a is None and b is not None) or (a is not None and b is None):
                 return False
 
-        for (a,b) in zip(self.basic_pace.values(), other.basic_pace.values()):
-            if (a is not None and b is not None) and not utilities.isclose(a,b,abs_tol=1e-3):
+        for (a, b) in zip(self.basic_pace.values(), other.basic_pace.values()):
+            if (a is not None and b is not None) and
+            not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
             if (a is None and b is not None) or (a is not None and b is None):
                 return False
 
         return self.type == other.type and\
-                self.time == other.time and\
-                utilities.isclose(self.distance, other.distance, abs_tol=1e-3) and\
-                self.climb == other.climb and\
-                utilities.isclose(self.pace, other.pace, abs_tol=1e-3) and\
-                utilities.isclose(self.vspeed, other.vspeed, abs_tol=1e-3) and\
-                self.date == other.date and\
-                self.is_trail_running == other.is_trail_running and\
-                self.where == other.where and\
-                self.route == other.route and\
-                self.feeling == other.feeling and\
-                self.notes == other.notes
+            self.time == other.time and\
+            utilities.isclose(self.distance, other.distance, abs_tol=1e-3) and\
+            self.climb == other.climb and\
+            utilities.isclose(self.pace, other.pace, abs_tol=1e-3) and\
+            utilities.isclose(self.vspeed, other.vspeed, abs_tol=1e-3) and\
+            self.date == other.date and\
+            self.is_trail_running == other.is_trail_running and\
+            self.where == other.where and\
+            self.route == other.route and\
+            self.feeling == other.feeling and\
+            self.notes == other.notes
 
     def __str__(self):
         str_ = []
@@ -134,7 +137,7 @@ class SingleRun(segment.Segment):
         except KeyError:
             easy = types.RUN_TYPES_DICTIONARY[
                                 types.BASIC_RUN_TYPES_ENUM.E]
-            str_.append(f"Type: {easy}") 
+            str_.append(f"Type: {easy}")
 
         if self.is_trail_running:
             str_.append("Trail running")
@@ -167,13 +170,20 @@ class SingleRun(segment.Segment):
         str_.append("Stats by training speeds:")
         str_.append("=========================\n")
 
-        print_dist = {types.BASIC_RUN_TYPES_DICTIONARY[t]:d for (t,d) in self.basic_dist.items() if d != 0}
+        b_type = types.BASIC_RUN_TYPES_DICTIONARY
+        print_dist = {
+            b_type[t]: d for (t, d) in self.basic_dist.items() if d != 0
+        }
         str_.append(f"Distances (km): {print_dist}")
 
-        print_time = {types.BASIC_RUN_TYPES_DICTIONARY[t]:tm for (t,tm) in self.basic_time.items() if tm != 0}
+        print_time = {
+            b_type[t]: tm for (t, tm) in self.basic_time.items() if tm != 0
+        }
         str_.append(f"Times (sec): {print_time}")
 
-        print_pace = {types.BASIC_RUN_TYPES_DICTIONARY[t]:p for (t,p) in self.basic_pace.items() if p != 0}
+        print_pace = {
+            b_type[t]: p for (t, p) in self.basic_pace.items() if p != 0
+        }
         str_.append(f"Paces (sec/km): {print_pace}")
 
         return "\n".join(str_)
@@ -182,46 +192,54 @@ class SingleRun(segment.Segment):
         """ Converts segment into dictionary.
         This is later used to build a panda's DataFrame representation
         """
+        E_ = types.BASIC_RUN_TYPES_ENUM.E
+        M_ = types.BASIC_RUN_TYPES_ENUM.M
+        T_ = types.BASIC_RUN_TYPES_ENUM.T
+        I_ = types.BASIC_RUN_TYPES_ENUM.I
+        R_ = types.BASIC_RUN_TYPES_ENUM.R
+        X_ = types.BASIC_RUN_TYPES_ENUM.X
+        XB_ = types.BASIC_RUN_TYPES_ENUM.XB
+
         rdict = {
-            blockNames.Colnames.type:types.RUN_TYPES_DICTIONARY[self.type],
-            blockNames.Colnames.time:self.time,
-            blockNames.Colnames.distance:self.distance,
-            blockNames.Colnames.climb:self.climb,
-            blockNames.Colnames.avg_pace:self.pace,
-            blockNames.Colnames.vspeed:self.vspeed,
-            blockNames.Colnames.date:self.date,
-            blockNames.Colnames.trail:self.is_trail_running,
-            blockNames.Colnames.where:self.where,
-            blockNames.Colnames.route:self.route,
-            blockNames.Colnames.notes:self.notes,
-            blockNames.Colnames.feeling:self.feeling,
-            blockNames.Colnames.distE:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.E],
-            blockNames.Colnames.distM:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.M],
-            blockNames.Colnames.distT:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.T],
-            blockNames.Colnames.distI:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.I],
-            blockNames.Colnames.distR:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.R],
-            blockNames.Colnames.distX:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.X],
-            blockNames.Colnames.distXB:self.basic_dist[types.BASIC_RUN_TYPES_ENUM.XB],
-            blockNames.Colnames.timeE:self.basic_time[types.BASIC_RUN_TYPES_ENUM.E],
-            blockNames.Colnames.timeM:self.basic_time[types.BASIC_RUN_TYPES_ENUM.M],
-            blockNames.Colnames.timeT:self.basic_time[types.BASIC_RUN_TYPES_ENUM.T],
-            blockNames.Colnames.timeI:self.basic_time[types.BASIC_RUN_TYPES_ENUM.I],
-            blockNames.Colnames.timeR:self.basic_time[types.BASIC_RUN_TYPES_ENUM.R],
-            blockNames.Colnames.timeX:self.basic_time[types.BASIC_RUN_TYPES_ENUM.X],
-            blockNames.Colnames.timeXB:self.basic_time[types.BASIC_RUN_TYPES_ENUM.XB],
-            blockNames.Colnames.paceE:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.E],
-            blockNames.Colnames.paceM:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.M],
-            blockNames.Colnames.paceT:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.T],
-            blockNames.Colnames.paceI:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.I],
-            blockNames.Colnames.paceR:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.R],
-            blockNames.Colnames.paceX:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.X],
-            blockNames.Colnames.paceXB:self.basic_pace[types.BASIC_RUN_TYPES_ENUM.XB]
+            blockNames.Colnames.type: types.RUN_TYPES_DICTIONARY[self.type],
+            blockNames.Colnames.time: self.time,
+            blockNames.Colnames.distance: self.distance,
+            blockNames.Colnames.climb: self.climb,
+            blockNames.Colnames.avg_pace: self.pace,
+            blockNames.Colnames.vspeed: self.vspeed,
+            blockNames.Colnames.date: self.date,
+            blockNames.Colnames.trail: self.is_trail_running,
+            blockNames.Colnames.where: self.where,
+            blockNames.Colnames.route: self.route,
+            blockNames.Colnames.notes: self.notes,
+            blockNames.Colnames.feeling: self.feeling,
+            blockNames.Colnames.distE: self.basic_dist[E_],
+            blockNames.Colnames.distM: self.basic_dist[M_],
+            blockNames.Colnames.distT: self.basic_dist[T_],
+            blockNames.Colnames.distI: self.basic_dist[I_],
+            blockNames.Colnames.distR: self.basic_dist[R_],
+            blockNames.Colnames.distX: self.basic_dist[X_],
+            blockNames.Colnames.distXB: self.basic_dist[XB_],
+            blockNames.Colnames.timeE: self.basic_time[E_],
+            blockNames.Colnames.timeM: self.basic_time[M_],
+            blockNames.Colnames.timeT: self.basic_time[T_],
+            blockNames.Colnames.timeI: self.basic_time[I_],
+            blockNames.Colnames.timeR: self.basic_time[R_],
+            blockNames.Colnames.timeX: self.basic_time[X_],
+            blockNames.Colnames.timeXB: self.basic_time[XB_],
+            blockNames.Colnames.paceE: self.basic_pace[E_],
+            blockNames.Colnames.paceM: self.basic_pace[M_],
+            blockNames.Colnames.paceT: self.basic_pace[T_],
+            blockNames.Colnames.paceI: self.basic_pace[I_],
+            blockNames.Colnames.paceR: self.basic_pace[R_],
+            blockNames.Colnames.paceX: self.basic_pace[X_],
+            blockNames.Colnames.paceXB: self.basic_pace[XB_]
         }
         return rdict
 
     def get_structure_as_df(self):
         """ Returns a DataFrame from the list of segments
-        
+
         Uses the segment.as_dict() function to build a pandas Series
         which is appended in a DataFrame
 
@@ -229,7 +247,7 @@ class SingleRun(segment.Segment):
             DataFrame: DataFrame containing the structure
         """
         df = pd.DataFrame()
-        for sgmnt in self.run_structure:
+        for sgmnt in self.structure:
             ds_sgmnt = pd.Series(sgmnt.as_dict())
             df = df.append(ds_sgmnt, ignore_index=True)
         return df
@@ -245,7 +263,7 @@ class SingleRun(segment.Segment):
         When providing a running structure (with segments), different
         distances, times and paces are kept for each basic running type.
         These are assigned to the corresponding basic run type of each
-        segment. If the segments' sum of distances and time do not add 
+        segment. If the segments' sum of distances and time do not add
         up to the total distance and time in the run, the difference is
         assigned to the easy pace, for consistency.
 
@@ -296,17 +314,19 @@ class SingleRun(segment.Segment):
         self.fill_notes(parsed_json)
 
         # Fill run structure
-        self.fill_run_structure(parsed_json)
+        self.fill_structure(parsed_json)
 
         # Compute variables
         self.compute_vspeed()
         self.pace = self.compute_avg_pace()
 
         self.fill_basic_volume_dict_with_structure_volume()
-        if len(self.run_structure) == 0:
+
+        if not len(self.structure):
             self.fill_basic_volume_dict_with_guessed_type()
+
         self.fill_basic_volume_dict_with_unassigned_volume()
-        self.compute_basic_types_avg_paces()
+        self.compute_basic_pace_dictionary()
 
     def init_distribution_dictionaries(self):
         """Initializes distribution dictionaries
@@ -316,13 +336,13 @@ class SingleRun(segment.Segment):
             to 0 and the latter to None.
         """
         for k in types.BASIC_RUN_TYPES_DICTIONARY.keys():
-            self.basic_dist[k] = 0 
-            self.basic_time[k] = 0 
+            self.basic_dist[k] = 0
+            self.basic_time[k] = 0
             self.basic_pace[k] = None
 
     def fill_time(self, config):
         """Fills time with data in input dictionary
-            
+
             Fills time with the configuration dictionary.
 
             Args:
@@ -342,7 +362,7 @@ class SingleRun(segment.Segment):
 
     def fill_distance(self, config):
         """Fills distance with data in input dictionary
-            
+
             Fills distance with the configuration dictionary.
 
             Args:
@@ -362,7 +382,7 @@ class SingleRun(segment.Segment):
 
     def fill_date(self, config):
         """Fills date with data in input dictionary
-            
+
             Fills date with the configuration dictionary.
 
             Args:
@@ -372,7 +392,7 @@ class SingleRun(segment.Segment):
                 Date is a compulsory attribute
         """
 
-        date_key = blockNames.FileParams.date 
+        date_key = blockNames.FileParams.date
         try:
             date_str = config[date_key]
         except KeyError as err:
@@ -382,8 +402,8 @@ class SingleRun(segment.Segment):
 
     def fill_type(self, config):
         """Fills type with data in input dictionary
-            
-            Fills type with the configuration dictionary. If the type 
+
+            Fills type with the configuration dictionary. If the type
             is either not present in the dictionary, or it is a not supported
             one, it is set to types.RUN_TYPES_ENUM.E
 
@@ -403,7 +423,7 @@ class SingleRun(segment.Segment):
 
     def fill_climb(self, config):
         """Fills climb with data in input dictionary
-            
+
             Fills climb with the configuration dictionary.
             If it is missing, climb is assigned to 0
 
@@ -416,13 +436,13 @@ class SingleRun(segment.Segment):
         except KeyError:
             climb_str = 0
 
-        self.climb = int(climb_str)  
+        self.climb = int(climb_str)
 
     def compute_vspeed(self):
         """Computes vertical speed
 
         Computes vertical speed. Needs of a time different to 0
-        
+
         Units:
             meters/hour
 
@@ -435,7 +455,7 @@ class SingleRun(segment.Segment):
 
     def fill_where(self, config):
         """Fills location with data in input dictionary
-            
+
             Fills location (where)  with the configuration dictionary.
             If it is missing, an empty string is assigned
 
@@ -452,7 +472,7 @@ class SingleRun(segment.Segment):
 
     def fill_route(self, config):
         """Fills route with data in input dictionary
-            
+
             Fills route with the configuration dictionary.
             If it is missing, an empty string is assigned
 
@@ -469,7 +489,7 @@ class SingleRun(segment.Segment):
 
     def fill_is_trail_running(self, config):
         """Fills trail running flag  with data in input dictionary
-            
+
             Fills trail running flag  with data in input dictionary
             It is set to the boolean evaluation of the input value
             If it is missing, trail running is assumed to be False
@@ -480,13 +500,14 @@ class SingleRun(segment.Segment):
 
         try:
             trail_str = config[blockNames.FileParams.trail]
-        except:
+        except KeyError:
             trail_str = False
+
         self.is_trail_running = bool(trail_str)
 
     def fill_feeling(self, config):
         """Fills feeling with data in input dictionary
-            
+
             Fills feeling with the configuration dictionary.
             If it is missing, None value is assigned
 
@@ -503,7 +524,7 @@ class SingleRun(segment.Segment):
 
     def fill_notes(self, config):
         """Fills notes with data in input dictionary
-            
+
             Fills notes with the configuration dictionary.
             If it is missing, an empty string is assigned
 
@@ -518,10 +539,10 @@ class SingleRun(segment.Segment):
 
         self.notes = notes_str
 
-    def fill_run_structure(self, config):
-        """Fills the run structure with data in input dictionary
-            
-            Fills the run structure with data in input dictionary
+    def fill_structure(self, config):
+        """Fills structure with data in input dictionary
+
+            Fills structure with data in input dictionary
 
             Args:
                 config(dict): Dictionary with structure data
@@ -532,8 +553,28 @@ class SingleRun(segment.Segment):
         except KeyError:
             struct_str = ""
 
-        if struct_str != "":
-            self.fill_segments(struct_str)
+        if struct_str:
+            self.parse_structure(struct_str)
+
+    def parse_structure(self, struct_list_dict):
+        """Parses structure with data in the list of dictionaries
+
+            Parses structure with data in the list of dictionaries.
+            Data from the single run is passed into the segment, such as trail,
+            feeling or date.
+        """
+        for rep_num, item in enumerate(struct_list_dict):
+            sgmnt = segment.Segment()
+
+            sgmnt.fill_segment(item)
+
+            if not sgmnt.is_empty():
+                sgmnt.repetition_number = rep_num
+                sgmnt.trail = self.is_trail_running
+                sgmnt.date = self.date
+                sgmnt.feeling = self.feeling
+
+                self.structure.append(sgmnt)
 
     def parse_type(self, type_str):
         """Parses type
@@ -560,40 +601,16 @@ class SingleRun(segment.Segment):
         #                                self.date, self.distance, self.time))
         return types.RUN_TYPES_ENUM.E
 
-    #def fill_basic_runtype_info_with_dict(self, struct_list_dict):
-    #    self.fill_segments(struct_list_dict)
-    #    self.fill_basic_dist_and_time_dictionaries()
-
-    def fill_segments(self, struct_list_dict):
-        """Fills the single run segments with data in the list of dictionaries
-
-            Fills the single run segments with data in the list of dictionaries.
-            Data from the single run is passed into the segment, such as trail,
-            feeling or date if not present already.
-        """
-        for rep_num,item in enumerate(struct_list_dict):
-            sgmnt = segment.Segment()
-
-            sgmnt.fill_segment(item)
-
-            if not sgmnt.is_empty():
-                sgmnt.repetition_number = rep_num
-                sgmnt.trail = self.is_trail_running
-                sgmnt.date = self.date
-
-                self.run_structure.append(sgmnt)
-
     def fill_basic_volume_dict_with_structure_volume(self):
         """Fills basic dictionaries with structure.
 
             Fills basic_dist and basic_time dictionaries with structure data.
         """
         self.init_distribution_dictionaries()
-        for sgmnt in self.run_structure:
+        for sgmnt in self.structure:
             self.basic_dist[sgmnt.type] += sgmnt.distance
-            if sgmnt.time is not None: 
+            if sgmnt.time is not None:
                 self.basic_time[sgmnt.type] += sgmnt.time
-
 
     def fill_basic_volume_dict_with_guessed_type(self):
         """
@@ -608,8 +625,8 @@ class SingleRun(segment.Segment):
 
         type_val = types.RUN_TYPES_DICTIONARY[self.type]
         if type_val in types.BASIC_RUN_TYPES_DICTIONARY.values():
-            for (k1,v1) in types.BASIC_RUN_TYPES_DICTIONARY.items():
-                if type_val==v1: 
+            for (k1, v1) in types.BASIC_RUN_TYPES_DICTIONARY.items():
+                if type_val == v1:
                     dictkey = k1
         else:
             dictkey = types.BASIC_RUN_TYPES_ENUM.E
@@ -659,8 +676,8 @@ class SingleRun(segment.Segment):
         if str_type in types.RUNNING_ACTIVITIES:
             type_ = types.BASIC_RUN_TYPES_ENUM.E
         else:
-            #assign to cross training basic type
-            for (k,v) in types.BASIC_RUN_TYPES_DICTIONARY.items():
+            # Assign to cross training basic type
+            for (k, v) in types.BASIC_RUN_TYPES_DICTIONARY.items():
                 if str_type == v:
                     type_ = k
 
@@ -681,8 +698,8 @@ class SingleRun(segment.Segment):
 
         type_val = types.RUN_TYPES_DICTIONARY[self.type]
         if type_val in types.BASIC_RUN_TYPES_DICTIONARY.values():
-            for (k1,v1) in types.BASIC_RUN_TYPES_DICTIONARY.items():
-                if type_val==v1: 
+            for (k1, v1) in types.BASIC_RUN_TYPES_DICTIONARY.items():
+                if type_val == v1:
                     dictkey = k1
         else:
             dictkey = types.BASIC_RUN_TYPES_ENUM.E
@@ -691,7 +708,7 @@ class SingleRun(segment.Segment):
         self.basic_time[dictkey] = self.time * 60
         self.basic_pace[dictkey] = self.time * 60 / self.distance
 
-    def compute_basic_types_avg_paces(self):
+    def compute_basic_pace_dictionary(self):
         """Computes the avg pace for each basic running type
 
             Computes the avg pace for each basic running type. If either

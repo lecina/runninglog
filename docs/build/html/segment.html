@@ -38,6 +38,14 @@
 <dd><p>Basic run element of a given type.
 It must have a type and a distance. The rest of parameters are optional
 A single run may contain from none to an indefinite number of them.</p>
+<dl class="simple">
+<dt>Units:</dt><dd><p>distance: km
+time: sec
+climb: m
+pace: sec/km
+vspeed: m/h</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="runninglog.single_run.segment.Segment.as_dict">
 <code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.as_dict" title="Permalink to this definition">¶</a></dt>
@@ -47,7 +55,7 @@ This is later used to build a panda’s DataFrame representation</p>
 
 <dl class="py method">
 <dt id="runninglog.single_run.segment.Segment.fill_segment">
-<code class="sig-name descname">fill_segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">segment_dict</span></em>, <em class="sig-param"><span class="n">repetition_number</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.fill_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.fill_segment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">fill_segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">segment_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.fill_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.fill_segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fills the segment with the data in the dictionary</p>
 <p>Fills the segment with the data in the input dictionary.
 A segment type and a distance must be provided. The rest of
@@ -59,17 +67,15 @@ to enseure consistency. As expected, if none are given, they
 are left unfilled</p>
 <dl class="simple">
 <dt>Units:</dt><dd><p>distance: km
-time:
-pace: seconds/km
+time: sec
+climb: m
+pace: sec/km
 vspeed: m/h</p>
 </dd>
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>segment_dict</strong> (<em>dict</em>) – Dictionary containing segment information</p></li>
-<li><p><strong>repetition_number</strong> (<em>int</em>) – Repetition number within a workout</p></li>
-</ul>
+<dd class="field-odd"><p><strong>segment_dict</strong> (<em>dict</em>) – Dictionary containing segment information</p>
 </dd>
 </dl>
 <div class="admonition note">

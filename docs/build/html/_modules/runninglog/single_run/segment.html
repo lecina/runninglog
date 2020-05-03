@@ -39,14 +39,22 @@
 <span class="kn">from</span> <span class="nn">runninglog.constants</span> <span class="kn">import</span> <span class="n">blockNames</span>
 <span class="kn">from</span> <span class="nn">runninglog.single_run</span> <span class="kn">import</span> <span class="n">runTypes</span>
 
+
 <div class="viewcode-block" id="Segment"><a class="viewcode-back" href="../../../segment.html#runninglog.single_run.segment.Segment">[docs]</a><span class="k">class</span> <span class="nc">Segment</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Basic run element of a given type.  </span>
+    <span class="sd">&quot;&quot;&quot;Basic run element of a given type.</span>
 <span class="sd">    It must have a type and a distance. The rest of parameters are optional</span>
 <span class="sd">    A single run may contain from none to an indefinite number of them.</span>
+
+<span class="sd">    Units:</span>
+<span class="sd">        distance: km</span>
+<span class="sd">        time: sec</span>
+<span class="sd">        climb: m</span>
+<span class="sd">        pace: sec/km</span>
+<span class="sd">        vspeed: m/h</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trail</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_trail_running</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">distance</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pace</span> <span class="o">=</span> <span class="kc">None</span>
@@ -55,35 +63,47 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">bpm</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">str_</span> <span class="o">=</span> <span class="p">[]</span> 
+        <span class="n">str_</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date: self.date&quot;</span><span class="p">)</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Date: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Date: -&quot;</span><span class="p">)</span>
 
         <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Repetition: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">repetition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Type: not yet defined&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Type: </span><span class="si">{</span><span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">type_</span> <span class="o">=</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Type: </span><span class="si">{</span><span class="n">type_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trail</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trail_running</span><span class="p">:</span>
             <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Trail running segment&quot;</span><span class="p">)</span>
 
-        <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feeling: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feeling</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feeling: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">feeling</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feeling: -&quot;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Time: </span><span class="si">{:d}</span><span class="s2">min&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Distance: </span><span class="si">{:0.2f}</span><span class="s2">km&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">))</span>
-        <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Climb: </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">climb</span><span class="p">))</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Time: </span><span class="si">{:.0f}</span><span class="s2">min&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Total time: -&quot;</span><span class="p">)</span>
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Pace: </span><span class="si">{:d}</span><span class="s2"> (in sec/km)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">avg_pace</span><span class="p">))</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="k">pass</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Distance: </span><span class="si">{:0.2f}</span><span class="s2">km&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Distance: -&quot;</span><span class="p">)</span>
+
+        <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Climb: </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">climb</span><span class="p">))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Pace: </span><span class="si">{:.0f}</span><span class="s2"> (in sec/km)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pace</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Pace: -&quot;</span><span class="p">)</span>
         <span class="n">str_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Vert. speed:: </span><span class="si">{:.0f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">str_</span><span class="p">)</span>
@@ -92,17 +112,18 @@
         <span class="sd">&quot;&quot;&quot; Converts segment into dictionary.</span>
 <span class="sd">        This is later used to build a panda&#39;s DataFrame representation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">type_</span> <span class="o">=</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
         <span class="n">rdict</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">type</span> <span class="p">:</span>  <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">],</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">trail</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">trail</span><span class="p">,</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">feeling</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span><span class="p">,</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">time</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distance</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">avg_pace</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pace</span><span class="p">,</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">climb</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">climb</span><span class="p">,</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">bpm</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bpm</span><span class="p">,</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">date</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
-            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">repetition</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">type</span><span class="p">:</span> <span class="n">type_</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">trail</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_trail_running</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">feeling</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">time</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">distance</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">avg_pace</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pace</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">climb</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">climb</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">bpm</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">bpm</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">date</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+            <span class="n">blockNames</span><span class="o">.</span><span class="n">Colnames</span><span class="o">.</span><span class="n">repetition</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">rdict</span></div>
 
@@ -111,17 +132,17 @@
 <span class="sd">        Checks if segment is empty</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">trail</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_trail_running</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">distance</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">pace</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bpm</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feeling</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Segment.fill_segment"><a class="viewcode-back" href="../../../segment.html#runninglog.single_run.segment.Segment.fill_segment">[docs]</a>    <span class="k">def</span> <span class="nf">fill_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment_dict</span><span class="p">,</span> <span class="n">repetition_number</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.fill_segment"><a class="viewcode-back" href="../../../segment.html#runninglog.single_run.segment.Segment.fill_segment">[docs]</a>    <span class="k">def</span> <span class="nf">fill_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fills the segment with the data in the dictionary</span>
 
 <span class="sd">        Fills the segment with the data in the input dictionary.</span>
@@ -137,58 +158,73 @@
 
 <span class="sd">        Units:</span>
 <span class="sd">            distance: km</span>
-<span class="sd">            time: </span>
-<span class="sd">            pace: seconds/km</span>
+<span class="sd">            time: sec</span>
+<span class="sd">            climb: m</span>
+<span class="sd">            pace: sec/km</span>
 <span class="sd">            vspeed: m/h</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            segment_dict (dict): Dictionary containing segment information</span>
-<span class="sd">            repetition_number (int): Repetition number within a workout</span>
 
 <span class="sd">        Note:</span>
 <span class="sd">            Dictionary keys are defined in constants.blockNames</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">item_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">segment_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
-        <span class="c1">#Parsing compulsory elements</span>
-        <span class="c1">#Type</span>
-        <span class="n">type_</span> <span class="o">=</span> <span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+        <span class="c1"># If empty, return empty segment</span>
+        <span class="k">if</span> <span class="n">item_dict</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Parsing compulsory elements</span>
+        <span class="c1"># Type</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">type_</span> <span class="o">=</span> <span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing key: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2"> in</span><span class="se">\n</span><span class="si">{</span><span class="n">item_dict</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="k">raise</span>
+
         <span class="n">parsed_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_type</span><span class="p">(</span><span class="n">type_</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">parsed_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">parsed_type</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">error</span> <span class="o">=</span> <span class="s2">&quot;Unknown type in segment: </span><span class="si">{}</span><span class="s2">, repetition:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                                            <span class="n">type_</span><span class="p">,</span> 
-                                                            <span class="n">repetition_number</span>
-            <span class="p">)</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown type in segment: </span><span class="si">{</span><span class="n">item_dict</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
 
-        <span class="c1">#Distance</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_distance</span><span class="p">(</span><span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">distance</span><span class="p">])</span>
+        <span class="c1"># Distance</span>
+        <span class="n">str_distance</span> <span class="o">=</span> <span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">distance</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_distance</span><span class="p">(</span><span class="n">str_distance</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span> <span class="o">=</span> <span class="n">repetition_number</span>
-
-        <span class="c1">#Date</span>
+        <span class="c1"># Date</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_date</span><span class="p">(</span><span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">date</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="c1">#Climb</span>
+        <span class="c1"># Repetition</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span> <span class="o">=</span> <span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">rep</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">repetition</span> <span class="o">=</span> <span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">rep_alt</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Climb</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">=</span> <span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">climb</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="c1">#BPM</span>
+        <span class="c1"># BPM</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bpm</span> <span class="o">=</span> <span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">bpm</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="c1">#Pace and time.</span>
-        <span class="c1">#If one is given, the other is computed.</span>
-        <span class="c1">#If both are given, pace is used to compute time for consistency</span>
+        <span class="c1"># Pace and time.</span>
+        <span class="c1"># If one is given, the other is computed.</span>
+        <span class="c1"># If both are given, pace is used to compute time for consistency</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">pace_str</span> <span class="o">=</span> <span class="n">item_dict</span><span class="p">[</span><span class="n">blockNames</span><span class="o">.</span><span class="n">FileParams</span><span class="o">.</span><span class="n">pace</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -210,41 +246,42 @@
             <span class="n">parsed_pace</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">*</span> <span class="mf">3600.</span><span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span> <span class="c1">#vspeed in m/h</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vspeed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">climb</span> <span class="o">*</span> <span class="mf">3600.</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>  <span class="c1"># vspeed in m/h</span></div>
 
 <div class="viewcode-block" id="Segment.parse_type"><a class="viewcode-back" href="../../../segment.html#runninglog.single_run.segment.Segment.parse_type">[docs]</a>    <span class="k">def</span> <span class="nf">parse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parses type</span>
-<span class="sd">            </span>
+
 <span class="sd">            It parses the segment type from the input argument</span>
 
 <span class="sd">            Args:</span>
 <span class="sd">                type_str (str): string type</span>
 
 <span class="sd">            Returns:</span>
-<span class="sd">                int: run type in BASIC_RUN_TYPES_DICTIONARY. </span>
+<span class="sd">                int: run type in BASIC_RUN_TYPES_DICTIONARY.</span>
 <span class="sd">                If not found, returns None</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">runType</span><span class="p">,</span> <span class="n">runTypeBlockname</span><span class="p">)</span> <span class="ow">in</span> <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">runType</span><span class="p">,</span> <span class="n">runTypeBlockname</span><span class="p">)</span> <span class="ow">in</span>\
+                <span class="n">runTypes</span><span class="o">.</span><span class="n">BASIC_RUN_TYPES_DICTIONARY</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="n">runTypeBlockname</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">runType</span>
 
         <span class="k">return</span> <span class="kc">None</span></div>
 
     <span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date_str</span><span class="p">):</span>
-        <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">dateObj</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%y&quot;</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%y&quot;</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">dateObj</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y&quot;</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%Y&quot;</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">dateObj</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%y&quot;</span>
+                    <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">-%m-%y&quot;</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">dateObj</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -252,8 +289,8 @@
         <span class="k">return</span> <span class="n">dateObj</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Segment.parse_time"><a class="viewcode-back" href="../../../segment.html#runninglog.single_run.segment.Segment.parse_time">[docs]</a>    <span class="k">def</span> <span class="nf">parse_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_str</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Parses time </span>
-<span class="sd">            </span>
+        <span class="sd">&quot;&quot;&quot;Parses time</span>
+
 <span class="sd">            It parses the segment time from the input argument pace and</span>
 <span class="sd">            returns it in minutes</span>
 
@@ -268,23 +305,25 @@
 <span class="sd">                The minutes can be written as: &#39;min&#39;, &#39;mi&#39;, &#39;mn&#39; or &#39;m&#39;</span>
 <span class="sd">                Seconds can be written as: &#39;s&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;((?P&lt;hours&gt;\d+?)hr?)?((?P&lt;minutes&gt;\d+?)m)?([i])?([n])?((?P&lt;seconds&gt;\d+?)s)?&#39;</span><span class="p">)</span>
+        <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;((?P&lt;hours&gt;\d+?)hr?)?&#39;</span>
+                           <span class="sa">r</span><span class="s1">&#39;((?P&lt;minutes&gt;\d+?)m)?([i])?([n])?&#39;</span>
+                           <span class="sa">r</span><span class="s1">&#39;((?P&lt;seconds&gt;\d+?)s)?&#39;</span><span class="p">)</span>
         <span class="n">time_str</span> <span class="o">=</span> <span class="n">time_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">time</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">time_str</span><span class="p">)</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
 
         <span class="n">time_in_minutes</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="s2">&quot;hours&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
-            <span class="n">time_in_minutes</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;hours&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">60</span> 
-        <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="s2">&quot;minutes&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="s2">&quot;hours&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time_in_minutes</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;hours&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mi">60</span>
+        <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="s2">&quot;minutes&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">time_in_minutes</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;minutes&quot;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="s2">&quot;seconds&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="n">time</span><span class="p">[</span><span class="s2">&quot;seconds&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">time_in_minutes</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="s2">&quot;seconds&quot;</span><span class="p">])</span><span class="o">/</span><span class="mi">60</span>
 
         <span class="k">return</span> <span class="n">time_in_minutes</span></div>
 
 <div class="viewcode-block" id="Segment.parse_distance"><a class="viewcode-back" href="../../../segment.html#runninglog.single_run.segment.Segment.parse_distance">[docs]</a>    <span class="k">def</span> <span class="nf">parse_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parses distance</span>
-<span class="sd">            </span>
+
 <span class="sd">            It parses the segment distance from the input argument in dist</span>
 <span class="sd">            Distance must be given in km</span>
 
@@ -298,7 +337,7 @@
 <span class="sd">                Only the numerical part is extracted</span>
 <span class="sd">                Hence 10km is interpreted in the same way as 10m</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1">#If it is a number, do not preprocess</span>
+        <span class="c1"># If it is a number, do not preprocess</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">dist</span>
 
@@ -306,23 +345,23 @@
         <span class="n">distance</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">distance</span><span class="p">[</span><span class="s2">&quot;km&quot;</span><span class="p">])</span></div>
-    
+
 <div class="viewcode-block" id="Segment.parse_pace"><a class="viewcode-back" href="../../../segment.html#runninglog.single_run.segment.Segment.parse_pace">[docs]</a>    <span class="k">def</span> <span class="nf">parse_pace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pace</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parses pace</span>
-<span class="sd">            </span>
+
 <span class="sd">            It parses the segment pace from the input argument pace</span>
 
 <span class="sd">            Args:</span>
 <span class="sd">                pace (int or str): If pace is an integer, it is supposed</span>
 <span class="sd">                    to be in seconds/km. If it is a string it is supposed</span>
-<span class="sd">                    to be in minutes:seconds/km </span>
+<span class="sd">                    to be in minutes:seconds/km</span>
 <span class="sd">            Returns:</span>
 <span class="sd">                int: pace in seconds/km</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">pace</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="c1">#If it is a number, do not preprocess</span>
+        <span class="c1"># If it is a number, do not preprocess</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pace</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">pace</span>
 

@@ -35,7 +35,21 @@
   <span class="target" id="module-runninglog.single_run.single_run"></span><dl class="py class">
 <dt id="runninglog.single_run.single_run.SingleRun">
 <em class="property">class </em><code class="sig-prename descclassname">runninglog.single_run.single_run.</code><code class="sig-name descname">SingleRun</code><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="py method">
+<dd><p>A running event
+It may be composed of different running segments.</p>
+<p>In itself, the whole run could be understood as a segment,
+with a total time, distance, climb, avg. speed, date…</p>
+<p>In addition to segment characteristics, it has a distance/pace/time
+distribution of running types, whereas a segmen has only on of them.</p>
+<dl class="simple">
+<dt>Units:</dt><dd><p>distance: km
+time: min
+pace: sec/km
+climb: m
+vspeed: m/h</p>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="runninglog.single_run.single_run.SingleRun.as_dict">
 <code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.as_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts segment into dictionary.
@@ -43,17 +57,324 @@ This is later used to build a panda’s DataFrame representation</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.assign_spare_distance_and_time_to_easy_basic_type">
+<code class="sig-name descname">assign_spare_distance_and_time_to_easy_basic_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.assign_spare_distance_and_time_to_easy_basic_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.assign_spare_distance_and_time_to_easy_basic_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assigns the spare time and distance to a basic type</p>
+<p>For consistency, the difference between the total distance
+and time is added into a distribution dictionary element.
+If it is a running activity, it is assigned to the easy
+running type. If it is a cross training activity, it is
+assigned to the general activity type.</p>
+<p>After running this function, the sum over all basic running
+types for basic_time and basic distances will be equal to
+the total time and distance, respectively.</p>
+<p>Note:</p>
+<p>This function assumes that basic_time and basic_distance
+dictionaries are filled with structured information.</p>
+<p>If no structure was used, all the distance and time will be
+assigned to the easy basic running type in the case of
+running activities and the activity type for cross training
+activities.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.compute_avg_pace">
+<code class="sig-name descname">compute_avg_pace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.compute_avg_pace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.compute_avg_pace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the average pace of the single run</p>
+<p>Computes the average pace of the single run. Distance
+and time must have been set beforehand</p>
+<p>Time is assumed to be in minutes and distance in seconds.
+The avg. pace is stored in seconds/km</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.compute_basic_types_avg_paces">
+<code class="sig-name descname">compute_basic_types_avg_paces</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.compute_basic_types_avg_paces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.compute_basic_types_avg_paces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the avg pace for each basic running type</p>
+<p>Computes the avg pace for each basic running type. If either
+time or distance is missing for a basic type, the basic pace
+is not computed</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.compute_vspeed">
+<code class="sig-name descname">compute_vspeed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.compute_vspeed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.compute_vspeed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes vertical speed</p>
+<p>Computes vertical speed. Needs of a time different to 0</p>
+<dl class="simple">
+<dt>Units:</dt><dd><p>meters/hour</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_basic_dist_and_time_dictionaries">
+<code class="sig-name descname">fill_basic_dist_and_time_dictionaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_basic_dist_and_time_dictionaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_basic_dist_and_time_dictionaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills distribution dictionaries with segment</p>
+<p>Fills the single run segments with data in the list of dictionaries.
+Data from the single run is passed into the segment, such as trail,
+feeling or date if not present already.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="runninglog.single_run.single_run.SingleRun.fill_basic_runtype_info_with_global_type">
 <code class="sig-name descname">fill_basic_runtype_info_with_global_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_basic_runtype_info_with_global_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_basic_runtype_info_with_global_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Only applied when no structure was found</p>
-<p>It requires self.type, self.total_distance and self.total_time
+<p>It requires self.type, self.distance and self.time
 to be set beforehand</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_climb">
+<code class="sig-name descname">fill_climb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_climb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_climb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills climb with data in input dictionary</p>
+<p>Fills climb with the configuration dictionary.
+If it is missing, climb is assigned to 0</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with climb information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_date">
+<code class="sig-name descname">fill_date</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills date with data in input dictionary</p>
+<p>Fills date with the configuration dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with date information</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Date is a compulsory attribute</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_distance">
+<code class="sig-name descname">fill_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills distance with data in input dictionary</p>
+<p>Fills distance with the configuration dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with distance information</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Distance is a compulsory attribute</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_feeling">
+<code class="sig-name descname">fill_feeling</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_feeling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_feeling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills feeling with data in input dictionary</p>
+<p>Fills feeling with the configuration dictionary.
+If it is missing, None value is assigned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with feeling information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_is_trail_running">
+<code class="sig-name descname">fill_is_trail_running</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_is_trail_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_is_trail_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills trail running flag  with data in input dictionary</p>
+<p>Fills trail running flag  with data in input dictionary
+It is set to the boolean evaluation of the input value
+If it is missing, trail running is assumed to be False</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with trail running information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_notes">
+<code class="sig-name descname">fill_notes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_notes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_notes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills notes with data in input dictionary</p>
+<p>Fills notes with the configuration dictionary.
+If it is missing, an empty string is assigned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with notes data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_route">
+<code class="sig-name descname">fill_route</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_route"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_route" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills route with data in input dictionary</p>
+<p>Fills route with the configuration dictionary.
+If it is missing, an empty string is assigned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with route information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_run_structure">
+<code class="sig-name descname">fill_run_structure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_run_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_run_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills the run structure with data in input dictionary</p>
+<p>Fills the run structure with data in input dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with structure data</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_segments">
+<code class="sig-name descname">fill_segments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">struct_list_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_segments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills the single run segments with data in the list of dictionaries</p>
+<p>Fills the single run segments with data in the list of dictionaries.
+Data from the single run is passed into the segment, such as trail,
+feeling or date if not present already.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_time">
+<code class="sig-name descname">fill_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills time with data in input dictionary</p>
+<p>Fills time with the configuration dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with time information</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Time is a compulsory attribute</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_type">
+<code class="sig-name descname">fill_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills type with data in input dictionary</p>
+<p>Fills type with the configuration dictionary. If the type
+is either not present in the dictionary, or it is a not supported
+one, it is set to runTypes.RUN_TYPES_ENUM.E</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with type information</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Supported activity types are defined in
+runTypes.RUN_TYPES_DICTIONARY</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.fill_where">
+<code class="sig-name descname">fill_where</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.fill_where"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.fill_where" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fills location with data in input dictionary</p>
+<p>Fills location (where)  with the configuration dictionary.
+If it is missing, an empty string is assigned</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – Dictionary with location information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.get_structure_as_df">
+<code class="sig-name descname">get_structure_as_df</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.get_structure_as_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.get_structure_as_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a DataFrame from the list of segments</p>
+<p>Uses the segment.as_dict() function to build a pandas Series
+which is appended in a DataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>DataFrame containing the structure</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.init_distribution_dictionaries">
+<code class="sig-name descname">init_distribution_dictionaries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.init_distribution_dictionaries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.init_distribution_dictionaries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes distribution dictionaries</p>
+<p>Initializes distribution dictionaries (basic_dist,
+basic_time, and basic_pace). The first two are set
+to 0 and the latter to None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="runninglog.single_run.single_run.SingleRun.load_json">
+<code class="sig-name descname">load_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parsed_json</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.load_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.load_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the data in the input dictionary into the single run</p>
+<p>Loads the data in the input dictionary into the single run.
+The dicitonary <em>must</em> at least contain a time, distance and date.
+The rest of parameters are optional but further analysis can be
+performed when provided (e.g. segment analysis).</p>
+<p>When providing a running structure (with segments), different
+distances, times and paces are kept for each basic running type.
+These are assigned to the corresponding basic run type of each
+segment. If the segments’ sum of distances and time do not add
+up to the total distance and time in the run, the difference is
+assigned to the easy pace, for consistency.</p>
+<dl class="simple">
+<dt>Compulsory parameters:</dt><dd><ul class="simple">
+<li><p>Time</p></li>
+<li><p>Distance</p></li>
+<li><p>Date</p></li>
+</ul>
+</dd>
+<dt>Optional parameters:</dt><dd><ul class="simple">
+<li><p>Type</p></li>
+<li><p>Climb</p></li>
+<li><p>Location (where)</p></li>
+<li><p>Route</p></li>
+<li><p>Trail</p></li>
+<li><p>Feeling</p></li>
+<li><p>Structure (running structure)</p></li>
+</ul>
+</dd>
+<dt>Units:</dt><dd><p>distance: km
+time: min
+pace: sec/km
+climb: m
+vspeed: m/h</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parsed_json</strong> (<em>dict</em>) – Dictionary containing single run information</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Dictionary keys are defined in constants.blockNames</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
 <dt id="runninglog.single_run.single_run.SingleRun.parse_type">
 <code class="sig-name descname">parse_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/single_run.html#SingleRun.parse_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.single_run.SingleRun.parse_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses run type. If not found, set it to E.</p>
+<dd><p>Parses type</p>
+<p>It parses the run type from the input argument. If not
+available, it is set to easy</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>type_str</strong> (<em>str</em>) – string type</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>run type in RUN_TYPES_DICTIONARY.
+If not found, returns runTypes.RUN_TYPES.E</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

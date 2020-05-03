@@ -91,7 +91,7 @@ class TestSingleRun(unittest.TestCase):
 
         #Segments are needed to be set in singleRun
         singleRun.fill_segments(input_dict)
-        singleRun.fill_basic_dist_and_time_dictionaries()
+        singleRun.fill_basic_volume_dict_with_structure_volume()
 
         golden_basic_dist = {}
         golden_basic_time = {}
@@ -119,7 +119,7 @@ class TestSingleRun(unittest.TestCase):
                             golden_basic_time[i],
                             2)
 
-    def test_assign_spare_distance_and_time_to_easy_basic_type(self):
+    def test_fill_basic_volume_dict_with_unassigned_volume(self):
         singleRun = single.SingleRun()
 
         #Equivalent distance and time distributions to structure:
@@ -131,11 +131,11 @@ class TestSingleRun(unittest.TestCase):
         singleRun.basic_dist[types.BASIC_RUN_TYPES_ENUM.T] = 5
         singleRun.basic_time[types.BASIC_RUN_TYPES_ENUM.M] = 40*60
         singleRun.basic_time[types.BASIC_RUN_TYPES_ENUM.T] = 17*60
-        singleRun.type = types.BASIC_RUN_TYPES_ENUM.E
+        singleRun.type = types.RUN_TYPES_ENUM.E
         singleRun.distance = 20
         singleRun.time = 82
 
-        singleRun.assign_spare_distance_and_time_to_easy_basic_type()
+        singleRun.fill_basic_volume_dict_with_unassigned_volume()
 
         golden_basic_dist = {}
         golden_basic_time = {}
@@ -162,7 +162,41 @@ class TestSingleRun(unittest.TestCase):
                             golden_basic_time[i],
                             2)
 
-    def test_load_json1(self):
+    def test_assign_to_easy_regardless_of_activity_type_if_no_struct(self):
+        # The spare time and basic type is assigned to the easy type in
+        # running activities if it is not specified as a structure
+
+        singleRun = single.SingleRun()
+        singleRun.type = types.RUN_TYPES_ENUM.M
+        singleRun.distance = 10
+        singleRun.time = 60
+        #Note that by default basic_dist and basic_time are empty
+
+        singleRun.fill_basic_volume_dict_with_unassigned_volume()
+
+        golden_basic_dist = {}
+        golden_basic_time = {}
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
+            golden_basic_dist[i] = 0
+            golden_basic_time[i] = 0
+
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.E] = 10
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.E] = 60*60
+
+
+        for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
+            self.assertAlmostEqual(
+                            singleRun.basic_dist[i],
+                            golden_basic_dist[i],
+                            2)
+            self.assertAlmostEqual(
+                            singleRun.basic_time[i],
+                            golden_basic_time[i],
+                            2)
+
+    def test_load_json_struct_and_assign_to_E_type(self):
+        # Although the single run is of type T, the spare
+        # time and distance is assigned to the E type
         singleRun = single.SingleRun()
 
         parsed_json = {
@@ -226,7 +260,7 @@ class TestSingleRun(unittest.TestCase):
 
 
 
-    def test_load_json2(self):
+    def test_load_json_no_struct(self):
         singleRun = single.SingleRun()
 
         parsed_json = {
@@ -274,7 +308,7 @@ class TestSingleRun(unittest.TestCase):
                             golden_basic_time[i],
                             2)
 
-    def test_load_json3(self):
+    def test_load_json_cross_training(self):
         # All dist/time/pace are assigned to key X in dictionary
         singleRun = single.SingleRun()
 
@@ -322,7 +356,7 @@ class TestSingleRun(unittest.TestCase):
                             golden_basic_time[i],
                             2)
 
-    def test_load_json4(self):
+    def test_load_json_cross_training_with_struct(self):
         # We can assign data to any basic type with an X activity.
         # In the case of cross training activities, the remaining
         # is assigned to the cross training activity type
@@ -345,6 +379,7 @@ class TestSingleRun(unittest.TestCase):
         self.assertEqual(singleRun.where, "")
         self.assertEqual(singleRun.route, "")
         self.assertEqual(singleRun.feeling, None)
+        self.assertEqual(singleRun.is_trail_running, False)
         dateObj = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
@@ -377,29 +412,27 @@ class TestSingleRun(unittest.TestCase):
                             golden_basic_time[i],
                             2)
 
-    def test_load_json5(self):
-        # Although the single run is of type T, the spare
-        # time and distance is assigned to the E type
+    def test_load_json_assign_to_E_if_no_struct(self):
+        # If no structure is defined, time and distance are assigned
+        # to easy type regardless of type
         singleRun = single.SingleRun()
 
         parsed_json = {
                         "type": "T",
                         "date": "01-01-2020",
                         "time": "1h",
-                        "distance": 14,
-                        "structure": [
-                            {"type":"T", "distance":5, "time":"18min"},
-                            {"type":"T", "distance":5, "time":"22min"}
-                        ]
+                        "distance": 14
                       }
 
         singleRun.load_json(parsed_json)
 
         self.assertEqual(singleRun.time, 60)
+        self.assertEqual(singleRun.distance, 14)
         self.assertEqual(singleRun.climb, 0)
         self.assertEqual(singleRun.where, "")
         self.assertEqual(singleRun.route, "")
         self.assertEqual(singleRun.feeling, None)
+        self.assertEqual(singleRun.is_trail_running, False)
         dateObj = datetime.datetime.strptime("01/01/2020", "%d/%m/%Y").date()
         self.assertEqual(singleRun.date, dateObj)
 
@@ -411,12 +444,9 @@ class TestSingleRun(unittest.TestCase):
             golden_basic_time[i] = 0
             golden_basic_pace[i] = None
 
-        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.E] = 4
-        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.T] = 10
-        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.E] = 300
-        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.T] = 240
-        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.E] = 20*60
-        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.T] = 40*60
+        golden_basic_dist[types.BASIC_RUN_TYPES_ENUM.T] = 14
+        golden_basic_pace[types.BASIC_RUN_TYPES_ENUM.T] = 257.1428
+        golden_basic_time[types.BASIC_RUN_TYPES_ENUM.T] = 60*60
 
         for i in types.BASIC_RUN_TYPES_DICTIONARY.keys():
             self.assertAlmostEqual(

@@ -12,21 +12,54 @@ from runninglog.run import segment
 
 
 class SingleRun(segment.Segment):
-    """A running event
-    It may be composed of different running segments.
+    """Running activity object.
 
-    In itself, the whole run could be understood as a segment,
-    with a total time, distance, climb, avg. speed, date... 
+    A SingleRun is a running activity object.
 
-    In addition to segment characteristics, it has a distance/pace/time 
-    distribution of running types, whereas a segmen has only on of them.
+    Attributes that must be defined:
+        * Time
+        * Distance
+        * Date
+
+    Ideally defined. Assigned default values otherwise:
+        * Type (see note below)
+        * Climb
+        * Location (`where`)
+        * Route
+        * Trail
+        * Feeling
+        * Structure (`run_structure`)
 
     Units:
-        distance: km
-        time: min
-        pace: sec/km
-        climb: m
-        vspeed: m/h
+        * distance: km
+        * time: min
+        * pace: sec/km
+        * climb: m
+        * vspeed: m/h
+
+
+    Note:
+        The SingleRun type and Segment type refer to different concepts:\
+        the former is a short identifier of the primary goal of the workout,\
+        whereas the latter identifies the running intensities (e.g. easy\
+        pace, marathon pace, threshold pace, interval/hard pace or repetition\
+        in Daniel's running formula):
+
+        * The SingleRun type expresses succintly the goal of the run and is\
+        used as a quick identifier of workout type (e.g. easy run, interval\
+        workout or race). Beside, the type is used to identify cross training\
+        activities.
+
+        * Segment types are used to classify training volume into the defined\
+        running intensities. This is useful for example to keep\
+        track of accumulated volume at each intensity or to compare\
+        performance over time.
+
+        * The user is expected to define the volume spent on each Segment\
+        type in the structure section. When it does not cover the overall\
+        time or distance (e.g. when no structure is defined), SingleRun\
+        guesses the volume spent on each segment.
+
     """
     def __init__(self):
         super(SingleRun, self).__init__()
@@ -231,11 +264,11 @@ class SingleRun(segment.Segment):
             * Structure (running structure)
 
         Units:
-            distance: km
-            time: min
-            pace: sec/km
-            climb: m
-            vspeed: m/h
+            * distance: km
+            * time: min
+            * pace: sec/km
+            * climb: m
+            * vspeed: m/h
 
         Args:
             parsed_json (dict): Dictionary containing single run information
@@ -262,21 +295,24 @@ class SingleRun(segment.Segment):
         self.fill_feeling(parsed_json)
         self.fill_notes(parsed_json)
 
-        #struct
+        # Fill run structure
         self.fill_run_structure(parsed_json)
 
-        #compute variables
+        # Compute variables
         self.compute_vspeed()
         self.pace = self.compute_avg_pace()
-        self.assign_spare_distance_and_time_to_easy_basic_type()
 
+        self.fill_basic_volume_dict_with_structure_volume()
+        if len(self.run_structure) == 0:
+            self.fill_basic_volume_dict_with_guessed_type()
+        self.fill_basic_volume_dict_with_unassigned_volume()
         self.compute_basic_types_avg_paces()
 
     def init_distribution_dictionaries(self):
         """Initializes distribution dictionaries
 
-            Initializes distribution dictionaries (basic_dist,
-            basic_time, and basic_pace). The first two are set
+            Initializes distribution dictionaries (`basic_dist`,
+            `basic_time`, and `basic_pace`). The first two are set
             to 0 and the latter to None.
         """
         for k in types.BASIC_RUN_TYPES_DICTIONARY.keys():
@@ -498,9 +534,6 @@ class SingleRun(segment.Segment):
 
         if struct_str != "":
             self.fill_segments(struct_str)
-            self.fill_basic_dist_and_time_dictionaries()
-        else:
-            self.fill_basic_runtype_info_with_global_type()
 
     def parse_type(self, type_str):
         """Parses type
@@ -527,9 +560,9 @@ class SingleRun(segment.Segment):
         #                                self.date, self.distance, self.time))
         return types.RUN_TYPES_ENUM.E
 
-    def fill_basic_runtype_info_with_dict(self, struct_list_dict):
-        self.fill_segments(struct_list_dict)
-        self.fill_basic_dist_and_time_dictionaries()
+    #def fill_basic_runtype_info_with_dict(self, struct_list_dict):
+    #    self.fill_segments(struct_list_dict)
+    #    self.fill_basic_dist_and_time_dictionaries()
 
     def fill_segments(self, struct_list_dict):
         """Fills the single run segments with data in the list of dictionaries
@@ -550,12 +583,10 @@ class SingleRun(segment.Segment):
 
                 self.run_structure.append(sgmnt)
 
-    def fill_basic_dist_and_time_dictionaries(self):
-        """Fills distribution dictionaries with segment
+    def fill_basic_volume_dict_with_structure_volume(self):
+        """Fills basic dictionaries with structure.
 
-            Fills the single run segments with data in the list of dictionaries.
-            Data from the single run is passed into the segment, such as trail,
-            feeling or date if not present already.
+            Fills basic_dist and basic_time dictionaries with structure data.
         """
         self.init_distribution_dictionaries()
         for sgmnt in self.run_structure:
@@ -564,9 +595,11 @@ class SingleRun(segment.Segment):
                 self.basic_time[sgmnt.type] += sgmnt.time
 
 
-    def fill_basic_runtype_info_with_global_type(self):
+    def fill_basic_volume_dict_with_guessed_type(self):
         """
-            Only applied when no structure was found
+            If the SingleRun type matches a Segment type,
+            use that type to fill basic_time and basic_dist
+            dictionaries.
 
             It requires self.type, self.distance and self.time
             to be set beforehand
@@ -599,28 +632,27 @@ class SingleRun(segment.Segment):
         else:
             return None
 
-    def assign_spare_distance_and_time_to_easy_basic_type(self):
-        """Assigns the spare time and distance to a basic type
+    def fill_basic_volume_dict_with_unassigned_volume(self):
+        """Assigns the spare time and distance to a basic type.
 
             For consistency, the difference between the total distance
-            and time is added into a distribution dictionary element.
+            and time is added into a distribution dictionary element,
+            so that the sum over time and distance distribution
+            dictionaries is equal to the total activity distance and
+            time, respectively.
+
             If it is a running activity, it is assigned to the easy
             running type. If it is a cross training activity, it is
-            assigned to the general activity type.
-
-            After running this function, the sum over all basic running
-            types for basic_time and basic distances will be equal to 
-            the total time and distance, respectively.
+            assigned to the general activity type (e.g. X for an X
+            activity).
 
             Note:
 
             This function assumes that basic_time and basic_distance
             dictionaries are filled with structured information.
 
-            If no structure was used, all the distance and time will be
-            assigned to the easy basic running type in the case of
-            running activities and the activity type for cross training
-            activities.
+            If no structure was used, the basic running type will be
+            guessed.
         """
 
         str_type = types.RUN_TYPES_DICTIONARY[self.type]
@@ -628,16 +660,36 @@ class SingleRun(segment.Segment):
             type_ = types.BASIC_RUN_TYPES_ENUM.E
         else:
             #assign to cross training basic type
-            for (runType, runTypeBlockname) in\
-                types.BASIC_RUN_TYPES_DICTIONARY.items():
-                    if str_type == runTypeBlockname:
-                        type_ = runType
+            for (k,v) in types.BASIC_RUN_TYPES_DICTIONARY.items():
+                if str_type == v:
+                    type_ = k
 
         assigned_dist = sum(self.basic_dist.values())
         self.basic_dist[type_] += self.distance - assigned_dist
 
         assigned_time = sum(self.basic_time.values())
         self.basic_time[type_] += self.time*60 - assigned_time
+
+    def fill_basic_runtype_info_with_global_type(self):
+        """
+            Only applied when no structure was found
+
+            It requires self.type, self.distance and self.time
+            to be set beforehand
+        """
+        dictkey = 0
+
+        type_val = types.RUN_TYPES_DICTIONARY[self.type]
+        if type_val in types.BASIC_RUN_TYPES_DICTIONARY.values():
+            for (k1,v1) in types.BASIC_RUN_TYPES_DICTIONARY.items():
+                if type_val==v1: 
+                    dictkey = k1
+        else:
+            dictkey = types.BASIC_RUN_TYPES_ENUM.E
+
+        self.basic_dist[dictkey] = self.distance
+        self.basic_time[dictkey] = self.time * 60
+        self.basic_pace[dictkey] = self.time * 60 / self.distance
 
     def compute_basic_types_avg_paces(self):
         """Computes the avg pace for each basic running type

@@ -1,13 +1,13 @@
-import context
-
-from all_runs import all_runs
-from single_run import single_run, runTypes
-from reader import reader
-
 import unittest
 import datetime
 import os
 import pandas as pd
+
+import context
+from runninglog.all_runs import all_runs
+from runninglog.single_run import single_run, runTypes
+from runninglog.reader import reader
+
 
 class TestAllRuns(unittest.TestCase):
     def test_read_single_run1(self):
@@ -17,14 +17,14 @@ class TestAllRuns(unittest.TestCase):
 
         goldenSingleRun = single_run.SingleRun()
         goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T
-        goldenSingleRun.total_time = 75
-        goldenSingleRun.total_distance = 13.80
+        goldenSingleRun.time = 75
+        goldenSingleRun.distance = 13.80
         goldenSingleRun.climb = 110
         goldenSingleRun.vspeed = 88
-        goldenSingleRun.avg_pace = 326.087
+        goldenSingleRun.pace = 326.087
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = "Lap 1"
-        goldenSingleRun.trail_running = True
+        goldenSingleRun.is_trail_running = True
         goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.E] = 7.96
         goldenSingleRun.basic_dist[runTypes.BASIC_RUN_TYPES_ENUM.M] = 0
@@ -51,11 +51,11 @@ class TestAllRuns(unittest.TestCase):
 
         goldenSingleRun = single_run.SingleRun()
         goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.E
-        goldenSingleRun.total_time = 60
-        goldenSingleRun.total_distance = 12.2
+        goldenSingleRun.time = 60
+        goldenSingleRun.distance = 12.2
         goldenSingleRun.climb = 100
         goldenSingleRun.vspeed = 100
-        goldenSingleRun.avg_pace = 295.081967213 
+        goldenSingleRun.pace = 295.081967213 
         goldenSingleRun.trail_running = False
         goldenSingleRun.where = "Park2"
         goldenSingleRun.route = ""
@@ -85,11 +85,11 @@ class TestAllRuns(unittest.TestCase):
 
         goldenSingleRun = single_run.SingleRun()
         goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T
-        goldenSingleRun.total_time = 75
-        goldenSingleRun.total_distance = 13.80
+        goldenSingleRun.time = 75
+        goldenSingleRun.distance = 13.80
         goldenSingleRun.climb = 110
         goldenSingleRun.vspeed = 88
-        goldenSingleRun.avg_pace = 326.087
+        goldenSingleRun.pace = 326.087
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = ""
         goldenSingleRun.date = datetime.datetime.strptime("26/12/2018", "%d/%m/%Y").date()
@@ -111,11 +111,11 @@ class TestAllRuns(unittest.TestCase):
 
         goldenSingleRun2 = single_run.SingleRun()
         goldenSingleRun2.type = runTypes.RUN_TYPES_ENUM.E
-        goldenSingleRun2.total_time = 60
-        goldenSingleRun2.total_distance = 12.2
+        goldenSingleRun2.time = 60
+        goldenSingleRun2.distance = 12.2
         goldenSingleRun2.climb = 100
         goldenSingleRun2.vspeed = 100
-        goldenSingleRun2.avg_pace = 295.082
+        goldenSingleRun2.pace = 295.082
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
         goldenSingleRun2.date = datetime.datetime.strptime("27/12/2018", "%d/%m/%Y").date()
@@ -234,11 +234,11 @@ class TestAllRuns(unittest.TestCase):
 
         goldenSingleRun = single_run.SingleRun()
         goldenSingleRun.type = runTypes.RUN_TYPES_ENUM.T
-        goldenSingleRun.total_time = 75
-        goldenSingleRun.total_distance = 13.80
+        goldenSingleRun.time = 75
+        goldenSingleRun.distance = 13.80
         goldenSingleRun.climb = 110
         goldenSingleRun.vspeed = 88
-        goldenSingleRun.avg_pace = 326.09
+        goldenSingleRun.pace = 326.09
         goldenSingleRun.where = "Park"
         goldenSingleRun.route = ""
         goldenSingleRun.date = datetime.datetime.strptime("26/11/2018", "%d/%m/%Y").date()
@@ -260,11 +260,11 @@ class TestAllRuns(unittest.TestCase):
 
         goldenSingleRun2 = single_run.SingleRun()
         goldenSingleRun2.type = runTypes.RUN_TYPES_ENUM.E
-        goldenSingleRun2.total_time = 60
-        goldenSingleRun2.total_distance = 12.2
+        goldenSingleRun2.time = 60
+        goldenSingleRun2.distance = 12.2
         goldenSingleRun2.climb = 100
         goldenSingleRun2.vspeed = 100
-        goldenSingleRun2.avg_pace = 295.08
+        goldenSingleRun2.pace = 295.08
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
         goldenSingleRun2.date = datetime.datetime.strptime("27/11/2018", "%d/%m/%Y").date()

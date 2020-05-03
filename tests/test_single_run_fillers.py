@@ -3,12 +3,12 @@ import datetime
 import math
 
 import context
-from single_run import single_run
-from single_run import runTypes
-from constants import blockNames
+from runninglog.single_run import single_run
+from runninglog.single_run import runTypes
+from runninglog.constants import blockNames
 
 
-class TestSingleTest(unittest.TestCase):
+class TestSingleRunFillers(unittest.TestCase):
     def test_fill_type_valid(self):
         singleRun = single_run.SingleRun()
         config_dict = {'type': blockNames.RunTypes.E}
@@ -56,7 +56,7 @@ class TestSingleTest(unittest.TestCase):
     def test_missing_time_raise_exception(self):
         singleRun = single_run.SingleRun()
         config_dict = {'invalid_key' : '1h'}
-        with self.assertRaises(KeyError):
+        with self.assertRaises(Exception):
             singleRun.fill_time(config_dict)
 
     def test_fill_distance_valid(self):
@@ -68,7 +68,7 @@ class TestSingleTest(unittest.TestCase):
     def test_missing_distance_raise_exception(self):
         singleRun = single_run.SingleRun()
         config_dict = {'invalid_key' : 10}
-        with self.assertRaises(KeyError):
+        with self.assertRaises(Exception):
             singleRun.fill_distance(config_dict)
 
     def test_fill_date_valid(self):
@@ -81,7 +81,7 @@ class TestSingleTest(unittest.TestCase):
     def test_missing_date_raise_exception(self):
         singleRun = single_run.SingleRun()
         config_dict = {'invalid_key' : '01/05/2020'}
-        with self.assertRaises(KeyError):
+        with self.assertRaises(Exception):
             singleRun.fill_date(config_dict)
 
     def test_fill_climb_valid(self):
@@ -183,3 +183,9 @@ class TestSingleTest(unittest.TestCase):
         config_dict = {}
         singleRun.fill_notes(config_dict)
         self.assertEqual(singleRun.notes, '')
+
+def main():
+    return unittest.main(exit=False)
+
+if __name__ == "__main__":
+    main()

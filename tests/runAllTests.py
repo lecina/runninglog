@@ -1,15 +1,17 @@
 import unittest
 
-import tests.test_all_runs as tAllRuns
-import tests.test_single_run as tSingleRun
-import tests.test_segment as tSegment
-#import tests.single_test as tSing
+import context
+import test_all_runs as tAllRuns
+import test_single_run as tSingleRun
+import test_segment as tSegment
+import test_single_run_fillers as tSingleRunFillers
 
 def main():
     testSuite = unittest.TestSuite()
 
     testSuite.addTest(unittest.makeSuite(tAllRuns.TestAllRuns))
     testSuite.addTest(unittest.makeSuite(tSingleRun.TestSingleRun))
+    testSuite.addTest(unittest.makeSuite(tSingleRunFillers.TestSingleRunFillers))
     testSuite.addTest(unittest.makeSuite(tSegment.TestSegment))
     #testSuite.addTest(unittest.makeSuite(tSing.TestSingleTest))
 

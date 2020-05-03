@@ -13,6 +13,8 @@ class FileParams:
     route = "route"
     notes = "notes"
     bpm = "bpm"
+    rep = "rep"
+    rep_alt = "repetition"
     list = "list"
 
 class Colnames:

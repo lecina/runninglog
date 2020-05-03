@@ -13,7 +13,7 @@ Welcome to runninglog's documentation!
    all_runs
    single_run
    segment
-   runTypes
+   run_types
 
 
 

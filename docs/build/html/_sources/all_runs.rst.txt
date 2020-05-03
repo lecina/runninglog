@@ -1,4 +1,4 @@
-.. automodule:: runninglog.all_runs.all_runs
+.. automodule:: runninglog.run.all_runs
    :members:
 
 

@@ -1,4 +1,4 @@
-.. automodule:: runninglog.single_run.runTypes
+.. automodule:: runninglog.run.types
    :members:
 
 

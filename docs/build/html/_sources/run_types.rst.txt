@@ -1,9 +1,9 @@
-.. automodule:: runninglog.run.single
+.. automodule:: runninglog.run.types
    :members:
 
 
 
-Single_run
+runTypes
 ==================
 
 * :ref:`genindex`

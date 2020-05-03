@@ -14,7 +14,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="runTypes" href="runTypes.html" />
+    <link rel="next" title="runTypes" href="run_types.html" />
     <link rel="prev" title="Single_run" href="single_run.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -32,9 +32,9 @@
 
           <div class="body" role="main">
             
-  <span class="target" id="module-runninglog.single_run.segment"></span><dl class="py class">
-<dt id="runninglog.single_run.segment.Segment">
-<em class="property">class </em><code class="sig-prename descclassname">runninglog.single_run.segment.</code><code class="sig-name descname">Segment</code><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment" title="Permalink to this definition">¶</a></dt>
+  <span class="target" id="module-runninglog.run.segment"></span><dl class="py class">
+<dt id="runninglog.run.segment.Segment">
+<em class="property">class </em><code class="sig-prename descclassname">runninglog.run.segment.</code><code class="sig-name descname">Segment</code><a class="reference internal" href="_modules/runninglog/run/segment.html#Segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.run.segment.Segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basic run element of a given type.
 It must have a type and a distance. The rest of parameters are optional
 A single run may contain from none to an indefinite number of them.</p>
@@ -47,15 +47,15 @@ vspeed: m/h</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="runninglog.single_run.segment.Segment.as_dict">
-<code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.as_dict" title="Permalink to this definition">¶</a></dt>
+<dt id="runninglog.run.segment.Segment.as_dict">
+<code class="sig-name descname">as_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/run/segment.html#Segment.as_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.run.segment.Segment.as_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts segment into dictionary.
 This is later used to build a panda’s DataFrame representation</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="runninglog.single_run.segment.Segment.fill_segment">
-<code class="sig-name descname">fill_segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">segment_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.fill_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.fill_segment" title="Permalink to this definition">¶</a></dt>
+<dt id="runninglog.run.segment.Segment.fill_segment">
+<code class="sig-name descname">fill_segment</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">segment_dict</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/run/segment.html#Segment.fill_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.run.segment.Segment.fill_segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fills the segment with the data in the dictionary</p>
 <p>Fills the segment with the data in the input dictionary.
 A segment type and a distance must be provided. The rest of
@@ -85,14 +85,14 @@ vspeed: m/h</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="runninglog.single_run.segment.Segment.is_empty">
-<code class="sig-name descname">is_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.is_empty" title="Permalink to this definition">¶</a></dt>
+<dt id="runninglog.run.segment.Segment.is_empty">
+<code class="sig-name descname">is_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/run/segment.html#Segment.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.run.segment.Segment.is_empty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if segment is empty</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="runninglog.single_run.segment.Segment.parse_distance">
-<code class="sig-name descname">parse_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dist</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.parse_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.parse_distance" title="Permalink to this definition">¶</a></dt>
+<dt id="runninglog.run.segment.Segment.parse_distance">
+<code class="sig-name descname">parse_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dist</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/run/segment.html#Segment.parse_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.run.segment.Segment.parse_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses distance</p>
 <p>It parses the segment distance from the input argument in dist
 Distance must be given in km</p>
@@ -115,8 +115,8 @@ Hence 10km is interpreted in the same way as 10m</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="runninglog.single_run.segment.Segment.parse_pace">
-<code class="sig-name descname">parse_pace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pace</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.parse_pace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.parse_pace" title="Permalink to this definition">¶</a></dt>
+<dt id="runninglog.run.segment.Segment.parse_pace">
+<code class="sig-name descname">parse_pace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pace</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/run/segment.html#Segment.parse_pace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.run.segment.Segment.parse_pace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses pace</p>
 <p>It parses the segment pace from the input argument pace</p>
 <dl class="field-list simple">
@@ -135,8 +135,8 @@ to be in minutes:seconds/km</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="runninglog.single_run.segment.Segment.parse_time">
-<code class="sig-name descname">parse_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.parse_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.parse_time" title="Permalink to this definition">¶</a></dt>
+<dt id="runninglog.run.segment.Segment.parse_time">
+<code class="sig-name descname">parse_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/run/segment.html#Segment.parse_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.run.segment.Segment.parse_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses time</p>
 <p>It parses the segment time from the input argument pace and
 returns it in minutes</p>
@@ -160,8 +160,8 @@ Seconds can be written as: ‘s’</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="runninglog.single_run.segment.Segment.parse_type">
-<code class="sig-name descname">parse_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/single_run/segment.html#Segment.parse_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.single_run.segment.Segment.parse_type" title="Permalink to this definition">¶</a></dt>
+<dt id="runninglog.run.segment.Segment.parse_type">
+<code class="sig-name descname">parse_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type_str</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/runninglog/run/segment.html#Segment.parse_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#runninglog.run.segment.Segment.parse_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses type</p>
 <p>It parses the segment type from the input argument</p>
 <dl class="field-list simple">
@@ -211,7 +211,7 @@ If not found, returns None</p>
 <li class="toctree-l1"><a class="reference internal" href="all_runs.html">All_runs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="single_run.html">Single_run</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Segment</a></li>
-<li class="toctree-l1"><a class="reference internal" href="runTypes.html">runTypes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_types.html">runTypes</a></li>
 </ul>
 
 <div class="relations">
@@ -219,7 +219,7 @@ If not found, returns None</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="single_run.html" title="previous chapter">Single_run</a></li>
-      <li>Next: <a href="runTypes.html" title="next chapter">runTypes</a></li>
+      <li>Next: <a href="run_types.html" title="next chapter">runTypes</a></li>
   </ul></li>
 </ul>
 </div>

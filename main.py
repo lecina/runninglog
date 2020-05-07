@@ -1,14 +1,12 @@
-from src.all_runs import all_runs
-from src.utilities import utilities
-from src.constants import constants
-from src.reader import reader
-
 import os.path
 import json
 import argparse
 import types
 
-import pdb
+from runninglog.run import all_runs
+from runninglog.utilities import utilities
+from runninglog.constants import constants
+from runninglog.reader import reader
 
 def parseArgs():
     desc_str = "Running log program.\n"\

@@ -9,9 +9,10 @@ from runninglog.constants import blockNames
 from runninglog.utilities import utilities
 from runninglog.run import types
 from runninglog.run import segment
+from runninglog.reader import parser
 
 
-class SingleRun(segment.Segment):
+class SingleRun():
     """Running activity object.
 
     A SingleRun is a running activity object.
@@ -62,11 +63,20 @@ class SingleRun(segment.Segment):
 
     """
     def __init__(self):
-        super(SingleRun, self).__init__()
+        self.type = None
+        self.is_trail_running = False
+        self.distance = 0
+        self.time = None
+        self.pace = None
+        self.climb = 0
+        self.vspeed = 0
+        self.bpm = None
+        self.date = None
+        self.repetition = 0
+        self.feeling = None
 
         self.where = None
         self.route = None
-
         self.notes = ""
 
         self.orig_json_string = ""
@@ -358,7 +368,7 @@ class SingleRun(segment.Segment):
         except KeyError as err:
             raise Exception(f"Missing key: {time_key} in\n{config}") from err
 
-        self.time = self.parse_time(time_str)
+        self.time = parser.parse_time(time_str)
 
     def fill_distance(self, config):
         """Fills distance with data in input dictionary
@@ -378,7 +388,7 @@ class SingleRun(segment.Segment):
         except KeyError as err:
             raise Exception(f"Missing key: {dist_key} in\n{config}") from err
 
-        self.distance = self.parse_distance(distance_str)
+        self.distance = parser.parse_distance(distance_str)
 
     def fill_date(self, config):
         """Fills date with data in input dictionary
@@ -398,7 +408,7 @@ class SingleRun(segment.Segment):
         except KeyError as err:
             raise Exception(f"Missing key: {date_key} in\n{config}") from err
 
-        self.date = self.parse_date(date_str)
+        self.date = parser.parse_date(date_str)
 
     def fill_type(self, config):
         """Fills type with data in input dictionary

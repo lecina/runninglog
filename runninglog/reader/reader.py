@@ -14,10 +14,16 @@ def __unicodeToStr(data):
 
     return data
 
-def read_file(jsonParams):
-    jsonFile = open(jsonParams, 'r').read()
-    try:
-        parsedJSON = json.loads(jsonFile)
-    except ValueError:
-        sys.exit("Could not read: %s"%jsonParams)
-    return parsedJSON
+def read_file(json_filename):
+    with open(json_filename, 'r') as json_file:
+        json_str = json_file.read()
+
+        try:
+            parsed_json = json.loads(json_str)
+        except json.JSONDecodeError as err:
+            raise Exception(f"Could not read: {json_filename}; "
+                            f"Error: {err}") from err
+        except:
+            raise Exception(f"Could not read: {json_filename}") from err
+
+    return parsed_json

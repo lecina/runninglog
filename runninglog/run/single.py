@@ -82,21 +82,21 @@ class SingleRun(segment.Segment):
 
     def __eq__(self, other):
         for (a, b) in zip(self.basic_dist.values(), other.basic_dist.values()):
-            if (a is not None and b is not None) and
+            if (a is not None and b is not None) and\
             not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
             if (a is None and b is not None) or (a is not None and b is None):
                 return False
 
         for (a, b) in zip(self.basic_time.values(), other.basic_time.values()):
-            if (a is not None and b is not None) and
+            if (a is not None and b is not None) and\
             not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
             if (a is None and b is not None) or (a is not None and b is None):
                 return False
 
         for (a, b) in zip(self.basic_pace.values(), other.basic_pace.values()):
-            if (a is not None and b is not None) and
+            if (a is not None and b is not None) and\
             not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
             if (a is None and b is not None) or (a is not None and b is None):

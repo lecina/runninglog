@@ -14,50 +14,83 @@ from runninglog.utilities import utilities
 
 class AllRuns():
     def __init__(self):
-        self.df = pd.DataFrame()
-        self.structures = pd.DataFrame() #TODO: append structures
+        self.runs = []
+        self.structures = []
 
-    def read_single_run(self, filename, verbose=True):
+        self.df = pd.DataFrame()
+        self.df_structures = pd.DataFrame()
+
+    def read_file(self, filename, verbose=True):
+        """Reads the run(s) in filename
+
+            Loads the run (or runs if there is more than one) in the
+            filename
+
+            Args:
+                filename(str): Path to the filename to be read
+                verbose(bool): True for enhanced output
+
+            Returns:
+                list: list of single runs
+
+            Note:
+                It accepts a filename in json format with either one or
+                a list of single runs. In the latter, the list is
+                defined with the key in `blockNames.FileParams.list`
+        """
         if verbose: print ("Reading", filename)
-        #TODO: raise/catch exception
         parsed_json = reader.read_file(filename)
 
-        if blockNames.FileParams.list in parsed_json.keys():
-            singleRuns = []
-            for json_dir in parsed_json[blockNames.FileParams.list]:
-                singleRun = single.SingleRun()
-                singleRun.load_json(json_dir)
-                singleRuns.append(singleRun)
-            return singleRuns
-        else:
-            singleRun = single.SingleRun()
-            singleRun.load_json(parsed_json)
-            return singleRun
+        try:
+            run_dicts = parsed_json[blockNames.FileParams.list]
+        except KeyError:
+            run_dicts = [parsed_json]
 
-    def append_single_run_if_not_present(self, sr):
-        sr_df = pd.DataFrame()
-        sr_df = sr_df.append(pd.Series(sr.as_dict()), ignore_index=True)
+        single_runs = []
+        for run_dict in run_dicts:
+            single_run = single.SingleRun()
+            single_run.load(run_dict)
+            single_runs.append(single_run)
 
-        columns = ['avg_pace', 'vspeed', 
-            'distE', 'distM', 'distT', 'distI', 'distR', 'distX', 'distXB', 
-            'timeE', 'timeM', 'timeT', 'timeI', 'timeR', 'timeX', 'timeXB', 
-            'paceE', 'paceM', 'paceT', 'paceI', 'paceR', 'paceX', 'paceXB']
-        decimals = pd.Series([2] * len(columns), index=columns)
-        sr_df = sr_df.round(decimals)
+        return single_runs
+
+    def add_run(self, run):
+        """Adds the run if it is not found
+
+            Adds the run if it is not found, so that runs are not duplicated
+
+            Args:
+                run(SinlgeRun): Single run to be added
+
+            Returns:
+                bool: True if run was added
+        """
+        if run in self.runs:
+            return False
     
-        if self.df.size == 0:
-            already_added = False
-        else:
-            already_added = sum((self.df.values==sr_df.values).all(axis=1))
+        self.runs.append(run)
+        self.structures.extend(run.structure)
 
-        if not already_added:
-            self.df = pd.concat([self.df, sr_df], axis=0, ignore_index=True)
-            self.structures = pd.concat([self.structures, sr.get_structure_as_df()], axis=0, ignore_index=True)
+        self.df = self.df.append(run.as_dict(), ignore_index=True)
+        self.df_structures = pd.concat([
+                                        self.df_structures, 
+                                        run.get_structure_as_df(),
+                                        ],
+                                        axis=0, ignore_index=True)
 
-        added_sr = not already_added
-        return added_sr
+        return True
 
     def get_json_files_in_subdirs(self, directory):
+        """Get all JSON files in dir and subdirs
+
+            Get all JSON files in root dir and subdirs
+
+            Args:
+                directory(str): Root directory
+
+            Returns:
+                list: List of JSON files
+        """
         file_list = []
         for root, dirnames, filenames in os.walk(directory):
             for filename in fnmatch.filter(filenames, '*.json'):
@@ -65,40 +98,47 @@ class AllRuns():
         return file_list
 
     def load_files_in_dir(self, directory, verbose=True):
-        file_list = self.get_json_files_in_subdirs(directory)
+        """Loads all runs from all JSON files in dir
 
-        if len(file_list) == 0:
-            if verbose: 
-                print ("No files to read!")
-            return []
+            Loads all runs from all JSON files in dir
+
+            Args:
+                directory(str): Root directory
+                verbose(bool): Show more output
+
+            Returns:
+                list: List of added files
+        """
+        file_list = self.get_json_files_in_subdirs(directory)
 
         parsed_single_runs = []
         for f in file_list:
             jsonFile = open(f, 'r').read()
             if jsonFile == constants.EMPTY_JSON or jsonFile == "":
                 if verbose: 
-                    print ("Empty json file: \"%s\"!\nClean it up!!"%f)
+                    print (f"Empty file: \"{f}\"!")
             else:
-                #TODO: add json validator
-                srs = self.read_single_run(f, verbose) 
-                if type(srs) is not list:
-                    srs = [srs]
+                runs = self.read_file(f, verbose) 
                 
-                for sr in srs:
-                    added_sr = self.append_single_run_if_not_present(sr)
+                for run in runs:
+                    added_run = self.add_run(run)
 
-                    if added_sr:
-                        parsed_single_runs.append(sr)
+                    if added_run:
+                        parsed_single_runs.append(run)
                     elif verbose==True:
-                        print ("Not adding already added move:", sr.as_dict())
-                        print ("in %s"%f)
+                        print (f"Not adding already added move: {sr.as_dict()}")
+                        print (f"Filename: {f}")
 
         return parsed_single_runs
 
     def compute_umap_projection(self, cols=['climb', 'distance', 'time', 'avg_pace']):
-        """
-            Dimensionality reduction.
-            Adds two columns: umap_X1, uma_X2 with projection
+        """Compute UMAP projection
+
+            Compute umap projection.
+            Adds two columns to self.df: umap_X1, umap_X2 with the projection
+
+            Args:
+                cols(list): list of input columns to UMAP
         """
         reducer = umap.UMAP(n_neighbors=15, min_dist=0.1)
 
@@ -110,25 +150,98 @@ class AllRuns():
         self.df = pd.concat([self.df, df_embedding], axis=1, sort=False)
 
     def save_all_runs(self, fname):
+        """Saves runs as pickle object
+
+            Saves runs as pickle object
+
+            Args:
+                fname(str): Filename to save
+        """
         self.df.to_pickle(fname)
 
     def load_all_runs(self, fname):
+        """Loads runs from pickle object
+
+            Loads runs from pickle object
+
+            Args:
+                fname(str): Filename to load
+        """
         self.df = pd.read_pickle(fname)
 
     def save_all_runs_as_csv(self, fname):
-        self.df.to_csv(fname, encoding='utf-8')
+        """Saves runs as csv
+
+            Saves runs as csv
+
+            Args:
+                fname(str): Filename to save
+        """
+        columns = ['avg_pace', 'vspeed']
+
+        basic_types = [
+            types.BASIC_RUN_TYPES_DICTIONARY[t]\
+            for t in types.BASIC_RUN_TYPES_ENUM
+        ]
+        dist_cols = ["dist{}".format(t) for t in basic_types]
+        time_cols = ["time{}".format(t) for t in basic_types]
+        pace_cols = ["pace{}".format(t) for t in basic_types]
+
+        columns.extend(dist_cols)
+        columns.extend(time_cols)
+        columns.extend(pace_cols)
+
+        decimals = pd.Series([2] * len(columns), index=columns)
+        df_to_save = self.df.round(decimals)
+
+        df_to_save.to_csv(fname, encoding='utf-8')
 
     def load_all_runs_from_csv(self, fname):
+        """Loads runs from csv
+
+            Loads runs from csv
+
+            Args:
+                fname(str): CSV filename
+        """
         self.df = pd.from_csv(fname)
 
     def save_all_runs_structures(self, fname):
-        self.structures.to_pickle(fname)
+        """Save runs structure as picke
+
+            Save runs structure as pickle
+
+            Args:
+                fname(str): Pickle filename
+        """
+        self.df_structures.to_pickle(fname)
 
     def load_all_runs_structures(self, fname):
-        self.structures = pd.read_pickle(fname)
+        """Load runs structure from pickle
+
+            Load runs structure from pickle
+
+            Args:
+                fname(str): Pickle filename
+        """
+        self.df_structures = pd.read_pickle(fname)
 
     def save_all_runs_structures_as_csv(self, fname):
-        self.structures.to_csv(fname, encoding='utf-8')
+        """Save runs structure as csv
+
+            Save runs structure as csv
+
+            Args:
+                fname(str): CSV filename
+        """
+        self.df_structures.to_csv(fname, encoding='utf-8')
 
     def load_all_runs_structures_from_csv(self, fname):
-        self.structures = pd.from_csv(fname)
+        """Load runs structure from csv
+
+            Load runs structure from csv
+
+            Args:
+                fname(str): CSV filename
+        """
+        self.df_structures = pd.from_csv(fname)

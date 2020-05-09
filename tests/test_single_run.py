@@ -216,7 +216,7 @@ class TestSingleRun(unittest.TestCase):
                         ]
                       }
 
-        singleRun.load_json(parsed_json)
+        singleRun.load(parsed_json)
 
         self.assertEqual(singleRun.time, 75)
         self.assertEqual(singleRun.climb, 110)
@@ -271,7 +271,7 @@ class TestSingleRun(unittest.TestCase):
                         "distance": 15,
                       }
 
-        singleRun.load_json(parsed_json)
+        singleRun.load(parsed_json)
 
         self.assertEqual(singleRun.time, 75)
         self.assertEqual(singleRun.climb, 0)
@@ -319,7 +319,7 @@ class TestSingleRun(unittest.TestCase):
                         "distance": 15,
                       }
 
-        singleRun.load_json(parsed_json)
+        singleRun.load(parsed_json)
 
         self.assertEqual(singleRun.time, 75)
         self.assertEqual(singleRun.climb, 0)
@@ -372,7 +372,7 @@ class TestSingleRun(unittest.TestCase):
                         ]
                       }
 
-        singleRun.load_json(parsed_json)
+        singleRun.load(parsed_json)
 
         self.assertEqual(singleRun.time, 75)
         self.assertEqual(singleRun.climb, 0)
@@ -424,7 +424,7 @@ class TestSingleRun(unittest.TestCase):
                         "distance": 14
                       }
 
-        singleRun.load_json(parsed_json)
+        singleRun.load(parsed_json)
 
         self.assertEqual(singleRun.time, 60)
         self.assertEqual(singleRun.distance, 14)

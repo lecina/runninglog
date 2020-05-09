@@ -13,7 +13,10 @@ class TestAllRuns(unittest.TestCase):
     def test_read_single_run1(self):
         allRuns = all_runs.AllRuns()
         datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_2.json')
-        singleRun = allRuns.read_single_run(datafile, verbose=False)
+        singleRun = allRuns.read_file(datafile, verbose=False)
+
+        self.assertEqual(len(singleRun),1)
+        singleRun = singleRun[0]
 
         goldenSingleRun = single.SingleRun()
         goldenSingleRun.type = types.RUN_TYPES_ENUM.T
@@ -47,7 +50,10 @@ class TestAllRuns(unittest.TestCase):
     def test_read_single_run2(self):
         allRuns = all_runs.AllRuns()
         datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_3.json')
-        singleRun = allRuns.read_single_run(datafile, verbose=False)
+        singleRun = allRuns.read_file(datafile, verbose=False)
+
+        self.assertEqual(len(singleRun),1)
+        singleRun = singleRun[0]
 
         goldenSingleRun = single.SingleRun()
         goldenSingleRun.type = types.RUN_TYPES_ENUM.E
@@ -81,7 +87,7 @@ class TestAllRuns(unittest.TestCase):
     def test_read_single_run3(self):
         allRuns = all_runs.AllRuns()
         datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_1.json')
-        singleRuns = allRuns.read_single_run(datafile, verbose=False)
+        singleRuns = allRuns.read_file(datafile, verbose=False)
 
         goldenSingleRun = single.SingleRun()
         goldenSingleRun.type = types.RUN_TYPES_ENUM.T
@@ -161,11 +167,11 @@ class TestAllRuns(unittest.TestCase):
         singleRun = single.SingleRun()
         datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_2.json')
         parsed_json = reader.read_file(datafile)
-        singleRun.load_json(parsed_json)
+        singleRun.load(parsed_json)
 
-        added1 = allRuns.append_single_run_if_not_present(singleRun)
+        added1 = allRuns.add_run(singleRun)
         df1 = allRuns.df.copy()
-        added2 = allRuns.append_single_run_if_not_present(singleRun)
+        added2 = allRuns.add_run(singleRun)
         df2 = allRuns.df.copy()
 
         goldenAdded1 = True
@@ -181,15 +187,15 @@ class TestAllRuns(unittest.TestCase):
         singleRun = single.SingleRun()
         datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_2.json')
         parsed_json = reader.read_file(datafile)
-        singleRun.load_json(parsed_json)
-        added1 = allRuns.append_single_run_if_not_present(singleRun)
+        singleRun.load(parsed_json)
+        added1 = allRuns.add_run(singleRun)
         df1 = allRuns.df.copy()
 
         singleRun = single.SingleRun()
         datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_3.json')
         parsed_json = reader.read_file(datafile)
-        singleRun.load_json(parsed_json)
-        added2 = allRuns.append_single_run_if_not_present(singleRun)
+        singleRun.load(parsed_json)
+        added2 = allRuns.add_run(singleRun)
         df2 = allRuns.df.copy()
 
         goldenAdded1 = True
@@ -207,15 +213,15 @@ class TestAllRuns(unittest.TestCase):
         singleRun = single.SingleRun()
         datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_3.json')
         parsed_json = reader.read_file(datafile)
-        singleRun.load_json(parsed_json)
-        added1 = allRuns.append_single_run_if_not_present(singleRun)
+        singleRun.load(parsed_json)
+        added1 = allRuns.add_run(singleRun)
         df1 = allRuns.df.copy()
 
         singleRun = single.SingleRun()
         datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_4.json')
         parsed_json = reader.read_file(datafile)
-        singleRun.load_json(parsed_json)
-        added2 = allRuns.append_single_run_if_not_present(singleRun)
+        singleRun.load(parsed_json)
+        added2 = allRuns.add_run(singleRun)
         df2 = allRuns.df.copy()
 
         goldenAdded1 = True

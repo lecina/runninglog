@@ -262,7 +262,7 @@ class SingleRun():
             df = df.append(ds_sgmnt, ignore_index=True)
         return df
 
-    def load_json(self, parsed_json):
+    def load(self, parsed_json):
         """Loads the data in the input dictionary into the single run
 
         Loads the data in the input dictionary into the single run.

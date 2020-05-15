@@ -119,6 +119,40 @@ class TestSingleRun(unittest.TestCase):
                             golden_basic_time[i],
                             2)
 
+    def test_parse_structure_pass_activity_attributes(self):
+        # is_trail_running_activity, date, and feeling are
+        # passed from singleRun
+
+        singleRun = single.SingleRun()
+
+        singleRun.is_trail_running = True
+        date = datetime.datetime.strptime('15/05/2020', "%d/%m/%Y")
+        singleRun.date = date
+        singleRun.feeling = 3
+
+        input_dict = [
+            {"type":"E", "distance" : 2.38},
+            {"type":"T", "distance": 5.84, "pace":"3:56"},
+            {"type":"E", "distance" : 2.2}
+        ]
+
+        singleRun.parse_structure(input_dict)
+
+        self.assertEqual(len(singleRun.structure), 3)
+
+        for i, sgmnt in enumerate(singleRun.structure):
+            if i == 0:
+                self.assertAlmostEqual(sgmnt.distance, 2.38, 2)
+            elif i == 1:
+                self.assertAlmostEqual(sgmnt.distance, 5.84, 2)
+                self.assertAlmostEqual(sgmnt.pace, 236, 2)
+            elif i == 2:
+                self.assertAlmostEqual(sgmnt.distance, 2.2, 2)
+
+            self.assertEqual(sgmnt.is_trail_running, True)
+            self.assertEqual(sgmnt.date, date)
+            self.assertEqual(sgmnt.feeling, 3)
+
     def test_fill_basic_volume_dict_with_unassigned_volume(self):
         singleRun = single.SingleRun()
 
@@ -164,7 +198,7 @@ class TestSingleRun(unittest.TestCase):
 
     def test_assign_to_easy_regardless_of_activity_type_if_no_struct(self):
         # The spare time and basic type is assigned to the easy type in
-        # running activities if it is not specified as a structure
+        # running activities
 
         singleRun = single.SingleRun()
         singleRun.type = types.RUN_TYPES_ENUM.M

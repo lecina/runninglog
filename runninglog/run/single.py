@@ -579,8 +579,8 @@ class SingleRun():
             sgmnt.fill_segment(item)
 
             if not sgmnt.is_empty():
-                sgmnt.repetition_number = rep_num
-                sgmnt.trail = self.is_trail_running
+                sgmnt.repetition = rep_num
+                sgmnt.is_trail_running = self.is_trail_running
                 sgmnt.date = self.date
                 sgmnt.feeling = self.feeling
 

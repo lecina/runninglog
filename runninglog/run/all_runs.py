@@ -5,9 +5,8 @@ import numpy as np
 import umap
 from sklearn.preprocessing import MinMaxScaler
 
-from runninglog.reader import reader
-from runninglog.run import single
-from runninglog.run import types
+from runninglog.io import reader
+from runninglog.run import single, types
 from runninglog.constants import constants, blockNames
 from runninglog.utilities import utilities
 

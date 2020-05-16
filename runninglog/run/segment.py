@@ -1,6 +1,6 @@
 from runninglog.constants import blockNames
 from runninglog.run import types
-from runninglog.reader import parser
+from runninglog.io import parser
 from runninglog.utilities import utilities
 
 

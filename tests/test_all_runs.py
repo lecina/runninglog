@@ -5,7 +5,7 @@ import pandas as pd
 
 import context
 from runninglog.run import all_runs, single, segment, types
-from runninglog.reader import reader
+from runninglog.io import reader
 
 
 class TestAllRuns(unittest.TestCase):

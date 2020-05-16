@@ -7,9 +7,8 @@ import pandas as pd
 
 from runninglog.constants import blockNames
 from runninglog.utilities import utilities
-from runninglog.run import types
-from runninglog.run import segment
-from runninglog.reader import parser
+from runninglog.run import segment, types
+from runninglog.io import parser
 
 
 class SingleRun():

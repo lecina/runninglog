@@ -2,7 +2,7 @@ import unittest
 import datetime
 
 import context
-from runninglog.reader import parser
+from runninglog.io import parser
 
 
 class TestParser(unittest.TestCase):

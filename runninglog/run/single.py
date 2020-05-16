@@ -91,26 +91,32 @@ class SingleRun():
         self.structure = []
 
     def __eq__(self, other):
+        if not isinstance(other, SingleRun):
+            return False
+
         for (a, b) in zip(self.basic_dist.values(), other.basic_dist.values()):
-            if (a is not None and b is not None) and\
-            not utilities.isclose(a, b, abs_tol=1e-3):
-                return False
-            if (a is None and b is not None) or (a is not None and b is None):
+            if not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
 
         for (a, b) in zip(self.basic_time.values(), other.basic_time.values()):
-            if (a is not None and b is not None) and\
-            not utilities.isclose(a, b, abs_tol=1e-3):
-                return False
-            if (a is None and b is not None) or (a is not None and b is None):
+            if not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
 
         for (a, b) in zip(self.basic_pace.values(), other.basic_pace.values()):
-            if (a is not None and b is not None) and\
-            not utilities.isclose(a, b, abs_tol=1e-3):
+            if not utilities.isclose(a, b, abs_tol=1e-3):
                 return False
-            if (a is None and b is not None) or (a is not None and b is None):
+
+        # Compare structures
+        if (len(self.structure) != len(other.structure)):
+            return False
+
+        for i in range(len(self.structure)):
+            if self.structure[i] != other.structure[i]:
                 return False
+
+        if (self.pace is None and other.pace is not None) or\
+            (self.pace is not None and self.pace is None):
+            return False
 
         return self.type == other.type and\
             self.time == other.time and\
@@ -123,6 +129,7 @@ class SingleRun():
             self.where == other.where and\
             self.route == other.route and\
             self.feeling == other.feeling and\
+            self.bpm == other.bpm and\
             self.notes == other.notes
 
     def __str__(self):
@@ -178,7 +185,7 @@ class SingleRun():
 
         str_.append("\nWith basic types:")
         str_.append("Stats by training speeds:")
-        str_.append("=========================\n")
+        str_.append("=========================")
 
         b_type = types.BASIC_RUN_TYPES_DICTIONARY
         print_dist = {
@@ -195,6 +202,15 @@ class SingleRun():
             b_type[t]: p for (t, p) in self.basic_pace.items() if p != 0
         }
         str_.append(f"Paces (sec/km): {print_pace}")
+
+        if len(self.structure) > 0:
+            str_.append("\nStructure")
+            str_.append("=====")
+            for i, struct in enumerate(self.structure):
+                str_.append(struct.__str__())
+                if i != len(self.structure) - 1:
+                    str_.append("")
+            str_.append("=====")
 
         return "\n".join(str_)
 

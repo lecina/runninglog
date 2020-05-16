@@ -1,3 +1,5 @@
+import os
+import fnmatch
 import json
 import sys
 
@@ -27,3 +29,20 @@ def read_file(json_filename):
             raise Exception(f"Could not read: {json_filename}") from err
 
     return parsed_json
+
+def get_json_files_in_subdirs(directory):
+    """Get all JSON files in dir and subdirs
+
+        Get all JSON files in root dir and subdirs
+
+        Args:
+            directory(str): Root directory
+
+        Returns:
+            list: List of JSON files
+    """
+    file_list = []
+    for root, dirnames, filenames in os.walk(directory):
+        for filename in fnmatch.filter(filenames, '*.json'):
+            file_list.append(os.path.join(root, filename))
+    return file_list

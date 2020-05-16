@@ -1,5 +1,3 @@
-import os
-import fnmatch
 import pickle
 
 import pandas as pd
@@ -9,6 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from runninglog.reader import reader
 from runninglog.run import single
+from runninglog.run import types
 from runninglog.constants import constants, blockNames
 from runninglog.utilities import utilities
 
@@ -20,7 +19,7 @@ class AllRuns():
         self.df = pd.DataFrame()
         self.df_structures = pd.DataFrame()
 
-    def read_file(self, filename, verbose=True):
+    def read_run_in_file(self, filename, verbose=True):
         """Reads the run(s) in filename
 
             Loads the run (or runs if there is more than one) in the
@@ -38,13 +37,40 @@ class AllRuns():
                 a list of single runs. In the latter, the list is
                 defined with the key in `blockNames.FileParams.list`
         """
-        if verbose: print ("Reading", filename)
+
+        if verbose:
+            print ("Reading", filename)
+
         parsed_json = reader.read_file(filename)
 
+        if parsed_json == constants.EMPTY_JSON or parsed_json == "":
+            if verbose:
+                print (f"Empty file: \"{f}\"!")
+
+        return self.read_run(parsed_json)
+
+    def read_run(self, run_desc):
+        """Reads the run(s) in dictionary
+
+            Reads the run (or runs if there is more than one) in the
+            input dictionary
+
+            Args:
+                run_desc(dict): Dictionary used as single run input
+
+            Returns:
+                list: list of single runs
+
+            Note:
+                It accepts a run_desc in dict format with either one or
+                a list of single runs. In the latter, the list is
+                defined with the key in `blockNames.FileParams.list`
+        """
+
         try:
-            run_dicts = parsed_json[blockNames.FileParams.list]
+            run_dicts = run_desc[blockNames.FileParams.list]
         except KeyError:
-            run_dicts = [parsed_json]
+            run_dicts = [run_desc]
 
         single_runs = []
         for run_dict in run_dicts:
@@ -80,23 +106,6 @@ class AllRuns():
 
         return True
 
-    def get_json_files_in_subdirs(self, directory):
-        """Get all JSON files in dir and subdirs
-
-            Get all JSON files in root dir and subdirs
-
-            Args:
-                directory(str): Root directory
-
-            Returns:
-                list: List of JSON files
-        """
-        file_list = []
-        for root, dirnames, filenames in os.walk(directory):
-            for filename in fnmatch.filter(filenames, '*.json'):
-                file_list.append(os.path.join(root, filename))
-        return file_list
-
     def load_files_in_dir(self, directory, verbose=True):
         """Loads all runs from all JSON files in dir
 
@@ -109,25 +118,18 @@ class AllRuns():
             Returns:
                 list: List of added files
         """
-        file_list = self.get_json_files_in_subdirs(directory)
+        file_list = reader.get_json_files_in_subdirs(directory)
 
         parsed_single_runs = []
         for f in file_list:
-            jsonFile = open(f, 'r').read()
-            if jsonFile == constants.EMPTY_JSON or jsonFile == "":
-                if verbose: 
-                    print (f"Empty file: \"{f}\"!")
-            else:
-                runs = self.read_file(f, verbose) 
-                
-                for run in runs:
-                    added_run = self.add_run(run)
+            runs = self.read_run_in_file(f, verbose) 
 
-                    if added_run:
-                        parsed_single_runs.append(run)
-                    elif verbose==True:
-                        print (f"Not adding already added move: {sr.as_dict()}")
-                        print (f"Filename: {f}")
+            for run in runs:
+                added_run = self.add_run(run)
+
+                if added_run:
+                    parsed_single_runs.append(run)
+                    # TODO: add event to log
 
         return parsed_single_runs
 
@@ -145,9 +147,9 @@ class AllRuns():
         scaler = MinMaxScaler()
         df_scaled = scaler.fit_transform(self.df[cols])
         embedding = reducer.fit_transform(df_scaled)
-        df_embedding = pd.DataFrame(embedding, columns=['umap_X1', 'umap_X2'])
 
-        self.df = pd.concat([self.df, df_embedding], axis=1, sort=False)
+        self.df['umap_X1'] = embedding[:,0]
+        self.df['umap_X2'] = embedding[:,1]
 
     def save_all_runs(self, fname):
         """Saves runs as pickle object
@@ -179,10 +181,7 @@ class AllRuns():
         """
         columns = ['avg_pace', 'vspeed']
 
-        basic_types = [
-            types.BASIC_RUN_TYPES_DICTIONARY[t]\
-            for t in types.BASIC_RUN_TYPES_ENUM
-        ]
+        basic_types = types.BASIC_RUN_TYPES_DICTIONARY.values()
         dist_cols = ["dist{}".format(t) for t in basic_types]
         time_cols = ["time{}".format(t) for t in basic_types]
         pace_cols = ["pace{}".format(t) for t in basic_types]
@@ -234,7 +233,10 @@ class AllRuns():
             Args:
                 fname(str): CSV filename
         """
-        self.df_structures.to_csv(fname, encoding='utf-8')
+        columns = ['avg_pace', 'vspeed']
+        decimals = pd.Series([2] * len(columns), index=columns)
+        df_to_save = self.df_structures.round(decimals)
+        self.df_to_save.to_csv(fname, encoding='utf-8')
 
     def load_all_runs_structures_from_csv(self, fname):
         """Load runs structure from csv

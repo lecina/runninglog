@@ -1,6 +1,7 @@
 from runninglog.constants import blockNames
 from runninglog.run import types
 from runninglog.reader import parser
+from runninglog.utilities import utilities
 
 
 class Segment:
@@ -52,7 +53,7 @@ class Segment:
             str_.append(f"Feeling: -")
 
         try:
-            str_.append("Time: {:.0f}min".format(self.time))
+            str_.append("Time: {:.0f}sec".format(self.time))
         except TypeError:
             str_.append("Total time: -")
 
@@ -67,9 +68,23 @@ class Segment:
             str_.append("Pace: {:.0f} (in sec/km)".format(self.pace))
         except TypeError:
             str_.append("Pace: -")
-        str_.append("Vert. speed:: {:.0f}".format(self.vspeed))
+        str_.append("Vert. speed: {:.0f}".format(self.vspeed))
 
-        return "\n".join(str_)
+        return "; ".join(str_)
+
+    def __eq__(self, other):
+        return isinstance(other, Segment) and\
+            self.type == other.type and\
+            self.is_trail_running == other.is_trail_running and\
+            utilities.isclose(self.distance, other.distance, abs_tol=1e-3) and\
+            self.time == other.time and\
+            utilities.isclose(self.pace, other.pace, abs_tol=1e-3) and\
+            self.climb == other.climb and\
+            utilities.isclose(self.vspeed, other.vspeed, abs_tol=1e-3) and\
+            self.bpm == other.bpm and\
+            self.date == other.date and\
+            self.repetition == other.repetition and\
+            self.feeling == other.feeling
 
     def as_dict(self):
         """ Converts segment into dictionary.

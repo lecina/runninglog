@@ -54,7 +54,7 @@ class RunningLog():
             self.allRuns.save_all_runs_structures_as_csv(self.df_struct_fname%ext)
 
     def load_files_in_directory(self, directory):
-        loaded_files = self.allRuns.load_files_in_dir(directory, verbose=False)
+        loaded_files = self.allRuns.load_runs_in_dir(directory, verbose=False)
         return loaded_files
 
     def generate_empty_json(self):

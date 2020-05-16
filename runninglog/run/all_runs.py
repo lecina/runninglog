@@ -7,7 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from runninglog.io import reader
 from runninglog.run import single, types
-from runninglog.constants import constants, blockNames
+from runninglog.constants import blockNames
 from runninglog.utilities import utilities
 
 class AllRuns():
@@ -18,40 +18,10 @@ class AllRuns():
         self.df = pd.DataFrame()
         self.df_structures = pd.DataFrame()
 
-    def read_run_in_file(self, filename, verbose=True):
-        """Reads the run(s) in filename
+    def build_run(self, run_desc):
+        """Builds the run(s) in dictionary
 
-            Loads the run (or runs if there is more than one) in the
-            filename
-
-            Args:
-                filename(str): Path to the filename to be read
-                verbose(bool): True for enhanced output
-
-            Returns:
-                list: list of single runs
-
-            Note:
-                It accepts a filename in json format with either one or
-                a list of single runs. In the latter, the list is
-                defined with the key in `blockNames.FileParams.list`
-        """
-
-        if verbose:
-            print ("Reading", filename)
-
-        parsed_json = reader.read_file(filename)
-
-        if parsed_json == constants.EMPTY_JSON or parsed_json == "":
-            if verbose:
-                print (f"Empty file: \"{f}\"!")
-
-        return self.read_run(parsed_json)
-
-    def read_run(self, run_desc):
-        """Reads the run(s) in dictionary
-
-            Reads the run (or runs if there is more than one) in the
+            Builds the run (or runs if there is more than one) in the
             input dictionary
 
             Args:
@@ -66,6 +36,9 @@ class AllRuns():
                 defined with the key in `blockNames.FileParams.list`
         """
 
+        if not isinstance(run_desc, dict):
+            raise Exception(f"Input must be a dict")
+
         try:
             run_dicts = run_desc[blockNames.FileParams.list]
         except KeyError:
@@ -79,10 +52,33 @@ class AllRuns():
 
         return single_runs
 
+    def build_runs(self, runs_to_build):
+        """Builds the runs in list of dictionaries
+
+            Builds the runs in the input list of dictionaries
+
+            Args:
+                run_desc(list): Runs to build
+
+            Returns:
+                list: list of single runs
+        """
+
+        if not isinstance(runs_to_build, list):
+            raise Exception(f"Input must be a dict")
+
+        all_runs = []
+        for run in runs_to_build:
+            built_runs = self.build_run(run)
+            all_runs.extend(built_runs)
+        return all_runs
+
+
     def add_run(self, run):
         """Adds the run if it is not found
 
-            Adds the run if it is not found, so that runs are not duplicated
+            Adds the SingleRun if it is not found, so that runs are not
+            duplicated. 
 
             Args:
                 run(SinlgeRun): Single run to be added
@@ -90,6 +86,10 @@ class AllRuns():
             Returns:
                 bool: True if run was added
         """
+
+        if not isinstance(run, single.SingleRun):
+            raise Exception(f"Input must be a SingleRun")
+
         if run in self.runs:
             return False
     
@@ -105,7 +105,32 @@ class AllRuns():
 
         return True
 
-    def load_files_in_dir(self, directory, verbose=True):
+    def add_runs(self, runs):
+        """Adds the runs if not found in self.runs
+
+            Adds the runs if not found in self.runs, so that runs are not
+            duplicated. Equivalent to add_run for list of runs
+
+            Args:
+                runs(list): List of single runs to be potentially added
+
+            Returns:
+                list: added runs
+        """
+
+        if not isinstance(runs, list):
+            raise Exception(f"Input must be a list")
+
+        parsed_single_runs = []
+        for run in runs:
+            added_run = self.add_run(run)
+
+            if added_run:
+                parsed_single_runs.append(run)
+
+        return parsed_single_runs
+
+    def load_runs_in_dir(self, directory, verbose=True):
         """Loads all runs from all JSON files in dir
 
             Loads all runs from all JSON files in dir
@@ -117,18 +142,14 @@ class AllRuns():
             Returns:
                 list: List of added files
         """
-        file_list = reader.get_json_files_in_subdirs(directory)
+        if not isinstance(directory, str):
+            raise Exception(f"Input must be a string")
 
-        parsed_single_runs = []
-        for f in file_list:
-            runs = self.read_run_in_file(f, verbose) 
+        runs_to_build = reader.get_runs_in_subdirs(directory)
 
-            for run in runs:
-                added_run = self.add_run(run)
+        all_runs = self.build_runs(runs_to_build)
 
-                if added_run:
-                    parsed_single_runs.append(run)
-                    # TODO: add event to log
+        parsed_single_runs = self.add_runs(all_runs)
 
         return parsed_single_runs
 

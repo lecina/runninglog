@@ -3,6 +3,8 @@ import fnmatch
 import json
 import sys
 
+from runninglog.constants import constants, blockNames
+
 def __unicodeToStr(data):
     #convert dict
     if isinstance(data, dict):
@@ -46,3 +48,19 @@ def get_json_files_in_subdirs(directory):
         for filename in fnmatch.filter(filenames, '*.json'):
             file_list.append(os.path.join(root, filename))
     return file_list
+
+def get_runs_in_subdirs(directory, verbose=False):
+    file_list = get_json_files_in_subdirs(directory)
+
+    read_runs = []
+    for filename in file_list:
+        if verbose:
+            print ("Reading", filename)
+
+        parsed_json = read_file(filename)
+
+        #Omit empty JSON or files
+        if parsed_json != constants.EMPTY_JSON and parsed_json != "":
+            read_runs.append(parsed_json)
+
+    return read_runs

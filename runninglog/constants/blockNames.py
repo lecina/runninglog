@@ -5,6 +5,9 @@ class ConfigParams:
 
     input_dir = "input_dir"
 
+    df_name = "df_name"
+    df_struct_name = "df_struct_name"
+
 class FileParams:
     type = "type"
     date = "date"

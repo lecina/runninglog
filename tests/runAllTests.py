@@ -7,6 +7,7 @@ import test_single_run_fillers as tSingleRunFillers
 import test_segment as tSegment
 import test_parser as tParser
 import test_reader as tReader
+import test_config as tConfig
 
 def main():
     testSuite = unittest.TestSuite()
@@ -17,6 +18,7 @@ def main():
     testSuite.addTest(unittest.makeSuite(tSegment.TestSegment))
     testSuite.addTest(unittest.makeSuite(tParser.TestParser))
     testSuite.addTest(unittest.makeSuite(tReader.TestReader))
+    testSuite.addTest(unittest.makeSuite(tConfig.TestConfig))
     #testSuite.addTest(unittest.makeSuite(tSing.TestSingleTest))
 
     runner = unittest.TextTestRunner()

@@ -6,7 +6,8 @@ import types
 from runninglog.run import all_runs
 from runninglog.utilities import utilities
 from runninglog.constants import constants
-from runninglog.reader import reader
+from runninglog.io import reader
+from runninglog.config import config
 
 def parseArgs():
     desc_str = "Running log program.\n"\

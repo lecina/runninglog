@@ -1,4 +1,4 @@
 {
-    'data_folder': 'data',
-    'folder_to_load': 'to_load'
+    'output_dir': 'data',
+    'input_dir': 'to_load'
 }

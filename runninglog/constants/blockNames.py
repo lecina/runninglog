@@ -1,3 +1,10 @@
+class ConfigParams:
+    output_dir = "output_dir"
+    raw_output_dir = "raw_output_dir"
+    processed_output_dir = "processed_output_dir"
+
+    input_dir = "input_dir"
+
 class FileParams:
     type = "type"
     date = "date"

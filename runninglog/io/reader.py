@@ -3,7 +3,7 @@ import fnmatch
 import json
 import sys
 
-from runninglog.constants import constants, blockNames
+from runninglog.constants import constants
 
 def __unicodeToStr(data):
     #convert dict
@@ -18,8 +18,35 @@ def __unicodeToStr(data):
 
     return data
 
-def read_file(json_filename):
-    with open(json_filename, 'r') as json_file:
+def get_files_in_subdirs(directory, extension):
+    """Get all files in dir and subdirs that match extension
+
+        Get all files in root dir and subdirs
+
+        Args:
+            directory(str): Root directory
+
+        Returns:
+            list: List of found files
+    """
+    file_list = []
+    for root, dirnames, filenames in os.walk(directory):
+        for filename in fnmatch.filter(filenames, extension):
+            file_list.append(os.path.join(root, filename))
+    return file_list
+
+def read_json_file(filename):
+    """Read JSON file
+
+        Read JSON file as dictionary
+
+        Args:
+            filename(str): Filename
+
+        Returns:
+            dict: Dictionary with file content
+    """
+    with open(filename, 'r') as json_file:
         json_str = json_file.read()
 
         try:
@@ -32,32 +59,16 @@ def read_file(json_filename):
 
     return parsed_json
 
-def get_json_files_in_subdirs(directory):
-    """Get all JSON files in dir and subdirs
 
-        Get all JSON files in root dir and subdirs
-
-        Args:
-            directory(str): Root directory
-
-        Returns:
-            list: List of JSON files
-    """
-    file_list = []
-    for root, dirnames, filenames in os.walk(directory):
-        for filename in fnmatch.filter(filenames, '*.json'):
-            file_list.append(os.path.join(root, filename))
-    return file_list
-
-def get_runs_in_subdirs(directory, verbose=False):
-    file_list = get_json_files_in_subdirs(directory)
+def get_json_runs_in_subdirs(directory, verbose=False):
+    file_list = get_files_in_subdirs(directory, '*.json')
 
     read_runs = []
     for filename in file_list:
         if verbose:
             print ("Reading", filename)
 
-        parsed_json = read_file(filename)
+        parsed_json = read_json_file(filename)
 
         #Omit empty JSON or files
         if parsed_json != constants.EMPTY_JSON and parsed_json != "":

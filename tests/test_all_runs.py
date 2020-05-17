@@ -5,8 +5,6 @@ import pandas as pd
 
 import context
 from runninglog.run import all_runs, single, segment, types
-from runninglog.io import reader
-
 
 class TestAllRuns(unittest.TestCase):
     def test_build_run(self):
@@ -548,15 +546,58 @@ class TestAllRuns(unittest.TestCase):
         self.assertEqual(len(allRuns.runs), 2)
 
 
-    def test_load_files_in_dir(self):
-        # Adding runs from different files
-        # File 1: using "list" to define list of runs
-        # File 2: different run
-        # File 3: repeating file 1 run. Only one should be added
+    def test_load_runs(self):
+        # Tests load_runs
+
+        # run 1: with struct
+        # run 2: repeating run 1
+        # run 3: second run
+
+        run_descs = [
+            {
+                "type": "T",
+                "date": "26-11-2018",
+                "time": "1h15min",
+                "distance": 13.8,
+                "climb": 110,
+                "where":"Park",
+                "route":"Lap 1",
+                "feeling": 4,
+                "trail": True,
+                "structure":[
+                    {"type":"E", "distance" : 2.36},
+                    {"type":"T", "distance": 5.84, "pace":"3:56"},
+                    {"type":"E", "distance" : 2.2}
+                ]
+            },
+            {
+                "type": "T",
+                "date": "26-11-2018",
+                "time": "1h15min",
+                "distance": 13.8,
+                "climb": 110, 
+                "where":"Park",
+                "route":"Lap 1",
+                "feeling": 4,
+                "trail": True,
+                "structure":[
+                    {"type":"E", "distance" : 2.36},
+                    {"type":"T", "distance": 5.84, "pace":"3:56"},
+                    {"type":"E", "distance" : 2.2}
+                ]
+            },
+            {
+                "type": "E",
+                "date": "27-11-2018",
+                "time": "1h",
+                "distance": 12.2,
+                "climb": 100, 
+                "where":"Park2"
+            }
+        ]
 
         allRuns = all_runs.AllRuns()
-        datafolder = os.path.join(os.path.split(__file__)[0], 'data', 'test_load_files_in_dir')
-        added_single_runs = allRuns.load_runs_in_dir(datafolder, verbose=False)
+        added_single_runs = allRuns.load_runs(run_descs, verbose=False)
 
         # First run
         goldenSingleRun = single.SingleRun()

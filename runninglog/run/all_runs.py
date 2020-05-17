@@ -130,24 +130,23 @@ class AllRuns():
 
         return parsed_single_runs
 
-    def load_runs_in_dir(self, directory, verbose=True):
-        """Loads all runs from all JSON files in dir
+    def load_runs(self, runs, verbose=True):
+        """Loads all runs
 
-            Loads all runs from all JSON files in dir
+            Loads all runs in list
 
             Args:
-                directory(str): Root directory
+                runs(list): List of runs to load
                 verbose(bool): Show more output
 
             Returns:
                 list: List of added files
         """
-        if not isinstance(directory, str):
-            raise Exception(f"Input must be a string")
+        if not isinstance(runs, list):
+            raise Exception(f"runs must be a list")
 
-        runs_to_build = reader.get_runs_in_subdirs(directory)
-
-        all_runs = self.build_runs(runs_to_build)
+        #runs_to_build = reader_.get_runs_in_subdirs(directory)
+        all_runs = self.build_runs(runs)
 
         parsed_single_runs = self.add_runs(all_runs)
 

@@ -8,6 +8,10 @@ class ConfigParams:
     df_name = "df_name"
     df_struct_name = "df_struct_name"
 
+    output_fmt = "output_format"
+    csv = "csv"
+    pickle = "pickle"
+
 class FileParams:
     type = "type"
     date = "date"

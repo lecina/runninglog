@@ -76,3 +76,37 @@ def get_json_runs_in_subdirs(directory, verbose=False):
             read_runs.append(parsed_json)
 
     return read_runs
+
+def read_dataframe_from_pickle(fname):
+    """Read dataframe from pandas pickle
+
+        Read dataframe from pandas pickle
+
+        Args:
+            fname(str): Pandas pickle filename
+    """
+    return pd.read_pickle(fname)
+
+def read_dataframe_from_csv(fname):
+    """Read dataframe from csv file
+
+        Read dataframe from csv file
+
+        Args:
+            fname(str): Csv filename
+    """
+    return pd.from_csv(fname)
+
+def from_pickle(fname):
+    """Load from pickle file
+
+        Load from pickle file
+
+        Args:
+            fname(str): Filename to read
+
+        Note:
+            Watch out for pickle objects, as they can be hacked.
+            Example: https://realpython.com/python-pickle-module/
+    """
+    pickle.load(open(fname, "rb"))

@@ -40,8 +40,3 @@ def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
         return True
 
     return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
-
-def read_pandas_pickle(fname = "../running_log_data/processed/df.pkl"):
-    df = pd.read_pickle(fname)
-    df.date = pd.to_datetime(df.date)
-    return df

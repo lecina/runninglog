@@ -1,11 +1,11 @@
 import pickle
-
+import os.path
 import pandas as pd
 import numpy as np
 import umap
 from sklearn.preprocessing import MinMaxScaler
 
-from runninglog.io import reader
+from runninglog.io import reader, writer
 from runninglog.run import single, types
 from runninglog.constants import blockNames
 from runninglog.utilities import utilities
@@ -145,7 +145,6 @@ class AllRuns():
         if not isinstance(runs, list):
             raise Exception(f"runs must be a list")
 
-        #runs_to_build = reader_.get_runs_in_subdirs(directory)
         all_runs = self.build_runs(runs)
 
         parsed_single_runs = self.add_runs(all_runs)
@@ -170,99 +169,32 @@ class AllRuns():
         self.df['umap_X1'] = embedding[:,0]
         self.df['umap_X2'] = embedding[:,1]
 
-    def save_all_runs(self, fname):
-        """Saves runs as pickle object
+    def save_as_csv(self, config):
+        """Saves all runs as csv
 
-            Saves runs as pickle object
-
-            Args:
-                fname(str): Filename to save
-        """
-        self.df.to_pickle(fname)
-
-    def load_all_runs(self, fname):
-        """Loads runs from pickle object
-
-            Loads runs from pickle object
+            Saves all runs as csv
 
             Args:
-                fname(str): Filename to load
+                config(Config): Config object with filenames
         """
-        self.df = pd.read_pickle(fname)
 
-    def save_all_runs_as_csv(self, fname):
-        """Saves runs as csv
+        fname = config.df_name + ".csv"
+        writer.dataframe_to_csv(self.df, fname)
 
-            Saves runs as csv
+        fname = config.df_struct_name + ".csv"
+        writer.dataframe_to_csv(self.df_structures, fname)
+
+    def save_as_pickle(self, config):
+        """Saves all runs as pkl
+
+            Saves all runs as pkl
 
             Args:
-                fname(str): Filename to save
+                config(Config): Config object with filenames
         """
-        columns = ['avg_pace', 'vspeed']
 
-        basic_types = types.BASIC_RUN_TYPES_DICTIONARY.values()
-        dist_cols = ["dist{}".format(t) for t in basic_types]
-        time_cols = ["time{}".format(t) for t in basic_types]
-        pace_cols = ["pace{}".format(t) for t in basic_types]
+        fname = config.df_name + ".pkl"
+        writer.dataframe_to_pickle(self.df, fname)
 
-        columns.extend(dist_cols)
-        columns.extend(time_cols)
-        columns.extend(pace_cols)
-
-        decimals = pd.Series([2] * len(columns), index=columns)
-        df_to_save = self.df.round(decimals)
-
-        df_to_save.to_csv(fname, encoding='utf-8')
-
-    def load_all_runs_from_csv(self, fname):
-        """Loads runs from csv
-
-            Loads runs from csv
-
-            Args:
-                fname(str): CSV filename
-        """
-        self.df = pd.from_csv(fname)
-
-    def save_all_runs_structures(self, fname):
-        """Save runs structure as picke
-
-            Save runs structure as pickle
-
-            Args:
-                fname(str): Pickle filename
-        """
-        self.df_structures.to_pickle(fname)
-
-    def load_all_runs_structures(self, fname):
-        """Load runs structure from pickle
-
-            Load runs structure from pickle
-
-            Args:
-                fname(str): Pickle filename
-        """
-        self.df_structures = pd.read_pickle(fname)
-
-    def save_all_runs_structures_as_csv(self, fname):
-        """Save runs structure as csv
-
-            Save runs structure as csv
-
-            Args:
-                fname(str): CSV filename
-        """
-        columns = ['avg_pace', 'vspeed']
-        decimals = pd.Series([2] * len(columns), index=columns)
-        df_to_save = self.df_structures.round(decimals)
-        self.df_to_save.to_csv(fname, encoding='utf-8')
-
-    def load_all_runs_structures_from_csv(self, fname):
-        """Load runs structure from csv
-
-            Load runs structure from csv
-
-            Args:
-                fname(str): CSV filename
-        """
-        self.df_structures = pd.from_csv(fname)
+        fname = config.df_struct_name + ".pkl"
+        writer.dataframe_to_pickle(self.df_structures, fname)

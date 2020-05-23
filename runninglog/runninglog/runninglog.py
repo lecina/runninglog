@@ -18,14 +18,14 @@ class RunningLog():
 
     def load_runs(self):
         """Load runs in input dir according to config
-    
+
             Loads runs in input dir according to configuration
         """
         self.load_runs_in_dir(self.config.input_dir)
 
     def load_runs_in_dir(self, input_dir):
         """Load runs
-    
+
             Loads runs in input dir
 
             Args:
@@ -35,18 +35,18 @@ class RunningLog():
 
         self.added_runs = self.all_runs.load_runs(run_descs)
 
-        print(f"Added {len(self.added_runs)} runs") 
+        print(f"Added {len(self.added_runs)} runs")
 
     def compute_embedding(self):
         """Compute UMAP embedding
-    
+
             Compute UMAP embedding
         """
         self.all_runs.compute_umap_projection()
 
     def group_added_runs_by_month(self):
         """Groups added runs by month in a dictionary
-    
+
             Groups added runs by month in a dictionary.
         """
         grouped_runs = {}
@@ -61,7 +61,7 @@ class RunningLog():
 
     def write_grouped_runs_to_file(self, grouped_runs):
         """Write grouped runs to file
-    
+
             Write grouped runs to file
         """
         for (year_month, content_to_add) in grouped_runs.items():
@@ -85,7 +85,7 @@ class RunningLog():
 
     def save(self):
         """Save all runs
-    
+
             Save all runs as defined in configuration file
         """
         # Save processed dataframes
@@ -104,7 +104,7 @@ class RunningLog():
 
     def load_previous_runs(self):
         """Load runs in raw directory
-    
+
             Load runs in raw directory
         """
         self.load_runs_in_dir(self.config.raw_output_dir)

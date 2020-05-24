@@ -21,6 +21,13 @@ class TestSingleRun(unittest.TestCase):
         avg_pace = singleRun.compute_avg_pace()
         self.assertEqual(avg_pace, 240)
 
+    def test_compute_avg_inclination(self):
+        singleRun = single.SingleRun()
+        singleRun.distance = 1
+        singleRun.climb = 100
+        avg_inclination = singleRun.compute_avg_inclination()
+        self.assertAlmostEqual(avg_inclination, 10, 2)
+
     def test_parse_structure(self):
         singleRun = single.SingleRun()
 

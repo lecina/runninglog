@@ -25,6 +25,7 @@ class Segment:
         self.time = None
         self.pace = None
         self.climb = 0
+        self.inclination = 0
         self.vspeed = 0
         self.bpm = None
         self.date = None
@@ -65,6 +66,7 @@ class Segment:
             str_.append("Distance: -")
 
         str_.append("Climb: {:d}".format(self.climb))
+        str_.append("Inclination: {:.2f}%".format(self.inclination))
 
         try:
             str_.append("Pace: {:.0f} (in sec/km)".format(self.pace))
@@ -82,6 +84,7 @@ class Segment:
             self.time == other.time and\
             utilities.isclose(self.pace, other.pace, abs_tol=1e-3) and\
             self.climb == other.climb and\
+            self.inclination == other.inclination and\
             utilities.isclose(self.vspeed, other.vspeed, abs_tol=1e-3) and\
             self.bpm == other.bpm and\
             self.date == other.date and\
@@ -101,6 +104,7 @@ class Segment:
             blockNames.Colnames.distance: self.distance,
             blockNames.Colnames.avg_pace: self.pace,
             blockNames.Colnames.climb: self.climb,
+            blockNames.Colnames.inclination: self.inclination,
             blockNames.Colnames.bpm: self.bpm,
             blockNames.Colnames.date: self.date,
             blockNames.Colnames.repetition: self.repetition
@@ -117,6 +121,7 @@ class Segment:
                 self.time is None and
                 self.pace is None and
                 self.climb == 0 and
+                self.inclination == 0 and
                 self.vspeed == 0 and
                 self.bpm is None and
                 self.feeling == None and
@@ -142,6 +147,7 @@ class Segment:
             climb: m
             pace: sec/km
             vspeed: m/h
+            inclination: %
 
         Args:
             segment_dict (dict): Dictionary containing segment information
@@ -198,6 +204,9 @@ class Segment:
             self.climb = item_dict[blockNames.FileParams.climb]
         except KeyError:
             pass
+
+        # Inclination (in %)
+        self.inclination = 100 * self.climb / (self.distance * 1000)
 
         # BPM
         try:

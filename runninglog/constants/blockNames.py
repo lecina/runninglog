@@ -38,6 +38,7 @@ class Colnames:
     distance = "distance"
     avg_pace = "avg_pace"
     climb = "climb"
+    inclination = "inclination"
     vspeed = "vspeed"
     trail = "trail"
     feeling = "feeling"

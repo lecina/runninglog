@@ -1,17 +1,20 @@
+import datetime
+import base64
+import argparse
+
+import pandas as pd
+import numpy as np
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 from plotly.tools import FigureFactory as ff
 import dash_table
-import datetime
-import base64
-
-import pandas as pd
-import numpy as np
 
 from runninglog.constants import blockNames
 from runninglog.run import types
+from runninglog.config import config
+from runninglog.io import reader
 
 try:
     from viz.viz_constants import viz_constants
@@ -22,11 +25,16 @@ try:
 except:
     from viz_exploration import update_distr_plot_figure
 
-def read_pandas_pickle(fname = "data/processed/df.pkl"):
-    df = pd.read_pickle(fname)
-    df.date = pd.to_datetime(df.date)
-    return df
 
+def parseArgs():
+    desc_str = "Visualization tool - summary"
+    parser = argparse.ArgumentParser(description=desc_str)
+
+    parser.add_argument("-c", "--config_file", type=str, default="",
+                        help="Config file path")
+
+    args = parser.parse_args()
+    return args
 
 def get_ordered_runType_long_name(runType_order):
     return [{'value':rt, 'label':blockNames.RUN_TYPES_LONG_NAME_DICTIONARY[rt] } for rt in runType_order]
@@ -67,6 +75,8 @@ def record_table_columns():
 
 
 def main():
+    args = parseArgs()
+
     df_empty = pd.DataFrame()
 
     runType_order = viz_constants.get_runType_order()
@@ -76,7 +86,10 @@ def main():
     time_agg_options = get_time_options()
 
     #reading data
-    df = read_pandas_pickle()
+    configuration = config.Config()
+    configuration.load_config_file(args.config_file)
+    df = reader.read_dataframe_from_pickle(configuration.df_name + ".pkl")
+    df.date = pd.to_datetime(df.date)
 
     year_marks = viz_constants.get_year_marks(df)
     available_cols = get_available_columns()

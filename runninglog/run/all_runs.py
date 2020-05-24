@@ -1,5 +1,6 @@
 import pickle
 import os.path
+
 import pandas as pd
 import numpy as np
 import umap
@@ -37,7 +38,9 @@ class AllRuns():
         """
 
         if not isinstance(run_desc, dict):
-            raise Exception(f"Input must be a dict")
+            error = f"Input must be a dict"
+            logging.exception(error)
+            raise Exception(error)
 
         try:
             run_dicts = run_desc[blockNames.FileParams.list]
@@ -65,7 +68,9 @@ class AllRuns():
         """
 
         if not isinstance(runs_to_build, list):
-            raise Exception(f"Input must be a dict")
+            error = "Input must be a dict"
+            logging.exception(error)
+            raise Exception(error)
 
         all_runs = []
         for run in runs_to_build:
@@ -88,7 +93,9 @@ class AllRuns():
         """
 
         if not isinstance(run, single.SingleRun):
-            raise Exception(f"Input must be a SingleRun")
+            error = "Input must be a SingleRun"
+            logging.exception(error)
+            raise Exception(error)
 
         if run in self.runs:
             return False
@@ -119,7 +126,9 @@ class AllRuns():
         """
 
         if not isinstance(runs, list):
-            raise Exception(f"Input must be a list")
+            error = "Input must be a list"
+            logging.exception(error)
+            raise Exception(error)
 
         parsed_single_runs = []
         for run in runs:
@@ -143,7 +152,9 @@ class AllRuns():
                 list: List of added files
         """
         if not isinstance(runs, list):
-            raise Exception(f"runs must be a list")
+            error = f"runs must be a list"
+            logging.exception(error)
+            raise Exception(error)
 
         all_runs = self.build_runs(runs)
 

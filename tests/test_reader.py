@@ -1,7 +1,13 @@
 import unittest
 import os
+import logging
 
 from runninglog.io import reader
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
+
 
 class TestReader(unittest.TestCase):
     def test_get_json_files_in_subdirs(self):

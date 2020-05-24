@@ -1,9 +1,14 @@
 import unittest
 import datetime
+import logging
 
 import context
 from runninglog.run import segment
 from runninglog.run import types
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
 
 
 class TestSegment(unittest.TestCase):
@@ -75,3 +80,8 @@ class TestSegment(unittest.TestCase):
         with self.assertRaises(ValueError):
             sgmnt.fill_segment(dictionary)
 
+def main():
+    return unittest.main(exit=False)
+
+if __name__ == "__main__":
+    main()

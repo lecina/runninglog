@@ -2,6 +2,7 @@ import datetime
 import re
 import numbers
 import sys
+import logging
 
 import pandas as pd
 
@@ -381,7 +382,9 @@ class SingleRun():
         try:
             time_str = config[time_key]
         except KeyError as err:
-            raise Exception(f"Missing key: {time_key} in\n{config}") from err
+            error = f"Missing key: {time_key} in\n{config}"
+            logging.exception(error)
+            raise Exception(error) from err
 
         self.time = parser.parse_time(time_str)
 
@@ -401,7 +404,9 @@ class SingleRun():
         try:
             distance_str = config[dist_key]
         except KeyError as err:
-            raise Exception(f"Missing key: {dist_key} in\n{config}") from err
+            error = f"Missing key: {dist_key} in\n{config}"
+            logging.exception(error)
+            raise Exception(error) from err
 
         self.distance = parser.parse_distance(distance_str)
 
@@ -421,7 +426,9 @@ class SingleRun():
         try:
             date_str = config[date_key]
         except KeyError as err:
-            raise Exception(f"Missing key: {date_key} in\n{config}") from err
+            error = f"Missing key: {date_key} in\n{config}"
+            logging.exception(error)
+            raise Exception(error) from err
 
         self.date = parser.parse_date(date_str)
 
@@ -619,11 +626,11 @@ class SingleRun():
             if type_str == runTypeBlockname:
                 return runType
 
-        # If run_type is not found, set it to E
-        # TODO: Add to log
-        # print ("Assigning {} type for run in {}; {} km; {} min".format(
-        #            types.RUN_TYPES_DICTIONARY[types.RUN_TYPES_ENUM.E],
-        #                                self.date, self.distance, self.time))
+        logger = logging.getLogger()
+        logging.warning(f"Assigning "\
+            f"{types.RUN_TYPES_DICTIONARY[types.RUN_TYPES_ENUM.E]} type "\
+            f"for run in {self.date}; {self.distance} km; {self.time} min ;"\
+            f"with desc: {self.orig_json_string}")
         return types.RUN_TYPES_ENUM.E
 
     def fill_basic_volume_dict_with_structure_volume(self):

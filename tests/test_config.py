@@ -1,8 +1,13 @@
 import unittest
 import os.path
+import logging
 
 from runninglog.constants import blockNames
 from runninglog.config import config
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
 
 
 class TestConfig(unittest.TestCase):

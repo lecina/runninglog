@@ -1,4 +1,5 @@
 import os.path
+import logging
 import json
 
 from runninglog.run import all_runs
@@ -35,7 +36,8 @@ class RunningLog():
 
         self.added_runs = self.all_runs.load_runs(run_descs)
 
-        print(f"Added {len(self.added_runs)} runs")
+        logger = logging.getLogger()
+        logger.info(f"Added {len(self.added_runs)} runs")
 
     def compute_embedding(self):
         """Compute UMAP embedding

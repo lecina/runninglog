@@ -1,4 +1,5 @@
 import os
+import logging
 
 from runninglog.io import reader
 from runninglog.constants import blockNames
@@ -67,8 +68,11 @@ class Config():
                 config_filename(str): Filename path
         """
         if config_filename != "":
+            logging.info(f"Reading config file: {config_filename}")
             config = reader.read_json_file(config_filename)
             self.load_config(config)
+        else:
+            logging.info(f"Using default config")
 
     def load_config(self, config):
         """Loads configuration in dict

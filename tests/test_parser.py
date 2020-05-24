@@ -1,8 +1,13 @@
 import unittest
 import datetime
+import logging
 
 import context
 from runninglog.io import parser
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
 
 
 class TestParser(unittest.TestCase):
@@ -73,3 +78,9 @@ class TestParser(unittest.TestCase):
     def test_parse_pace2(self):
         parsed_time = parser.parse_pace(240)
         self.assertEqual(parsed_time, 240)
+
+def main():
+    return unittest.main(exit=False)
+
+if __name__ == "__main__":
+    main()

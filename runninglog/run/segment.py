@@ -1,3 +1,5 @@
+import logging
+
 from runninglog.constants import blockNames
 from runninglog.run import types
 from runninglog.io import parser
@@ -159,7 +161,9 @@ class Segment:
         try:
             type_ = item_dict[type_key]
         except KeyError as err:
-            raise Exception(f"Missing key: {type_key} in\n{item_dict}") from err
+            error = f"Missing key: {type_key} in\n{item_dict}"
+            logging.exception(error)
+            raise Exception(error) from err
 
         parsed_type = parser.parse_type(type_)
 
@@ -167,6 +171,7 @@ class Segment:
             self.type = parsed_type
         else:
             error = f"Unknown type in segment: {item_dict}"
+            logging.exception(error)
             raise ValueError(error)
 
         # Distance

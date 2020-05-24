@@ -1,10 +1,17 @@
 import unittest
-from datetime import datetime
 import os
+import logging
+from datetime import datetime
+
 import pandas as pd
 
 import context
 from runninglog.run import all_runs, single, segment, types
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
+
 
 class TestAllRuns(unittest.TestCase):
     def test_build_run(self):

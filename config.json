@@ -1,0 +1,5 @@
+{
+    'output_dir': 'data',
+    'input_dir': 'to_load',
+    'output_format': ['csv', 'pickle'],
+}

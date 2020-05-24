@@ -1,4 +1,5 @@
 import unittest
+import logging
 import datetime
 import math
 
@@ -6,6 +7,10 @@ import context
 from runninglog.run import single
 from runninglog.run import types
 from runninglog.constants import blockNames
+
+
+logger = logging.getLogger()
+logger.setLevel(logging.CRITICAL)
 
 
 class TestSingleRunFillers(unittest.TestCase):

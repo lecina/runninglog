@@ -1,6 +1,7 @@
 import datetime
 import re
 import numbers
+import logging
 
 from runninglog.run import types
 
@@ -41,6 +42,7 @@ def parse_date(date_str):
                 try:
                     dateObj = datetime.datetime.strptime(date_str, fmt)
                 except ValueError as er:
+                    logging.exception(f"Unknown date format:{date_str}")
                     raise Exception(f"Unknown date format:{date_str}") from er
     return dateObj.date()
 

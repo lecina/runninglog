@@ -3,6 +3,8 @@ import fnmatch
 import json
 import sys
 
+import pandas as pd
+
 from runninglog.constants import constants
 
 

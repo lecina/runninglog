@@ -709,6 +709,51 @@ class TestAllRuns(unittest.TestCase):
         self.assertEqual(allRuns.runs[0], goldenSingleRun)
         self.assertEqual(allRuns.runs[1], goldenSingleRun2)
 
+    def test_agg_df(self):
+        # TODO: unfinished test
+        run_desc = [
+                {
+                    "type": "T",
+                    "trail": True,
+                    "date": "26-11-2018",
+                    "time": "1h15min",
+                    "distance": 13.8,
+                    "climb": 110, 
+                    "where":"Park",
+                    "route":"Lap 1",
+                    "feeling": 4,
+                    "structure":[
+                        {"type":"E", "distance" : 2.36},
+                        {"type":"T", "distance": 5.84, "pace":"3:56"},
+                        {"type":"E", "distance" : 2.2}
+                    ]
+                },
+                {
+                    "type": "E",
+                    "date": "27-11-2018",
+                    "time": "1h",
+                    "distance": 12.2,
+                    "feeling": 3,
+                    "climb": 100, 
+                    "where":"Park2"
+                }
+        ]
+
+        allRuns = all_runs.AllRuns()
+        _ = allRuns.load_runs(run_desc)
+
+        dist_cols = ['dist%s' % i for i in
+            types.BASIC_RUN_TYPES_DICTIONARY.values()]
+        time_cols = ['time%s' % i for i in
+            types.BASIC_RUN_TYPES_DICTIONARY.values()]
+        sum_cols = ['climb', 'distance']
+        sum_cols.extend(dist_cols)
+        sum_cols.extend(time_cols)
+
+        avg_cols = ['feeling']
+
+        df_agg = allRuns.agg_df(allRuns.df, sum_cols, avg_cols, 'week')
+
 def main():
     return unittest.main(exit=False)
 

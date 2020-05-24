@@ -19,6 +19,28 @@ class AllRuns():
         self.df = pd.DataFrame()
         self.df_structures = pd.DataFrame()
 
+    def load_runs(self, runs, verbose=True):
+        """Loads all runs
+
+            Loads all runs in list
+
+            Args:
+                runs(list): List of runs to load
+                verbose(bool): Show more output
+
+            Returns:
+                list: List of added files
+        """
+        if not isinstance(runs, list):
+            error = "runs must be a list"
+            raise Exception(error)
+
+        all_runs = self.build_runs(runs)
+
+        parsed_single_runs = self.add_runs(all_runs)
+
+        return parsed_single_runs
+
     def build_run(self, run_desc):
         """Builds the run(s) in dictionary
 
@@ -104,6 +126,8 @@ class AllRuns():
         self.structures.extend(run.structure)
 
         self.df = self.df.append(run.as_dict(), ignore_index=True)
+        self.df = self.df.astype({blockNames.Colnames.feeling: 'float32'})
+
         self.df_structures = pd.concat([
                                         self.df_structures, 
                                         run.get_structure_as_df(),
@@ -139,29 +163,6 @@ class AllRuns():
 
         return parsed_single_runs
 
-    def load_runs(self, runs, verbose=True):
-        """Loads all runs
-
-            Loads all runs in list
-
-            Args:
-                runs(list): List of runs to load
-                verbose(bool): Show more output
-
-            Returns:
-                list: List of added files
-        """
-        if not isinstance(runs, list):
-            error = f"runs must be a list"
-            logging.exception(error)
-            raise Exception(error)
-
-        all_runs = self.build_runs(runs)
-
-        parsed_single_runs = self.add_runs(all_runs)
-
-        return parsed_single_runs
-
     def compute_umap_projection(self, cols=['climb', 'distance', 'time', 'avg_pace']):
         """Compute UMAP projection
 
@@ -179,6 +180,33 @@ class AllRuns():
 
         self.df['umap_X1'] = embedding[:,0]
         self.df['umap_X2'] = embedding[:,1]
+
+    def agg_df(self, df, sum_cols, avg_cols, time_option):
+        if time_option == 'week':
+            agg_option = 'W'
+        elif time_option == 'month':
+            agg_option = 'MS'
+        elif time_option == 'year':
+            agg_option = 'YS'
+        elif time_option == 'all':
+            agg_option = '2Y'
+        else:
+            error = f"Unknown aggregation {time_option}"
+            raise Exception(error)
+
+        df['activity'] = 'running'
+
+        dict_sum = {i: 'sum' for i in sum_cols}
+        dict_avg = {i: 'mean' for i in avg_cols}
+        dict_count = {'date':'size'}
+        desc_dict = {**dict_sum, **dict_avg, **dict_count}
+
+        df_agg = df.resample(agg_option, on='date')\
+                    .agg(desc_dict)\
+                    .rename(columns={'date':'N_all'})
+        return df_agg
+
+
 
     def save_as_csv(self, config):
         """Saves all runs as csv

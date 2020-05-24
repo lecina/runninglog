@@ -238,7 +238,7 @@ class SingleRun():
             blockNames.Colnames.inclination: self.inclination,
             blockNames.Colnames.avg_pace: self.pace,
             blockNames.Colnames.vspeed: self.vspeed,
-            blockNames.Colnames.date: self.date,
+            blockNames.Colnames.date: pd.to_datetime(self.date),
             blockNames.Colnames.trail: self.is_trail_running,
             blockNames.Colnames.where: self.where,
             blockNames.Colnames.route: self.route,

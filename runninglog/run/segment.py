@@ -1,5 +1,7 @@
 import logging
 
+import pandas as pd
+
 from runninglog.constants import blockNames
 from runninglog.run import types
 from runninglog.io import parser
@@ -106,7 +108,7 @@ class Segment:
             blockNames.Colnames.climb: self.climb,
             blockNames.Colnames.inclination: self.inclination,
             blockNames.Colnames.bpm: self.bpm,
-            blockNames.Colnames.date: self.date,
+            blockNames.Colnames.date: pd.to_datetime(self.date),
             blockNames.Colnames.repetition: self.repetition
         }
         return rdict

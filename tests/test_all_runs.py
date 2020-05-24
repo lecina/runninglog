@@ -45,6 +45,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.time = 75
         goldenSingleRun.distance = 13.80
         goldenSingleRun.climb = 110
+        goldenSingleRun.inclination = 0.7971
         goldenSingleRun.vspeed = 88
         goldenSingleRun.pace = 326.087
         goldenSingleRun.where = "Park"
@@ -136,6 +137,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.time = 60
         goldenSingleRun.distance = 12.2
         goldenSingleRun.climb = 100
+        goldenSingleRun.inclination = 0.81967
         goldenSingleRun.vspeed = 100
         goldenSingleRun.pace = 295.081967213 
         goldenSingleRun.trail_running = False
@@ -208,6 +210,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.time = 75
         goldenSingleRun.distance = 13.80
         goldenSingleRun.climb = 110
+        goldenSingleRun.inclination = 0.7971
         goldenSingleRun.vspeed = 88
         goldenSingleRun.pace = 326.087
         goldenSingleRun.where = "Park"
@@ -274,6 +277,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.time = 60
         goldenSingleRun2.distance = 12.2
         goldenSingleRun2.climb = 100
+        goldenSingleRun2.inclination = 0.81967
         goldenSingleRun2.vspeed = 100
         goldenSingleRun2.pace = 295.081967213 
         goldenSingleRun2.trail_running = False
@@ -303,10 +307,6 @@ class TestAllRuns(unittest.TestCase):
     def test_build_runs(self):
         # Equivalent to previous test. This time, we test build_runs,
         # the same runs are defined in two different dictionaries
-
-        #allRuns = all_runs.AllRuns()
-        #datafile = os.path.join(os.path.split(__file__)[0], 'data', 'test_1.json')
-        #singleRuns = allRuns.read_run_in_file(datafile, verbose=False)
 
         run_desc = [
                 {
@@ -346,6 +346,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.time = 75
         goldenSingleRun.distance = 13.80
         goldenSingleRun.climb = 110
+        goldenSingleRun.inclination = 0.7971
         goldenSingleRun.vspeed = 88
         goldenSingleRun.pace = 326.087
         goldenSingleRun.where = "Park"
@@ -412,6 +413,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.time = 60
         goldenSingleRun2.distance = 12.2
         goldenSingleRun2.climb = 100
+        goldenSingleRun2.inclination = 0.81967
         goldenSingleRun2.vspeed = 100
         goldenSingleRun2.pace = 295.081967213 
         goldenSingleRun2.trail_running = False
@@ -612,6 +614,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.time = 75
         goldenSingleRun.distance = 13.80
         goldenSingleRun.climb = 110
+        goldenSingleRun.inclination = 0.7971
         goldenSingleRun.vspeed = 88
         goldenSingleRun.pace = 326.087
         goldenSingleRun.where = "Park"
@@ -678,6 +681,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.time = 60
         goldenSingleRun2.distance = 12.2
         goldenSingleRun2.climb = 100
+        goldenSingleRun2.inclination = 0.81967
         goldenSingleRun2.vspeed = 100
         goldenSingleRun2.pace = 295.081967213 
         goldenSingleRun2.trail_running = False

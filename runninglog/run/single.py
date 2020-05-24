@@ -69,6 +69,7 @@ class SingleRun():
         self.time = None
         self.pace = None
         self.climb = 0
+        self.inclination = 0
         self.vspeed = 0
         self.bpm = None
         self.date = None
@@ -122,6 +123,8 @@ class SingleRun():
             self.time == other.time and\
             utilities.isclose(self.distance, other.distance, abs_tol=1e-3) and\
             self.climb == other.climb and\
+            utilities.isclose(self.inclination,
+                              other.inclination, abs_tol=1e-3) and\
             utilities.isclose(self.pace, other.pace, abs_tol=1e-3) and\
             utilities.isclose(self.vspeed, other.vspeed, abs_tol=1e-3) and\
             self.date == other.date and\
@@ -175,6 +178,7 @@ class SingleRun():
             str_.append("Total distance: -")
 
         str_.append("Climb: {:d}".format(self.climb))
+        str_.append("Inclination: {:.2f}%".format(self.inclination))
 
         try:
             str_.append("Avg. pace: {:.0f} (in sec/km)".format(self.pace))
@@ -231,6 +235,7 @@ class SingleRun():
             blockNames.Colnames.time: self.time,
             blockNames.Colnames.distance: self.distance,
             blockNames.Colnames.climb: self.climb,
+            blockNames.Colnames.inclination: self.inclination,
             blockNames.Colnames.avg_pace: self.pace,
             blockNames.Colnames.vspeed: self.vspeed,
             blockNames.Colnames.date: self.date,
@@ -344,6 +349,7 @@ class SingleRun():
 
         # Compute variables
         self.compute_vspeed()
+        self.inclination = self.compute_avg_inclination()
         self.pace = self.compute_avg_pace()
 
         self.fill_basic_volume_dict_with_structure_volume()
@@ -678,6 +684,20 @@ class SingleRun():
         """
         if self.time is not None and self.distance is not None:
             return self.time * 60 / self.distance
+        else:
+            return None
+
+    def compute_avg_inclination(self):
+        """Computes the average inclination of the single run
+
+            Computes the average inclination of the single run. Distance
+            and climb must have been set beforehand
+
+            Time is assumed to be in minutes and distance in seconds.
+            The avg. pace is stored in seconds/km
+        """
+        if self.distance is not None:
+            return 100 * self.climb / (1000 * self.distance)
         else:
             return None
 

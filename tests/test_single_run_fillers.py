@@ -16,7 +16,7 @@ logger.setLevel(logging.CRITICAL)
 class TestSingleRunFillers(unittest.TestCase):
     def test_fill_type_valid(self):
         singleRun = single.SingleRun()
-        config_dict = {'type': blockNames.RunTypes.E}
+        config_dict = {blockNames.FileParams.type: blockNames.RunTypes.E}
         singleRun.fill_type(config_dict)
         self.assertEqual(
                 singleRun.type,
@@ -24,7 +24,7 @@ class TestSingleRunFillers(unittest.TestCase):
 
     def test_fill_type_valid2(self):
         singleRun = single.SingleRun()
-        config_dict = {'type': blockNames.RunTypes.T}
+        config_dict = {blockNames.FileParams.type: blockNames.RunTypes.T}
         singleRun.fill_type(config_dict)
         self.assertEqual(singleRun.type, types.RUN_TYPES_ENUM.T)
 
@@ -37,9 +37,30 @@ class TestSingleRunFillers(unittest.TestCase):
     def test_fill_type_invalid(self):
         singleRun = single.SingleRun()
 
-        config_dict = {'type':'aaa'}
+        config_dict = {blockNames.FileParams.type:'aaa'}
         singleRun.fill_type(config_dict)
         self.assertEqual(singleRun.type, types.RUN_TYPES_ENUM.E)
+
+    def test_fill_activity_type(self):
+        singleRun = single.SingleRun()
+        config_dict = {
+            blockNames.FileParams.activity:
+            blockNames.Activities.mountainereeing
+        }
+        singleRun.fill_activity(config_dict)
+        self.assertEqual(singleRun.activity, types.ACTIVITIES.MOUNTAINEERING)
+
+    def test_fill_activity_missing(self):
+        singleRun = single.SingleRun()
+        config_dict = {}
+        singleRun.fill_activity(config_dict)
+        self.assertEqual(singleRun.activity, types.ACTIVITIES.RUNNING)
+
+    def test_fill_activity_invalid(self):
+        singleRun = single.SingleRun()
+        config_dict = {blockNames.FileParams.activity: 'aaa'}
+        with self.assertRaises(Exception):
+            singleRun.fill_activity(config_dict)
 
     def test_fill_time_valid(self):
         singleRun = single.SingleRun()

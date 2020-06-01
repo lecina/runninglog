@@ -6,6 +6,11 @@ from runninglog.constants import blockNames
 
     Activities may have an emphasis in one of the previous or may be a race (C)
 """
+class ACTIVITIES:
+    RUNNING = blockNames.Activities.running
+    BIKING = blockNames.Activities.biking
+    MOUNTAINEERING = blockNames.Activities.mountainereeing
+    OTHER = blockNames.Activities.other
 
 class BASIC_RUN_TYPES_ENUM:
     E, M, T, I, R, X, XB = range(7)

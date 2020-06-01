@@ -4,6 +4,25 @@ import numbers
 import logging
 
 from runninglog.run import types
+from runninglog.constants import blockNames
+
+def parse_activity(activity_str):
+    """Parses activity
+
+        It parses the activity type from the input argument
+
+        Args:
+            type_str (str): Activity as string
+
+        Returns:
+            type.ACTIVITIES: Activity type
+            If not found, returns None
+
+    """
+    for activity in blockNames.Activities.available_activities:
+        if activity_str.lower() == activity.lower():
+            return activity
+    return None
 
 def parse_type(type_str):
     """Parses type

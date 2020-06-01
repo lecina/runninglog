@@ -264,6 +264,7 @@ class TestSingleRun(unittest.TestCase):
 
         singleRun.load(parsed_json)
 
+        self.assertEqual(singleRun.activity, types.ACTIVITIES.RUNNING)
         self.assertEqual(singleRun.time, 75)
         self.assertEqual(singleRun.climb, 110)
         self.assertAlmostEqual(singleRun.vspeed, 88.0, 2)
@@ -310,6 +311,7 @@ class TestSingleRun(unittest.TestCase):
         singleRun = single.SingleRun()
 
         parsed_json = {
+                        "activity": "running",
                         "type": "E",
                         "trail": True,
                         "date": "26-11-2018",
@@ -319,6 +321,7 @@ class TestSingleRun(unittest.TestCase):
 
         singleRun.load(parsed_json)
 
+        self.assertEqual(singleRun.activity, types.ACTIVITIES.RUNNING)
         self.assertEqual(singleRun.time, 75)
         self.assertEqual(singleRun.climb, 0)
         self.assertEqual(singleRun.where, "")
@@ -359,6 +362,7 @@ class TestSingleRun(unittest.TestCase):
         singleRun = single.SingleRun()
 
         parsed_json = {
+                        "activity": "mountaineering",
                         "type": "X",
                         "date": "26-11-2018",
                         "time": "1h15min",
@@ -367,6 +371,7 @@ class TestSingleRun(unittest.TestCase):
 
         singleRun.load(parsed_json)
 
+        self.assertEqual(singleRun.activity, types.ACTIVITIES.MOUNTAINEERING)
         self.assertEqual(singleRun.time, 75)
         self.assertEqual(singleRun.climb, 0)
         self.assertEqual(singleRun.where, "")
@@ -409,6 +414,7 @@ class TestSingleRun(unittest.TestCase):
         singleRun = single.SingleRun()
 
         parsed_json = {
+                        "activity": "mountaineering",
                         "type": "X",
                         "date": "26-11-2018",
                         "time": "1h 15m",
@@ -420,6 +426,7 @@ class TestSingleRun(unittest.TestCase):
 
         singleRun.load(parsed_json)
 
+        self.assertEqual(singleRun.activity, types.ACTIVITIES.MOUNTAINEERING)
         self.assertEqual(singleRun.time, 75)
         self.assertEqual(singleRun.climb, 0)
         self.assertEqual(singleRun.where, "")

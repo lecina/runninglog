@@ -12,7 +12,21 @@ class ConfigParams:
     csv = "csv"
     pickle = "pickle"
 
+class Activities:
+    running = "running"
+    biking = "biking"
+    mountainereeing = "mountaineering"
+    other = "other"
+
+    available_activities = [
+        running,
+        biking,
+        mountainereeing,
+        other
+    ]
+
 class FileParams:
+    activity = "activity"
     type = "type"
     date = "date"
     time = "time"
@@ -32,6 +46,7 @@ class FileParams:
     list = "list"
 
 class Colnames:
+    activity = "activity"
     type = "type"
     date = "date"
     time = "time"

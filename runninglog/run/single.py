@@ -3,6 +3,7 @@ import re
 import numbers
 import sys
 import logging
+import warnings
 
 import pandas as pd
 
@@ -18,6 +19,7 @@ class SingleRun():
     A SingleRun is a running activity object.
 
     Attributes that must be defined:
+        * Activity
         * Time
         * Distance
         * Date
@@ -63,6 +65,7 @@ class SingleRun():
 
     """
     def __init__(self):
+        self.activity = types.ACTIVITIES.RUNNING
         self.type = None
         self.is_trail_running = False
         self.distance = 0
@@ -120,6 +123,7 @@ class SingleRun():
             return False
 
         return self.type == other.type and\
+            self.activity == other.activity and\
             self.time == other.time and\
             utilities.isclose(self.distance, other.distance, abs_tol=1e-3) and\
             self.climb == other.climb and\
@@ -137,6 +141,8 @@ class SingleRun():
 
     def __str__(self):
         str_ = []
+        str_.append(f"Activity: {self.activity}")
+
         if self.date is not None:
             str_.append(f"Date: {self.date}")
         else:
@@ -231,6 +237,7 @@ class SingleRun():
         XB_ = types.BASIC_RUN_TYPES_ENUM.XB
 
         rdict = {
+            blockNames.Colnames.activity: self.activity,
             blockNames.Colnames.type: types.RUN_TYPES_DICTIONARY[self.type],
             blockNames.Colnames.time: self.time,
             blockNames.Colnames.distance: self.distance,
@@ -304,6 +311,7 @@ class SingleRun():
             * Date
 
         Optional parameters:
+            * Activity
             * Type
             * Climb
             * Location (where)
@@ -336,6 +344,7 @@ class SingleRun():
         self.fill_date(parsed_json)
 
         # Non compulsory
+        self.fill_activity(parsed_json)
         self.fill_type(parsed_json)
         self.fill_climb(parsed_json)
         self.fill_where(parsed_json)
@@ -437,6 +446,33 @@ class SingleRun():
             raise Exception(error) from err
 
         self.date = parser.parse_date(date_str)
+
+    def fill_activity(self, config):
+        """Fills activity with data in input dictionary
+
+            Fills activity with the configuration dictionary.
+            If not present, assigned to types.ACTIVITIES.RUNNING
+
+            Args:
+                config(dict): Dictionary with activity information
+
+            Notes:
+                Supported activity types are defined in types.ACTIVITIES
+        """
+        try:
+            activity_str = config[blockNames.FileParams.activity]
+        except KeyError:
+            activity_str = types.ACTIVITIES.RUNNING
+
+        activity = parser.parse_activity(activity_str)
+
+        if activity is None:
+            error = f"Unknown activity: {activity_str};"\
+                    f" in: {self.orig_json_string}"
+            logging.exception(error)
+            raise Exception(error)
+
+        self.activity = activity
 
     def fill_type(self, config):
         """Fills type with data in input dictionary
@@ -633,7 +669,8 @@ class SingleRun():
                 return runType
 
         logger = logging.getLogger()
-        logging.warning(f"Assigning "\
+        # TODO: change for warning.warn
+        logger.warning(f"Assigning "\
             f"{types.RUN_TYPES_DICTIONARY[types.RUN_TYPES_ENUM.E]} type "\
             f"for run in {self.date}; {self.distance} km; {self.time} min ;"\
             f"with desc: {self.orig_json_string}")

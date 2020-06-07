@@ -82,6 +82,8 @@ def main():
 
     logger.info(f"Reading runs from {configuration.input_dir}")
     rl.load_runs()
+    logger.info("Computing aggregations")
+    rl.compute_aggregations()
     logger.info("Computing UMAP embedding")
     rl.compute_embedding()
     logger.info("Finished!")

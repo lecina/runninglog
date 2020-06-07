@@ -19,6 +19,10 @@ class AllRuns():
         self.df = pd.DataFrame()
         self.df_structures = pd.DataFrame()
 
+        self.df_agg_w = pd.DataFrame()
+        self.df_agg_m = pd.DataFrame()
+        self.df_agg_y = pd.DataFrame()
+
     def load_runs(self, runs, verbose=True):
         """Loads all runs
 
@@ -181,7 +185,20 @@ class AllRuns():
         self.df['umap_X1'] = embedding[:,0]
         self.df['umap_X2'] = embedding[:,1]
 
-    def agg_df(self, df, sum_cols, avg_cols, time_option):
+    def agg_df(self):
+        """Aggregate df
+
+            Aggregate df weekly, monthly, and yearly
+        """
+        self.df_agg_w = self.agg(self.df, 'week')
+        self.df_agg_m = self.agg(self.df, 'month')
+        self.df_agg_y = self.agg(self.df, 'year')
+
+    def agg(self, df, time_option):
+        """Aggregate df
+
+            Aggregate df
+        """
         if time_option == 'week':
             agg_option = 'W'
         elif time_option == 'month':
@@ -194,18 +211,29 @@ class AllRuns():
             error = f"Unknown aggregation {time_option}"
             raise Exception(error)
 
-        df['activity'] = 'running'
+        # Cols to be summed in agg
+        sum_cols = ['distance', 'time', 'climb'] 
+        dcols = ['dist%s'%v for v in types.BASIC_RUN_TYPES_DICTIONARY.values()]
+        sum_cols.extend(dcols)
+        tcols = ['time%s'%v for v in types.BASIC_RUN_TYPES_DICTIONARY.values()]
+        sum_cols.extend(tcols)
+
+        # Cols to be averaged in agg
+        avg_cols = ['feeling'] 
 
         dict_sum = {i: 'sum' for i in sum_cols}
         dict_avg = {i: 'mean' for i in avg_cols}
         dict_count = {'date':'size'}
         desc_dict = {**dict_sum, **dict_avg, **dict_count}
-
-        df_agg = df.resample(agg_option, on='date')\
+        #, as_index=False)\
+        df_agg = df.groupby(['activity', 'trail'])\
+                    .resample(agg_option, on='date')\
                     .agg(desc_dict)\
-                    .rename(columns={'date':'N_all'})
+                    .rename(columns={'date':'N'})
+        df_agg.reset_index(level=0, inplace=True)
+        print (df_agg.columns)
+        #df_agg.trail = int(df_agg.trail)
         return df_agg
-
 
 
     def save_as_csv(self, config):
@@ -223,6 +251,15 @@ class AllRuns():
         fname = config.df_struct_name + ".csv"
         writer.dataframe_to_csv(self.df_structures, fname)
 
+        fname = config.df_agg_name + "_w.csv"
+        writer.dataframe_to_csv(self.df_agg_w, fname)
+
+        fname = config.df_agg_name + "_m.csv"
+        writer.dataframe_to_csv(self.df_agg_m, fname)
+
+        fname = config.df_agg_name + "_y.csv"
+        writer.dataframe_to_csv(self.df_agg_y, fname)
+
     def save_as_pickle(self, config):
         """Saves all runs as pkl
 
@@ -237,3 +274,12 @@ class AllRuns():
 
         fname = config.df_struct_name + ".pkl"
         writer.dataframe_to_pickle(self.df_structures, fname)
+
+        fname = config.df_agg_name + "_w.pkl"
+        writer.dataframe_to_pickle(self.df_agg_w, fname)
+
+        fname = config.df_agg_name + "_m.pkl"
+        writer.dataframe_to_pickle(self.df_agg_m, fname)
+
+        fname = config.df_agg_name + "_y.pkl"
+        writer.dataframe_to_pickle(self.df_agg_y, fname)

@@ -46,6 +46,13 @@ class RunningLog():
         """
         self.all_runs.compute_umap_projection()
 
+    def compute_aggregations(self):
+        """Compute aggregations
+
+            Aggregate df in all runs
+        """
+        self.all_runs.agg_df()
+
     def group_added_runs_by_month(self):
         """Groups added runs by month in a dictionary
 
@@ -93,6 +100,7 @@ class RunningLog():
         # Save processed dataframes
         if blockNames.ConfigParams.csv in self.config.output_format:
             self.all_runs.save_as_csv(self.config)
+
         if blockNames.ConfigParams.pickle in self.config.output_format:
             self.all_runs.save_as_pickle(self.config)
 

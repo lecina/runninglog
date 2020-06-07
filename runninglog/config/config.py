@@ -17,6 +17,8 @@ class Config():
         self._df_name = "df"
         self._df_struct_name = "df_struct"
 
+        self._df_agg_name = "df_agg"
+
         self.output_format = ['csv', 'pickle']
 
     def __str__(self):
@@ -29,6 +31,7 @@ class Config():
                 self.all_runs,
                 self.df_name,
                 self.df_struct_name,
+                self.df_agg_name,
                 "\n".join(self.output_format)
             ]
         )
@@ -57,6 +60,11 @@ class Config():
     def df_struct_name(self):
         """Get df struct full filename"""
         return os.path.join(self.processed_output_dir, self._df_struct_name)
+
+    @property
+    def df_agg_name(self):
+        """Get df_agg full filename"""
+        return os.path.join(self.processed_output_dir, self._df_agg_name)
 
     def load_config_file(self, config_filename = ""):
         """Reads configuration file

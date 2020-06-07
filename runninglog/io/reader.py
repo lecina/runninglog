@@ -2,6 +2,7 @@ import os
 import fnmatch
 import json
 import sys
+import pickle
 
 import pandas as pd
 
@@ -57,7 +58,7 @@ def read_json_file(filename):
         try:
             parsed_json = json.loads(json_str)
         except json.JSONDecodeError as err:
-            raise Exception(f"Could not read: {json_filename}; "
+            raise Exception(f"Could not read: {filename}; "
                             f"Error: {err}") from err
 
     return parsed_json
@@ -111,4 +112,4 @@ def from_pickle(fname):
             Watch out for pickle objects, as they can be hacked.
             Example: https://realpython.com/python-pickle-module/
     """
-    pickle.load(open(fname, "rb"))
+    return pickle.load(open(fname, "rb"))

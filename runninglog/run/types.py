@@ -9,7 +9,7 @@ from runninglog.constants import blockNames
 class ACTIVITIES:
     RUNNING = blockNames.Activities.running
     BIKING = blockNames.Activities.biking
-    MOUNTAINEERING = blockNames.Activities.mountainereeing
+    MOUNTAINEERING = blockNames.Activities.mountaineering
     OTHER = blockNames.Activities.other
 
 class BASIC_RUN_TYPES_ENUM:

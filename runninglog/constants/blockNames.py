@@ -15,13 +15,13 @@ class ConfigParams:
 class Activities:
     running = "running"
     biking = "biking"
-    mountainereeing = "mountaineering"
+    mountaineering = "mountaineering"
     other = "other"
 
     available_activities = [
         running,
         biking,
-        mountainereeing,
+        mountaineering,
         other
     ]
 

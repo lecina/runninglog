@@ -51,7 +51,7 @@ class RunningLog():
 
             Aggregate df in all runs
         """
-        self.all_runs.agg_df()
+        self.all_runs.compute_df_aggregations()
 
     def group_added_runs_by_month(self):
         """Groups added runs by month in a dictionary

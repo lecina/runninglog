@@ -185,16 +185,16 @@ class AllRuns():
         self.df['umap_X1'] = embedding[:,0]
         self.df['umap_X2'] = embedding[:,1]
 
-    def agg_df(self):
+    def compute_df_aggregations(self):
         """Aggregate df
 
             Aggregate df weekly, monthly, and yearly
         """
-        self.df_agg_w = self.agg(self.df, 'week')
-        self.df_agg_m = self.agg(self.df, 'month')
-        self.df_agg_y = self.agg(self.df, 'year')
+        self.df_agg_w = self.agg_df('week')
+        self.df_agg_m = self.agg_df('month')
+        self.df_agg_y = self.agg_df('year')
 
-    def agg(self, df, time_option):
+    def agg_df(self, time_option):
         """Aggregate df
 
             Aggregate df
@@ -225,14 +225,16 @@ class AllRuns():
         dict_avg = {i: 'mean' for i in avg_cols}
         dict_count = {'date':'size'}
         desc_dict = {**dict_sum, **dict_avg, **dict_count}
-        #, as_index=False)\
-        df_agg = df.groupby(['activity', 'trail'])\
-                    .resample(agg_option, on='date')\
-                    .agg(desc_dict)\
-                    .rename(columns={'date':'N'})
+
+        df_agg = self.df.groupby(['activity', 'trail'])\
+                        .resample(agg_option, on='date')\
+                        .agg(desc_dict)\
+                        .rename(columns={'date':'N'})
+
         df_agg.reset_index(level=0, inplace=True)
-        print (df_agg.columns)
-        #df_agg.trail = int(df_agg.trail)
+
+        df_agg.sort_values(by=['date', 'activity', 'trail'], inplace=True)
+
         return df_agg
 
 

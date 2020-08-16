@@ -23,7 +23,7 @@ class TestAllRuns(unittest.TestCase):
             "date": "26-11-2018",
             "time": "1h15min",
             "distance": 13.8,
-            "climb": 110, 
+            "climb": 110,
             "where":"Park",
             "route":"Lap 1",
             "feeling": 4,
@@ -81,7 +81,7 @@ class TestAllRuns(unittest.TestCase):
         segment1.is_trail_running = True
         segment1.feeling = 4
         segment1.date = datetime.strptime("26/11/2018", "%d/%m/%Y").date()
-        
+
         segment2 = segment.Segment()
         segment2.type = types.BASIC_RUN_TYPES_ENUM.T
         segment2.distance = 5.84
@@ -122,7 +122,7 @@ class TestAllRuns(unittest.TestCase):
             "date": "27-11-2018",
             "time": "1h",
             "distance": 12.2,
-            "climb": 100, 
+            "climb": 100,
             "where":"Park2"
         }
 
@@ -139,7 +139,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun.climb = 100
         goldenSingleRun.inclination = 0.81967
         goldenSingleRun.vspeed = 100
-        goldenSingleRun.pace = 295.081967213 
+        goldenSingleRun.pace = 295.081967213
         goldenSingleRun.trail_running = False
         goldenSingleRun.where = "Park2"
         goldenSingleRun.route = ""
@@ -178,7 +178,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "26-11-2018",
                     "time": "1h15min",
                     "distance": 13.8,
-                    "climb": 110, 
+                    "climb": 110,
                     "where":"Park",
                     "route":"Lap 1",
                     "feeling": 4,
@@ -193,7 +193,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "27-11-2018",
                     "time": "1h",
                     "distance": 12.2,
-                    "climb": 100, 
+                    "climb": 100,
                     "where":"Park2"
                 }
             ]
@@ -246,7 +246,7 @@ class TestAllRuns(unittest.TestCase):
         segment1.feeling = 4
         segment1.is_trail_running = True
         segment1.date = datetime.strptime("26/11/2018", "%d/%m/%Y").date()
-        
+
         segment2 = segment.Segment()
         segment2.type = types.BASIC_RUN_TYPES_ENUM.T
         segment2.distance = 5.84
@@ -279,7 +279,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.climb = 100
         goldenSingleRun2.inclination = 0.81967
         goldenSingleRun2.vspeed = 100
-        goldenSingleRun2.pace = 295.081967213 
+        goldenSingleRun2.pace = 295.081967213
         goldenSingleRun2.trail_running = False
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
@@ -315,7 +315,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "26-11-2018",
                     "time": "1h15min",
                     "distance": 13.8,
-                    "climb": 110, 
+                    "climb": 110,
                     "where":"Park",
                     "route":"Lap 1",
                     "feeling": 4,
@@ -330,7 +330,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "27-11-2018",
                     "time": "1h",
                     "distance": 12.2,
-                    "climb": 100, 
+                    "climb": 100,
                     "where":"Park2"
                 }
         ]
@@ -382,7 +382,7 @@ class TestAllRuns(unittest.TestCase):
         segment1.feeling = 4
         segment1.is_trail_running = True
         segment1.date = datetime.strptime("26/11/2018", "%d/%m/%Y").date()
-        
+
         segment2 = segment.Segment()
         segment2.type = types.BASIC_RUN_TYPES_ENUM.T
         segment2.distance = 5.84
@@ -415,7 +415,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.climb = 100
         goldenSingleRun2.inclination = 0.81967
         goldenSingleRun2.vspeed = 100
-        goldenSingleRun2.pace = 295.081967213 
+        goldenSingleRun2.pace = 295.081967213
         goldenSingleRun2.trail_running = False
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
@@ -451,7 +451,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "26-11-2018",
                     "time": "1h15min",
                     "distance": 13.8,
-                    "climb": 110, 
+                    "climb": 110,
                     "where":"Park",
                     "route":"Lap 1",
                     "feeling": 4,
@@ -467,7 +467,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "26-11-2018",
                     "time": "1h15min",
                     "distance": 13.8,
-                    "climb": 110, 
+                    "climb": 110,
                     "where":"Park",
                     "route":"Lap 1",
                     "feeling": 4,
@@ -505,7 +505,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "26-11-2018",
                     "time": "1h15min",
                     "distance": 13.8,
-                    "climb": 110, 
+                    "climb": 110,
                     "where":"Park",
                     "route":"Lap 1",
                     "feeling": 4,
@@ -521,7 +521,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "26-11-2018",
                     "time": "1h15min",
                     "distance": 13.8,
-                    "climb": 110, 
+                    "climb": 110,
                     "where":"Park",
                     "route":"Lap 1",
                     "feeling": 4,
@@ -536,7 +536,7 @@ class TestAllRuns(unittest.TestCase):
                     "date": "27-11-2018",
                     "time": "1h",
                     "distance": 12.2,
-                    "climb": 100, 
+                    "climb": 100,
                     "where":"Park2"
                 }
             ]
@@ -584,7 +584,7 @@ class TestAllRuns(unittest.TestCase):
                 "date": "26-11-2018",
                 "time": "1h15min",
                 "distance": 13.8,
-                "climb": 110, 
+                "climb": 110,
                 "where":"Park",
                 "route":"Lap 1",
                 "feeling": 4,
@@ -600,7 +600,7 @@ class TestAllRuns(unittest.TestCase):
                 "date": "27-11-2018",
                 "time": "1h",
                 "distance": 12.2,
-                "climb": 100, 
+                "climb": 100,
                 "where":"Park2"
             }
         ]
@@ -650,7 +650,7 @@ class TestAllRuns(unittest.TestCase):
         segment1.feeling = 4
         segment1.is_trail_running = True
         segment1.date = datetime.strptime("26/11/2018", "%d/%m/%Y").date()
-        
+
         segment2 = segment.Segment()
         segment2.type = types.BASIC_RUN_TYPES_ENUM.T
         segment2.distance = 5.84
@@ -683,7 +683,7 @@ class TestAllRuns(unittest.TestCase):
         goldenSingleRun2.climb = 100
         goldenSingleRun2.inclination = 0.81967
         goldenSingleRun2.vspeed = 100
-        goldenSingleRun2.pace = 295.081967213 
+        goldenSingleRun2.pace = 295.081967213
         goldenSingleRun2.trail_running = False
         goldenSingleRun2.where = "Park2"
         goldenSingleRun2.route = ""
@@ -710,49 +710,95 @@ class TestAllRuns(unittest.TestCase):
         self.assertEqual(allRuns.runs[1], goldenSingleRun2)
 
     def test_agg_df(self):
-        # TODO: unfinished test
-        run_desc = [
-                {
-                    "type": "T",
-                    "trail": True,
-                    "date": "26-11-2018",
-                    "time": "1h15min",
-                    "distance": 13.8,
-                    "climb": 110, 
-                    "where":"Park",
-                    "route":"Lap 1",
-                    "feeling": 4,
-                    "structure":[
-                        {"type":"E", "distance" : 2.36},
-                        {"type":"T", "distance": 5.84, "pace":"3:56"},
-                        {"type":"E", "distance" : 2.2}
-                    ]
-                },
-                {
-                    "type": "E",
-                    "date": "27-11-2018",
-                    "time": "1h",
-                    "distance": 12.2,
-                    "feeling": 3,
-                    "climb": 100, 
-                    "where":"Park2"
-                }
-        ]
+        # Test aggregation
 
         allRuns = all_runs.AllRuns()
-        _ = allRuns.load_runs(run_desc)
 
-        dist_cols = ['dist%s' % i for i in
-            types.BASIC_RUN_TYPES_DICTIONARY.values()]
-        time_cols = ['time%s' % i for i in
-            types.BASIC_RUN_TYPES_DICTIONARY.values()]
-        sum_cols = ['climb', 'distance']
-        sum_cols.extend(dist_cols)
-        sum_cols.extend(time_cols)
+        allRuns.df = pd.DataFrame({
+            'date': [
+            pd.to_datetime(datetime.strptime("14/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("15/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("16/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("21/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("22/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("23/08/2020", "%d/%m/%Y").date())
+            ],
+            'activity': [
+                types.ACTIVITIES.RUNNING,
+                types.ACTIVITIES.BIKING,
+                types.ACTIVITIES.MOUNTAINEERING,
+                types.ACTIVITIES.RUNNING,
+                types.ACTIVITIES.RUNNING,
+                types.ACTIVITIES.RUNNING,
+            ],
+            'trail': [0, 0, 0, 0, 1, 1],
+            'distance': [10, 11, 12, 13, 14, 15],
+            'time': [38, 20, 120, 50, 60, 65],
+            'climb': [50, 100, 600, 50, 500, 700],
+            'feeling': [3, None, 5, 4, None, 5],
+            'distE': [0, 11, 12, 0, 0, 15],
+            'distT': [10, 0, 0, 0, 0, 0],
+            'timeE': [0, 20, 120, 0, 0, 65],
+            'timeT': [38, 0, 0, 50, 60, 0],
+            'distM': [0, 0, 0, 0, 0, 0],
+            'distI': [0, 0, 0, 0, 0, 0],
+            'distR': [0, 0, 0, 0, 0, 0],
+            'distX': [0, 0, 0, 0, 0, 0],
+            'distXB': [0, 0, 0, 0, 0, 0],
+            'timeM': [0, 0, 0, 0, 0, 0],
+            'timeI': [0, 0, 0, 0, 0, 0],
+            'timeR': [0, 0, 0, 0, 0, 0],
+            'timeX': [0, 0, 0, 0, 0, 0],
+            'timeXB': [0, 0, 0, 0, 0, 0]
+        })
 
-        avg_cols = ['feeling']
+        df_agg = allRuns.agg_df('week')
+        df_agg.reset_index(inplace=True)
 
-        df_agg = allRuns.agg_df(allRuns.df, sum_cols, avg_cols, 'week')
+        df_agg_golden = pd.DataFrame({
+            'trail': [0,0,0,0,1],
+            'date': [
+            pd.to_datetime(datetime.strptime("16/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("16/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("16/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("23/08/2020", "%d/%m/%Y").date()),
+            pd.to_datetime(datetime.strptime("23/08/2020", "%d/%m/%Y").date())
+            ],
+            'activity': [
+                types.ACTIVITIES.RUNNING,
+                types.ACTIVITIES.BIKING,
+                types.ACTIVITIES.MOUNTAINEERING,
+                types.ACTIVITIES.RUNNING,
+                types.ACTIVITIES.RUNNING,
+            ],
+            'distance': [10, 11, 12, 13, 29],
+            'time': [38, 20, 120, 50, 125],
+            'climb': [50, 100, 600, 50, 1200],
+            'distE': [0, 11, 12, 0, 15],
+            'distM': [0, 0, 0, 0, 0],
+            'distT': [10, 0, 0, 0, 0],
+            'distI': [0, 0, 0, 0, 0],
+            'distR': [0, 0, 0, 0, 0],
+            'distX': [0, 0, 0, 0, 0],
+            'distXB': [0, 0, 0, 0, 0],
+            'timeE': [0, 20, 120, 0, 65],
+            'timeM': [0, 0, 0, 0, 0],
+            'timeT': [38, 0, 0, 50, 60],
+            'timeI': [0, 0, 0, 0, 0],
+            'timeR': [0, 0, 0, 0, 0],
+            'timeX': [0, 0, 0, 0, 0],
+            'timeXB': [0, 0, 0, 0, 0],
+            'feeling': [3, None, 5, 4, 5],
+            'N': [1, 1, 1, 1, 2]
+        })
+
+        df_agg.sort_values(by=['date', 'activity', 'trail'], inplace=True)
+        df_agg_golden.sort_values(by=['date', 'activity', 'trail'], inplace=True)
+
+        df_agg_golden.reset_index(drop=True, inplace=True)
+        df_agg.reset_index(drop=True, inplace=True)
+
+        pd.testing.assert_frame_equal(df_agg, df_agg_golden)
 
 def main():
     return unittest.main(exit=False)

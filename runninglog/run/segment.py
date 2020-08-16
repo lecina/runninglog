@@ -126,7 +126,7 @@ class Segment:
                 self.inclination == 0 and
                 self.vspeed == 0 and
                 self.bpm is None and
-                self.feeling == None and
+                self.feeling is None and
                 self.repetition == 0)
 
     def fill_segment(self, segment_dict):

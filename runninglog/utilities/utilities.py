@@ -2,6 +2,7 @@ import os.path
 import shutil
 import pandas as pd
 
+
 def cleanup(f):
     """
         Remove dir if exists
@@ -11,6 +12,7 @@ def cleanup(f):
     """
     if os.path.exists(f):
         shutil.rmtree(f)
+
 
 def rm_file(f):
     """
@@ -32,6 +34,7 @@ def make_dir(outputDir):
     """
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)
+
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
     if (a is None and b is not None) or (a is not None and b is None):

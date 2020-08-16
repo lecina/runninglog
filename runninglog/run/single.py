@@ -119,7 +119,7 @@ class SingleRun():
                 return False
 
         if (self.pace is None and other.pace is not None) or\
-            (self.pace is not None and self.pace is None):
+                (self.pace is not None and self.pace is None):
             return False
 
         return self.type == other.type and\
@@ -670,9 +670,10 @@ class SingleRun():
 
         logger = logging.getLogger()
         # TODO: change for warning.warn
-        logger.warning(f"Assigning "\
-            f"{types.RUN_TYPES_DICTIONARY[types.RUN_TYPES_ENUM.E]} type "\
-            f"for run in {self.date}; {self.distance} km; {self.time} min ;"\
+        logger.warning(
+            f"Assigning "
+            f"{types.RUN_TYPES_DICTIONARY[types.RUN_TYPES_ENUM.E]} type "
+            f"for run in {self.date}; {self.distance} km; {self.time} min ;"
             f"with desc: {self.orig_json_string}")
         return types.RUN_TYPES_ENUM.E
 

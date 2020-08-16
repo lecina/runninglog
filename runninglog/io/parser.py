@@ -6,6 +6,7 @@ import logging
 from runninglog.run import types
 from runninglog.constants import blockNames
 
+
 def parse_activity(activity_str):
     """Parses activity
 
@@ -23,6 +24,7 @@ def parse_activity(activity_str):
         if activity_str.lower() == activity.lower():
             return activity
     return None
+
 
 def parse_type(type_str):
     """Parses type
@@ -43,6 +45,7 @@ def parse_type(type_str):
             return runType
 
     return None
+
 
 def parse_date(date_str):
     fmt = "%d/%m/%Y"
@@ -65,6 +68,7 @@ def parse_date(date_str):
                     raise Exception(f"Unknown date format:{date_str}") from er
     return dateObj.date()
 
+
 def parse_time(time_str):
     """Parses time
 
@@ -83,8 +87,8 @@ def parse_time(time_str):
             Seconds can be written as: 's'
     """
     regex = re.compile(r'((?P<hours>\d+?)hr?)?'
-                        r'((?P<minutes>\d+?)m)?([i])?([n])?'
-                        r'((?P<seconds>\d+?)s)?')
+                       r'((?P<minutes>\d+?)m)?([i])?([n])?'
+                       r'((?P<seconds>\d+?)s)?')
     time_str = time_str.replace(" ", "")
     time = regex.search(time_str).groupdict()
 
@@ -97,6 +101,7 @@ def parse_time(time_str):
         time_in_minutes += float(time["seconds"])/60
 
     return time_in_minutes
+
 
 def parse_distance(dist):
     """Parses distance
@@ -122,6 +127,7 @@ def parse_distance(dist):
     distance = regex.search(dist).groupdict()
 
     return float(distance["km"])
+
 
 def parse_pace(pace):
     """Parses pace

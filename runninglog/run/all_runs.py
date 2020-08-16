@@ -11,6 +11,7 @@ from runninglog.run import single, types
 from runninglog.constants import blockNames
 from runninglog.utilities import utilities
 
+
 class AllRuns():
     def __init__(self):
         self.runs = []
@@ -104,12 +105,11 @@ class AllRuns():
             all_runs.extend(built_runs)
         return all_runs
 
-
     def add_run(self, run):
         """Adds the run if it is not found
 
             Adds the SingleRun if it is not found, so that runs are not
-            duplicated. 
+            duplicated.
 
             Args:
                 run(SinlgeRun): Single run to be added
@@ -125,18 +125,17 @@ class AllRuns():
 
         if run in self.runs:
             return False
-    
+
         self.runs.append(run)
         self.structures.extend(run.structure)
 
         self.df = self.df.append(run.as_dict(), ignore_index=True)
         self.df = self.df.astype({blockNames.Colnames.feeling: 'float32'})
 
-        self.df_structures = pd.concat([
-                                        self.df_structures, 
-                                        run.get_structure_as_df(),
-                                        ],
-                                        axis=0, ignore_index=True)
+        self.df_structures = pd.concat(
+                            [self.df_structures, run.get_structure_as_df()],
+                            axis=0, ignore_index=True
+        )
 
         return True
 
@@ -167,7 +166,8 @@ class AllRuns():
 
         return parsed_single_runs
 
-    def compute_umap_projection(self, cols=['climb', 'distance', 'time', 'avg_pace']):
+    def compute_umap_projection(
+                self, cols=['climb', 'distance', 'time', 'avg_pace']):
         """Compute UMAP projection
 
             Compute umap projection.
@@ -182,8 +182,8 @@ class AllRuns():
         df_scaled = scaler.fit_transform(self.df[cols])
         embedding = reducer.fit_transform(df_scaled)
 
-        self.df['umap_X1'] = embedding[:,0]
-        self.df['umap_X2'] = embedding[:,1]
+        self.df['umap_X1'] = embedding[:, 0]
+        self.df['umap_X2'] = embedding[:, 1]
 
     def compute_df_aggregations(self):
         """Aggregate df
@@ -212,31 +212,30 @@ class AllRuns():
             raise Exception(error)
 
         # Cols to be summed in agg
-        sum_cols = ['distance', 'time', 'climb'] 
+        sum_cols = ['distance', 'time', 'climb']
         dcols = ['dist%s'%v for v in types.BASIC_RUN_TYPES_DICTIONARY.values()]
         sum_cols.extend(dcols)
         tcols = ['time%s'%v for v in types.BASIC_RUN_TYPES_DICTIONARY.values()]
         sum_cols.extend(tcols)
 
         # Cols to be averaged in agg
-        avg_cols = ['feeling'] 
+        avg_cols = ['feeling']
 
         dict_sum = {i: 'sum' for i in sum_cols}
         dict_avg = {i: 'mean' for i in avg_cols}
-        dict_count = {'date':'size'}
+        dict_count = {'date': 'size'}
         desc_dict = {**dict_sum, **dict_avg, **dict_count}
 
         df_agg = self.df.groupby(['activity', 'trail'])\
                         .resample(agg_option, on='date')\
                         .agg(desc_dict)\
-                        .rename(columns={'date':'N'})
+                        .rename(columns={'date': 'N'})
 
         df_agg.reset_index(level=0, inplace=True)
 
         df_agg.sort_values(by=['date', 'activity', 'trail'], inplace=True)
 
         return df_agg
-
 
     def save_as_csv(self, config):
         """Saves all runs as csv

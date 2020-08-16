@@ -45,7 +45,7 @@ class TestSingleRunFillers(unittest.TestCase):
         singleRun = single.SingleRun()
         config_dict = {
             blockNames.FileParams.activity:
-            blockNames.Activities.mountainereeing
+            blockNames.Activities.mountaineering
         }
         singleRun.fill_activity(config_dict)
         self.assertEqual(singleRun.activity, types.ACTIVITIES.MOUNTAINEERING)

@@ -7,7 +7,7 @@ import umap
 from sklearn.preprocessing import MinMaxScaler
 
 from runninglog.io import reader, writer
-from runninglog.run import single, types
+from runninglog.run import single, types, aggregator
 from runninglog.constants import blockNames
 from runninglog.utilities import utilities
 
@@ -195,47 +195,7 @@ class AllRuns():
         self.df_agg_y = self.agg_df('year')
 
     def agg_df(self, time_option):
-        """Aggregate df
-
-            Aggregate df
-        """
-        if time_option == 'week':
-            agg_option = 'W'
-        elif time_option == 'month':
-            agg_option = 'MS'
-        elif time_option == 'year':
-            agg_option = 'YS'
-        elif time_option == 'all':
-            agg_option = '2Y'
-        else:
-            error = f"Unknown aggregation {time_option}"
-            raise Exception(error)
-
-        # Cols to be summed in agg
-        sum_cols = ['distance', 'time', 'climb']
-        dcols = ['dist%s'%v for v in types.BASIC_RUN_TYPES_DICTIONARY.values()]
-        sum_cols.extend(dcols)
-        tcols = ['time%s'%v for v in types.BASIC_RUN_TYPES_DICTIONARY.values()]
-        sum_cols.extend(tcols)
-
-        # Cols to be averaged in agg
-        avg_cols = ['feeling']
-
-        dict_sum = {i: 'sum' for i in sum_cols}
-        dict_avg = {i: 'mean' for i in avg_cols}
-        dict_count = {'date': 'size'}
-        desc_dict = {**dict_sum, **dict_avg, **dict_count}
-
-        df_agg = self.df.groupby(['activity', 'trail'])\
-                        .resample(agg_option, on='date')\
-                        .agg(desc_dict)\
-                        .rename(columns={'date': 'N'})
-
-        df_agg.reset_index(level=0, inplace=True)
-
-        df_agg.sort_values(by=['date', 'activity', 'trail'], inplace=True)
-
-        return df_agg
+        return aggregator.agg_df(self.df, time_option)
 
     def save_as_csv(self, config):
         """Saves all runs as csv
